@@ -329,7 +329,137 @@ It is a declarative programming paradigm in which function definitions are trees
 As an exploration path for this research project, we planned to revisit this blending of symbolic processe perspectives, viewed as mental processes and viewed as computer programs expressed in functional languages, leading to an original (re)implementation of the NXP Architecture.
 
 *** Evaluation, Compilation and Abstract Machines
+A solid trend in programming language design has been the use of operational semantics to define the semantics of a programming language. In this respect, Abstract machines have been effectively used as intermediate and low-level architectures suitable for supporting serious implementations of a wide variety of programming languages, including imperative, functional, and logic programming languages. Abstract machines are distinguished from operational
+semantics by having simple and direct algorithmic implementations that can employ efficient data structures. On the other hand, abstract machines are distinguished from lower-level, machine-code implementations because typically the former uses pattern matching for manipulating data while the latter explicitly addresses the notions of structure sharing, storage allocation, and register allocation[fn:16]. 
+
+#+CINDEX: abstract machine
+#+CINCEX: Emacs-Lisp (implementation language)
+In the above characterization of abstract machines their use as an intermediate language for compilation is an essential feature. As a result the implementation of a programming language consists of two stages. The implementation of the compiler and the implementation of the abstract machine[fn:17]. These two consecutive stages are the path we followed to build this project of NXP Architecture with a functional perspective. Both the abstract machine implementation and the original compiler implementation are in Emacs-Lisp.
+
+#+CINDEX: funx
+In writing the compiler, care was exercised in order to only peruse the subset of Emacs-Lisp that maps directly into the primitives of the functional language, a simple variant of LISP called ~funx~. By doing so, the compiler may compile itself to the ~funx~ abstract machine, so that further developments no longer require the original compiler source.
+
+Additionally, the abstract machine can be ported to other programming languages with minimal effort--C, Python or Javascript being interesting targets for such ports.
+
+Along the development of computer science abstract machines were designed and developed for imperative programming languages (Algol Object Code, UCSD P-Machine) later evolving towards abstract machines for object-oriented programming languages (Smalltalk-80, Self, Java VM). Abstract machines also abound in string processing languages[fn:18].
+
+#+CINDEX: SECD
+#+CINDEX: FAM
+#+CINDEX: evaluation (strict, eager)
+#+CINDEX: call-by-value
+#+CINDEX: call-by-need
+Abstract machines were also created for functional programming languages. The first abstract machines for functional languages, such as the SECD, @@texinfo:@xref{Landin1964,,28},@@ and FAM, defined strict evaluation, also known as eager or call-by-value evaluation, in which function arguments are evaluated before the call, and exactly once. More recently, most work has focused on lazy (or call-by-need) evaluation, in which function arguments are evaluated only if needed, and at most once.
+
+Central concepts in abstract machines for functional languages include:
+#+CINDEX: stack
+- A stack :: represents the context of a nested computation. It may hold the intermediate results of pending computations, activation records of active function invocations, active exception handlers, etc.  The stack is sometimes used also for storing arguments to be passed to functions.
+#+CINDEX: environment
+- An environment :: maps program variables to their values.
+#+CINDEX: control list
+#+CINDEX: continuation
+- A control list :: a sequence of controls to be executed later, representing the rest of the calculation, also called a /continuation/. Each control is simply an operation that transforms the state of the abstract machine into a new state (in perfect Turing style).
+#+CINDEX: closure
+#+CINDEX: thunk
+- A closure :: is used to represent a function as a value.  It typically consists of a code address (for the function body) and an environment (binding the free variables of the function body)--more on closures later.
+#+CINDEX: heap
+#+CINDEX: dump
+- A heap (dump) :: stores the data of the computation. Abstract machines usually abstract away from the details of memory management, and thus include instructions for allocating data structures in the heap, but not for freeing them; the heap is assumed to be unlimited.
+#+CINDEX: garbage collector (GC)
+- A garbage collector :: supports the illusion that the heap is unlimited; it occasionally reclaims unreachable heap space and makes it available for allocation of new objects.
+
+#+CINDEX: SECD
+#+CINDEX: evaluation (strict, eager)
+#+CINDEX: call-by-value
+The SECD machine (1964) was designed by Landin for call-by-value evaluation of the pure lambda calculus, @@texinfo:@xref{Landin1964,,28}.@@ Although there are many evolved abstract machines later developed for increasingly richer and more expressive higher-function programming languages[fn:19], we chose to focus the initial design of the NXP Architecture Abstract Machine on this seminal model. The machine derives its name from the components of its state: an evaluation stack /S/, an environment /E/, a control /C/ holding the instructions to execute, and a dump /D/ holding a continuation (i.e., a description of what must be done next) and other data.
+
+#+CINDEX Lispkit
+#+CINDEX: evaluation (lazy)
+Lispkit Lisp is a lexically scoped, purely functional subset of Lisp ("Pure Lisp") developed as a testbed for functional programming concepts, @@texinfo:@xref{Bundy1984,,20}.@@ It was first used for early experimentation with /lazy evaluation/. An SECD machine-based implementation (written in an ALGOL variant) was published by the developer Peter Henderson in 1976, @@texinfo:@xref{Henderson1976,,21}.@@
+
+Henderson later published a reference book on functional programming languages and the SECD machine, @@texinfo:@xref{Henderson1980a,,22},@@ from which the design of this experimental NXP Architecture abstract machine heavily borrows. (Misunderstandings and bugs are, however, all mine!)
+
 *** Strict v. Lazy Evaluation
+#+CINDEX: evaluation (strict, eager)
+#+CINDEX: evaluation (lazy)
+#+CINDEX: call-by-value
+#+CINDEX: call-by-need
+Two fundamental questions to the functional programming language implementor are:
+  - How are function values, data values and unevaluated expressions represented?
+  - How is function application performed?
+
+#+CINDEX: sexp
+Large chapters of Henderson's book detail answers to these questions in the context of the SECD model. As appropriate for a functional programming language, every expression in ~funx~ is represented as a /symbolic expression/, or /sexp/.
+
+#+CINDEX: interpreter
+Note that an /intepreter/ for a functional language like ~funx~ can be defined as a function itself ~eval :: apply( <F-SEXP>, <ARGS> )~ which basically expects a well-formed sexp, with a function value, and a list of its arguments. During interpretation, each well-formed sub-expression is identified and evaluated (often more than once). So the interpreter turns out to be a case analysis of the well-formed sub-expressions of a program.
+
+#+CINDEX: environment
+#+CINDEX: binding
+Applying a function to its arguments is the /core binding operation/ in ~funx~ and other functional programming languages. Every expression in ~funx~ is evaluated with respect to an environment. An environment is just that, this association between arguments and values (which are simply sexps). In the situation where the functinal expression refers to variables introduced, not as arguments to the application, but locally--one also talks about variables defined outside the scope of the function--the environment needs to be augmented with the bindings for these variables prior to evaluation. This is the role of the ~let~ primitive in ~funx~ which introduces blocks with additional bindings.
+
+#+NAME: foo
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(let
+    ((foo (lambda (x) (add y (mul (quote 2) x))))
+     (y (quote 4))
+     )
+  (foo (quote 3))
+  )
+#+END_SRC
+
+In the example above, this block mechanism is used to introduce and name a new function in ~funx~. The name ~foo~ is bound to a function value (a functional sexp). The function value is called a /closure/, a composite sexp which contains both the sexp for the function--here the lambda expression--and the environment defining the values of the variables (in this instance, ~y~) and arguments (~x~) to the function. Finally the application sexp ~(foo (quote 3))~ is evaluated in an environment listing the binding of ~foo~ to this closure and the binding of ~x~ to the constant ~3~. The evaluation produces the expected value ~10~.
+
+#+FINDEX: let
+#+CINDEX: block
+Note that in ~funx~ there is a single ~let~ primitive which plays the roles of both ~let~ and ~letrec~ in Lispkit. The block introduced by ~let~ may contain mutually recursive definitions.
+
+In Cardelli's FAM, closure are represented as the text of the function and the value of its free variables. The text of a function is in itself a rather complex structure; it contains a sequence of instructions in some suitable machine language, and a set of literals which may be strings or other text cells. From a different perspective, in Henderson's SECD-based Lispkit, a function value is a suspended computation (promise to perform the computation when the value is applied to some arguments). The most compact way to represent a closure is as a block of static code (shared by all dynamic instances of the value), together with the values of its free variables.
+
+In terms of implementation, the representation of closure could be:
+  * A block of heap-allocated storage with one pointer to code followed by pointers to variables. The environment pointer points to the closure and variables are accessed by calls relative to this pointer. (Directly or by chains of pointers, with an impact on GC.)  
+  * The Three Instruction Machine (TIM) takes another interesting position[fn:20]. Instead of representing a closure by a single pointer, it represents a closure by a pair of a code pointer and a pointer to a heap-allocated frame. The frame, which is a vector of code-pointer/frame-pointer pairs, gives the values of the free variables of the closure, and may be shared between many closures. 
+
+#+CINDEX: environment (representation)
+#+CINDEX: closure (representation)
+In this implementation in Emacs-Lisp, environments are simply represented as association lists @@texinfo:@xref{Association Lists,,,elisp, Emacs-Lisp Info}.@@ Closure are lists constituted of the list of arguments to the function, the control list (i.e. compiled code, since we are targeting a compiler) for the functional sexp, and the environment.
+
+#+CINDEX: evaluation (strict, eager)
+#+CINDEX: evaluation (lazy)
+#+CINDEX: call-by-value
+#+CINDEX: call-by-need
+This closure infrastructure in the SECD machine is also critical in implementing /eager/ evaluation or /lazy/ evaluation we alluded to above. In eager, or strict, evaluation, sexps are evaluated immediately as they are mentinoned (call-by-value). In a non-strict language evaluation, values are passed to functions or stored in data structures in unevaluated form, and only evaluated when their value is actually required (call-by-need). There is a long and rich literature on strict v. non strict functional languages, eager v. lazy (sometimes even /lenient/) interpreters and compilers: @@texinfo:@xref{Steele1976,,16},@@ @@texinfo:@xref{Moses1970,,17},@@ @@texinfo:@xref{Traub1991,,24},@@ @@texinfo:@xref{FriedmanWise1976,,25}.@@
+
+#+CINDEX: thunk
+#+CINDEX: promise
+#+CINDEX: delay
+#+CINDEX: force
+Like function values, these unevaluated forms capture a /delayed/ computation, and can be represented by a closure in the same way as a function value. Following a broadly used terminology, we call this particular sort of closure a /thunk/, or a /promise/, a term which goes back to the early Algol implementations of call-by-name. When the value of the promise is required, the promise is /forced/, through naive reduction, cell model (flag) or self-updating model implementation, so that if the value is later required the value of this original evaluation is returned instead of being reevaluated. 
+
+#+CINDEX: eval-apply model
+So using the same closure concept as above, sexp evaluations can be delayed (lazy) or forced without changing the sexp itself. In eager evaluation, sexps are never delayed (or always forced). Compilers from the Lisp tradition usually compile function application as follows: evaluate the function, evaluate the argument, and apply the function value to the argument. When a known function is being applied (as is often the case, especially in Lisp), the "evaluate the
+function" part becomes trivial. This model for function application, which we called earlier the /eval-apply model/, is invariably used by compilers for strict languages (eg Lisp, Hope, SML and the SECD machine in Landin's and in Henderson's papers). It is also used in some implementations of non-strict languages, except that of course only the function is evaluated before the application (eg the ABC machine[fn:21], and the <n,G>-machine[fn:22]).
+
+#+CINDEX: push-enter model
+In contrast, compilers based on lazy graph reduction treat function application as follows: push the argument on an evaluation stack, and tail-call (or enter) the function. There is no "return" when the evaluation of the function is complete. We call this the /push-enter/ model.
+
+#+CINDEX: evaluation (lazy)
+#+CINDEX: Henderson's Transformations
+Henderson gives a precise definition of lazy evaluation, based on the ~delay~ and ~force~ operations, in a purely functional program (usually without any delays or forces). The rules are written as a series of program transformations:
+  - delay all arguments to (user-defined) functions
+  - delay all arguments to ~cons~
+  - delay all definitions in ~let~ blocks
+  - repeatedly force all arguments to primitive functions other than ~cons~
+  - repeatedly force the test sexp in conditional expressions
+  - repeatedly force the function in a function application.
+
+@@texinfo:@xref{Henderson1980a,,22}.@@
+
+#+CINDEX: evaluation (lazy)
+#+CINDEX: parallelism
+The power of lazy evaluation also allows the processing of potentially infinite structures and the proper interpretation of mutually recursive equations defined in ~let~ blocks. It also apply to the proper execution of a functional program viewed as a network of communicating processes, @@texinfo:@xref{Keller1979,,26}.@@ This turns functional languages into particularly natural forms of expressions for certain types of parallelism (and in particular, /data driven/, which is particularly useful in [[Production Systems and Rule-based Systems.][rule systems]])
+
+The next section of this manual will detail a SECD abstract machine, derived from Lispkit, with a strict compiler for the ~funx~ functional programming language. Henderson's transformations we be used however to design the ~funxp~ NXP-related extensions to the language as they require lazy compilation.
+
 *** I/O and GUI
 
 
@@ -350,8 +480,13 @@ Eager v. lazy.
 This section describes a simple functional programming language, ~funx~, evidently based on LISP with a minimal set of built-in functions.
 
 From Peyton Jones:
-  - How are function values, data values and unevaluated expressions represented (Section 3.1)?
-  - How is function application performed (Section 3.2)?
+
+In Cardelli's FAM: A closure is a data object representing a function;
+it contains the text of the function and the value of its free
+variables. The text of a function is in itself a rather complex
+structure; it contains a sequence of instructions in some suitable
+machine language, and a set of literals which may be strings or other
+text cells.
 
 Closures, thunks, promises. The heap contains two kinds of ob jects:
 head normal forms (or values), and as-yet unevaluated suspensions (or
@@ -411,10 +546,8 @@ model.
 It it has a formal operational semantics, expressed as a state
 transition system, as well as the usual denotational semantics
 
-
-** Rehash of Henderson's book and other references of the 60s and 70s. Sexps.
-
-** Simple subset of LISP. SECD Machine. Compiling funx to SECD assembly.
+** FUNX a functional language, pure and simplistic
+** FUNX SECD Abstract Machine
 
 * Extending for NXP-style inferencing, funxp
 #+CINDEX: funxp
@@ -552,6 +685,38 @@ From funx.bib
   :END:
 
 * Footnotes
+
+[fn:22] Parallel graph reduction with the (v , G)-machine. /Lennart Augustsson and Thomas Johnsson./ In Proceedings of the fourth international conference on Functional programming languages and computer architecture (FPCA 1989) DOI:https://doi.org/10.1145/99370.99386 
+
+[fn:21] The abc-machine: A sequential stack-based abstract machine for graph rewriting, /Koopman, P. W. M., M. C. J. D. van Eekelen, E. G. J. M. H. Nocker, M. J. Plasmaijer and J. E. W. Smetsers/, Technical Report 90-22, Univ. Nijmegen, (1990).
+
+[fn:20]  TIM: A simple, lazy abstract machine to execute supercombinatorics. /Fairbairn, J. and S. Wray./, FPCA (1987). 
+
+[fn:19] The history of abstract machines for functional programming
+languages is a fascinating subject of research. Cardelli’s Functional
+Abstract Machine (1983) is a much extended and optimized SECD machine
+used in the first native-code implementation of ML. The Categorical
+Abstract Machine (1985) was developed by Cousineau et al.: its
+instructions correspond to the constructions of a Cartesian closed
+category, identity, composition, abstraction, application, pairing,
+and selection. It was the base for the CAML implementation of ML. The
+Zinc Abstract Machine (1990) developed by Leroy permits more efficient
+execution. It is an optimized, strict version of the Krivine
+machine. This machine is the basis of the bytecode versions of Leroy’s
+Caml Light and Objective Caml implementations, and is used also in
+Moscow ML.
+
+[fn:18] A string processing language is a programming language that
+focuses on string processing rather than processing numeric
+data. String processing languages have been around for decades in the
+form of command shells, programming tools, macro processors, and
+scripting languages. This latter category has become prominent as
+scripting language are used to ‘glue’ components together. There are 
+myriads of scripting languages today.
+
+[fn:17] Abstract machines for programming language implementation, /Stephan Diehl, Pieter Hartel, Peter Sestoft/, Future Generation Computer Systems 16 739–751, (2000).
+
+[fn:16] From Operational Semantics to Abstract Machines, /John Hannan, Dale Miller/, (1992). 
 
 [fn:15] Troubles with functionalism. /Ned Block/, Minnesota Studies in the Philosophy of Science, 9:261-325, (1978).
 

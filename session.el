@@ -151,24 +151,10 @@ t
 alist
 ((G2 S4 S5) (G1 S4) (H1 S3 S1 S2))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(secd-cycle
+ nil
+ '((a . 2) (b . 10)
+   )
+ '(DUM LDC 4 LDF ((x) LD x LD 2 MUL LD y ADD RTN) LDF ((foo y) LDC 3 LD foo AP RTN) RAP STOP)
+ nil
+ )
