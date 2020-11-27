@@ -1,0 +1,36 @@
+#+TITLE: README revisions file
+#+SUBTITLE: NXP Runtime
+#+AUTHOR: jmc
+
+* DONE Henderson's delay/force from Lispkit <2020-11-26 jeu.>
+Implemented in ~secd-lazy-group.el~ which defines controls:
+  - LDE Immediate load of a promise
+  - LDP Loads a named promise from environment
+  - AP0 Switch to execution of promise on stack
+  - UPD Terminates promise and store value, if required
+
+Implemented special "optimized" logical operators for NXP. They operate
+on Boolean promises (returning ~*T*~ or ~*F*~).
+  - ANY n Returns ~*T*~ if one of the n b-promises on stack executes to ~*T*~
+  - ALL n Returns ~*T*~ if all of the n b-promises on stack executes to ~*T*~
+  - NOT   Inverts the top of stack b-promise
+
+ANY and ALL are first preprocessed, looking for already executed
+b-promises with values ~*T*~ or ~*F*~ respectively to conclude early
+without further evaluation. If this is not the case b-promises are
+executed in stack order until the first that returns ~*T*~ or ~*F*~
+respectively. When none meet the test, the negative result is
+returned. This is a kind of lenient evaluation in the NXP context.
+
+* DONE Core functional runtime <2020-11-11 mer.>
+Implemented the core SECD machine from Henderson's book. Controls are
+grouped into:
+  - LD family (LDC, LD, LDF)
+  - OPS family (CAR, CDR, ATOM, CONS, SEL/JOIN, EQ LEQ)
+  - FUN family (AP/RTN, DUM/RAP)
+  - Arithmetic family (ADD, SUB, MUL, DIV, REM)
+  - I/O family (ASK)
+
+The SECD machine (runtime) is in ~secd-exec.el~. Operates on
+underlying emacs-lisp atoms but operations on integer-typed atoms only
+are from the arithmetic group.
