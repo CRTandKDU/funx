@@ -126,12 +126,46 @@ it is updated in-place.
 ;;; Special lazy AND to bind conditions to a rule
 ;;; Special lazy NOT
 ;;; See also: Ken Traub
+;;; To be revisited:
+;;; As implemented ANY, ALL and NOT are deterministic (synchronized) calls.
+;;; If a promise cannot be evaluated for lack of data in a condition (ASK)
+;;; it is simply skipped and a random boolean is returned. This is due to
+;;; the calls to `secd-cycle' inside loops in these functions.
+;;; Proper implementation would require a scheduler à la Traub or maybe
+;;; Henderson's like handling of non-determinism (SOR/NONE see book).
+
+;; (defun secd-any (s e c d)
+;;   "ANY <n> Eager logical OR.
+;; (<n> . s) e (ANY <n> . c ) d --> (ORed-n . s) e c d
+
+;; Prerequisite: <n> boolean promises, executed or not, on the
+;; stack. Forces evaluation only if no *T* value among them.
+;; "
+;;   (let ((prefetch nil)
+;; 	(promises nil)
+;; 	(n (car (cdr c)))
+;; 	)
+;;     (if
+;; 	(dotimes (i n prefetch)
+;; 	  (setq promises (cons (nth i s) promises))
+;; 	  (if (eq (nth i s) secd--ops-true) (setq prefetch t))
+;; 	  ;; (insert (format "ANY PRE %d %s\t%s\t%s\n" i (nth i s) prefetch promises))
+;; 	  )
+;; 	;; An operand is *T*, evals to *T*
+;; 	(list (cons secd--ops-true (nthcdr n s)) e (cdr (cdr c)) d)
+;;       ;; No operand is *T*, some may be *F*.
+;;       (secd--any-force promises (nthcdr n s) e (cdr (cdr c)) d)
+;;       )
+;;     )
+;;   )
+
+;; This restricted version of ANY only performs the prechecks 
 (defun secd-any (s e c d)
   "ANY <n> Eager logical OR.
 (<n> . s) e (ANY <n> . c ) d --> (ORed-n . s) e c d
 
 Prerequisite: <n> boolean promises, executed or not, on the
-stack. Forces evaluation only if no *T* value among them.
+stack. Return *T* only if one *T*-executed value among them.
 "
   (let ((prefetch nil)
 	(promises nil)
@@ -141,12 +175,11 @@ stack. Forces evaluation only if no *T* value among them.
 	(dotimes (i n prefetch)
 	  (setq promises (cons (nth i s) promises))
 	  (if (eq (nth i s) secd--ops-true) (setq prefetch t))
-	  (insert (format "ANY PRE %d %s\t%s\t%s\n" i (nth i s) prefetch promises))
+	  ;; (insert (format "ANY PRE %d %s\t%s\t%s\n" i (nth i s) prefetch promises))
 	  )
 	;; An operand is *T*, evals to *T*
 	(list (cons secd--ops-true (nthcdr n s)) e (cdr (cdr c)) d)
-      ;; No operand is *T*, some may be *F*.
-      (secd--any-force promises (nthcdr n s) e (cdr (cdr c)) d)
+      (list (cons secd--ops-false (nthcdr n s)) e (cdr (cdr c)) d)
       )
     )
   )
@@ -180,6 +213,31 @@ Returns as soon as a promise evaluates to `*T*'
     )
   )
 
+;; (defun secd-all (s e c d)
+;;   "ALL <n> Eager logical AND.
+;; (<n> . s) e (ALL <n> . c ) d --> (ANDed-n . s) e c d
+
+;; Prerequisite: <n> boolean promises, executed or not, on the
+;; stack. Forces evaluation only if no *F* value among them.
+;; "
+;;   (let ((prefetch nil)
+;; 	(promises nil)
+;; 	(n (car (cdr c)))
+;; 	)
+;;     (if
+;; 	(dotimes (i n prefetch)
+;; 	  (setq promises (cons (nth i s) promises))
+;; 	  (if (eq (nth i s) secd--ops-false) (setq prefetch t))
+;; 	  ;; (insert (format "ALL PRE %d %s\t%s\t%s\n" i (nth i s) prefetch promises))
+;; 	  )
+;; 	;; An operand is *T*, evals to *T*
+;; 	(list (cons secd--ops-false (nthcdr n s)) e (cdr (cdr c)) d)
+;;       ;; No operand is *T*, some may be *F*.
+;;       (secd--all-force promises (nthcdr n s) e (cdr (cdr c)) d)
+;;       )
+;;     )
+;;   )
+
 (defun secd-all (s e c d)
   "ALL <n> Eager logical AND.
 (<n> . s) e (ALL <n> . c ) d --> (ANDed-n . s) e c d
@@ -197,14 +255,12 @@ stack. Forces evaluation only if no *F* value among them.
 	  (if (eq (nth i s) secd--ops-false) (setq prefetch t))
 	  (insert (format "ALL PRE %d %s\t%s\t%s\n" i (nth i s) prefetch promises))
 	  )
-	;; An operand is *T*, evals to *T*
-	(list (cons secd--ops-false (nthcdr n s)) e (cdr (cdr c)) d)
-      ;; No operand is *T*, some may be *F*.
-      (secd--all-force promises (nthcdr n s) e (cdr (cdr c)) d)
+	(list (cons secd--ops-true (nthcdr n s)) e (cdr (cdr c)) d)
+      (list (cons secd--ops-false (nthcdr n s)) e (cdr (cdr c)) d)
       )
     )
   )
-
+	
 ;; ANY-force works like an application on forced arguments.
 (defun secd--all-force (promises s e c d)
   "Eager AND evaluation of promises in stacked order.
@@ -221,6 +277,7 @@ Returns as soon as a promise evaluates to `*F*'
 	   (state (if (atom p) nil
 		    ;; (secd-cycle (list p) nil '(AP0 STOP) nil)))
 		    (secd-cycle (list p) e '(AP0 STOP) nil)))
+
 	   )
 	(if (eq secd--ops-false (car (car state))) (setq val nil))
 	;; (insert (format "P = %s\t%s\n%s\n" val p state))
@@ -234,25 +291,39 @@ Returns as soon as a promise evaluates to `*F*'
     )
   )
 
-(defun secd-not (s e c d)
-  "NOT Eager logical NOT.
-( <secd--ops-{true|false}> . s) e (NOT . c ) d --> ( <secd--ops-{false|true}> . s) e c d
+;; (defun secd-not (s e c d)
+;;   "NOT Eager logical NOT.
+;; ( <secd--ops-{true|false}> . s) e (NOT . c ) d --> ( <secd--ops-{false|true}> . s) e c d
 
-Prerequisite: a boolean promise, executed or not, on the stack. Forces evaluation.
-"
-  (let ((state (secd-cycle (list (car s)) e '(AP0 STOP) nil))
-	)
-    (list
+;; Prerequisite: a boolean promise, executed or not, on the stack. Forces evaluation.
+;; "
+;;   (let ((state (secd-cycle (list (car s)) e '(AP0 STOP) nil))
+;; 	)
+;;     (list
+;;      (cons
+;;       (if (eq secd--ops-false (car (car state)))
+;; 	  secd--ops-true
+;; 	secd--ops-false)
+;;       (cdr s))
+;;      e
+;;      (cdr c)
+;;      d
+;;      )
+;;     )
+;;   )
+
+(defun secd-not (s e c d)
+  "Simply negates top of stack."
+  (list
      (cons
-      (if (eq secd--ops-false (car (car state)))
-	  secd--ops-true
-	secd--ops-false)
-      (cdr s))
+      (if (eq secd--ops-false (car s)) secd--ops-true secd--ops-false)
+      (cdr s)
+      )
      e
      (cdr c)
      d
      )
-    )
   )
+
 
 (provide 'secd-lazy-group)

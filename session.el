@@ -461,3 +461,81 @@ STOP
        )
       )
 
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 (C11 . (ASK C11 UPD))
+	 (C12 . (LDC 15 LDC 15 EQ UPD))
+	 (R1  . (LDP C11 LDP C12 ALL 2 UPD))
+	 (H   . (LDP R1 ANY 1 UPD))
+	 )
+       '(
+	 LDC 1
+	 ASK foo
+	 LDC 3    
+	 STOP
+	 )
+       nil
+       )
+      )
+
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 (C11 . (ASK C11 UPD))
+	 (C12 . (LDC 15 LDC 15 EQ UPD))
+	 (R1  . (LDP C11 LDP C12 ALL 2 UPD))
+	 (H   . (LDP R1 ANY 1 UPD))
+	 )
+       '(
+	 LDP H
+	 AP0    
+	 STOP
+	 )
+       nil
+       )
+      )
+
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 (C21 . (ASK C21 UPD))
+	 (C22 . *F*)
+	 (R2  . (LDP C21 LDP C22 ALL 2
+		     SEL
+		     (LDC *F* JOIN)
+		     (LDP C21 AP0
+			  SEL (LDC *T* JOIN)
+			  (LDP C22 AP0 JOIN)
+			  JOIN)
+		     UPD))
+	 (C11 . (ASK C11 UPD))
+	 (C12 . (LDC 15 ASK foo EQ UPD))
+	 ;; (R1  . (LDP C11 LDP C12 ALL 2 UPD))
+	 (R3  . *F*)
+	 (R1  . (LDP C11
+		     AP0
+		     SEL
+		     (LDP C12 AP0 JOIN)
+		     (LDC *F* JOIN) UPD)
+	      )
+	 (H   . (LDP R1 LDP R3 LDP R2 ANY 3
+		 SEL
+		 (LDC *T* JOIN)    
+		 (LDP R1 AP0 SEL (LDC *T* JOIN) (LDP R2 AP0 JOIN) JOIN)
+		 UPD)
+	      )
+	 )
+       '(
+	 LDP H
+	 AP0    
+	 STOP
+	 )
+       nil
+       )
+      )
+(setq b5
+      (secd-answer b5 '*F* t))

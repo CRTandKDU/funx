@@ -69,6 +69,7 @@
     ;; Trace
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD*"))
+      (erase-buffer)
       (insert (format "-- NEW THREAD:\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c d (car c)))
       )
     ;; Steps through the instructions in control list `control'
@@ -91,7 +92,8 @@
 	 ((eq 'STOP (car c)) (throw 'STOP (list s e c d)))
 	 ;; Execute controls from mnemonics alist
 	 ((assoc (car c) secd--mnemonics)
-	  (funcall transition (cdr (assoc (car c) secd--mnemonics))))
+	    (funcall transition (cdr (assoc (car c) secd--mnemonics)))
+	    )
 	 ;; Early control list termination
 	 (t (setq c (cdr c)))
 	 )
