@@ -5,6 +5,7 @@
 (require 'secd-arith-group)
 ;;; Extensions
 (require 'secd-lazy-group)
+(require 'secd-cps-group)
 
 (defconst secd--mnemonics
   '(;; Load Group
@@ -38,8 +39,10 @@
     (LDP	. secd-ldp)
     (AP0	. secd-ap0)
     (UPD	. secd-upd)
-    (ANY	. secd-any)
-    (ALL	. secd-all)
+    ;;; Extension: CPS operators
+    (ANY	. secd-any-cps)
+    (ALL	. secd-all-cps)
+    (CPS	. secd-cps)
     (NOT	. secd-not)
     ))
 

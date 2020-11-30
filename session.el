@@ -539,3 +539,32 @@ STOP
       )
 (setq b5
       (secd-answer b5 '*F* t))
+
+
+;; New CPS implementation (in branch)
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 (C11 . (ASK C11 UPD))
+	 (C12 . (ASK C12 UPD))
+	 (R1  . (LDP C12 LDP C11 ALL 2 UPD))
+	 (R2  . (LDC 5 LDC 6 EQ UPD))
+	 (R3  . *F*)
+	 (H   . (LDP R1 LDP R3 LDP R2 ANY 3 UPD))
+	 )
+       '(
+	 LDP H
+	 AP0    
+	 STOP
+	 )
+       nil
+       )
+      )
+
+(setq b5
+      (secd-answer b5 '*F* t))
+
+
+
+

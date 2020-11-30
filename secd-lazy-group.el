@@ -312,18 +312,5 @@ Returns as soon as a promise evaluates to `*F*'
 ;;     )
 ;;   )
 
-(defun secd-not (s e c d)
-  "Simply negates top of stack."
-  (list
-     (cons
-      (if (eq secd--ops-false (car s)) secd--ops-true secd--ops-false)
-      (cdr s)
-      )
-     e
-     (cdr c)
-     d
-     )
-  )
-
 
 (provide 'secd-lazy-group)
