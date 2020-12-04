@@ -38,7 +38,8 @@ according to whether `a' is an atom or not.
 (a b . s) e (EQ . c) d --> (secd--ops-bool . s) e c d
 according to equality of `a' and `b'.
 "
-  (if (eq (car s) (car (cdr s)))
+  ;; (if (eq (car s) (car (cdr s)))
+  (if (equal (car s) (car (cdr s)))
       (list (cons secd--ops-true (cdr (cdr s))) e (cdr c) d)
     (list (cons secd--ops-false (cdr (cdr s))) e (cdr c) d)
     )

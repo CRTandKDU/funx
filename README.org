@@ -2,6 +2,20 @@
 #+SUBTITLE: NXP Runtime
 #+AUTHOR: jmc
 
+* DONE NXP Goal/Subgoal hierachy <2020-11-30 lun.>
+Implemented the specific control used in NXP goal/subgoal hierachies
+under specific mnemonics ANY, ALL which operates like sequences of
+applications on boolean promises (see LDP/UPD LDE/UPD).
+
+Continuation Passing Style is used for this implementation by
+modifying the top of the control-list and the stack, according to the
+NXP goal/subgoal specific handling (pre-fetching and OR/AND hierarchy).
+  - CPS family (ANY, ALL, NOT, /CPS/)
+
+The CPS implementation supersedes a restricted interpretation of ANY,
+ALL operators to their prefetching phase (still available in the
+LAZY family of operators).
+  
 * DONE Henderson's delay/force from Lispkit <2020-11-26 jeu.>
 Implemented in ~secd-lazy-group.el~ which defines controls:
   - LDE Immediate load of a promise
@@ -34,12 +48,4 @@ grouped into:
 The SECD machine (runtime) is in ~secd-exec.el~. Operates on
 underlying emacs-lisp atoms but operations on integer-typed atoms only
 are from the arithmetic group.
-* DONE NXP Goal/Subgoal hierachy <2020-11-30 lun.>
-Implemented the specific control used in NXP goal/subgoal hierachies
-under specific mnemonics ANY, ALL which operates like sequences of
-applications on boolean promises (see LDP/UPD LDE/UPD).
 
-Continuation Passing Style is used for this implementation by
-modifying the top of the control-list and the stack, according to the
-NXP goal/subgoal specific handling (pre-fetching and OR/AND hierarchy).
-  - CPS family (ANY, ALL, NOT, /CPS/)

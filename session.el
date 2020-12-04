@@ -546,7 +546,8 @@ STOP
       (secd-cycle
        nil
        '((a . 12) (b . 5)
-	 (C11 . (ASK C11 UPD))
+	 (CRT_and_KDU . (ASK CRT_and_KDU LDC "agree" EQ UPD))
+	 (C11 . (LDP CRT_and_KDU AP0 UPD))
 	 (C12 . (ASK C12 UPD))
 	 (R1  . (LDP C12 LDP C11 ALL 2 UPD))
 	 (R2  . (LDC 5 LDC 6 EQ UPD))
@@ -561,10 +562,154 @@ STOP
        nil
        )
       )
+What is the value of CRT_and_KDU?
 
 (setq b5
-      (secd-answer b5 '*F* t))
+      (secd-answer b5 "agree" t))
+What is the value of C12?
+
+(defun comp (e n c)
+  (if (atom e)
+      (cons 'LDC (cons e c))
+    (if (eq (car e) 'car)
+	(comp (car (cdr e)) n (cons 'CAR c))
+      (if (eq (car e) 'cdr)
+	  (comp (car (cdr e)) n (cons 'CDR c))
+	(if (eq (car e) 'cons)
+	    (comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'CONS c)))
+	  c
+	  )
+	)
+      )
+    )
+  )
+
+(let ((clist
+       (comp '(cons (car (cons 1 2)) (cdr (cons 3 4)))
+	     nil '(STOP)))
+      )
+  (secd-cycle nil nil clist nil)
+  )
+
+(comp '(cons (car (cons (quote 1) B)) (cdr (cons C D)))
+ nil
+ '(STOP)
+ )
+
+(setq clist
+      (comp '(if A (add '1 '2) (mul '1 '3))
+	    nil
+	    '(STOP)
+	    )
+      )
+(secd-cycle 'nil '((A . *F*)) clist nil)
+
+(setq clist
+      (comp '(lambda (x y) (add x y))
+	    nil
+	    '(STOP)
+	    )
+      )
+(secd-cycle 'nil '((A . *F*)) clist nil)
+
+(setq clist
+      (comp '(let ((fac (lambda (n) (add n '1)))
+		   (fbc (lambda (n) (add n '1)))
+		   )
+	       (fac (quote 2))
+	       )
+	    nil '(STOP)
+	    ))
+--
+e: (let ((fac (lambda (n) (add n '1))) (fbc (lambda (n) (add n '1)))) (fac '2))
+n: nil
+c: (STOP)
+--
+e: (fac '2)
+n: nil
+c: (RTN)
+--
+e: fac
+n: nil
+c: (AP RTN)
+	--- comp--args
+	e: ('2)
+	n: nil
+	c: (LD fac AP RTN)
+--
+e: '2
+n: nil
+c: (LD fac AP RTN)
+	--- comp--args
+	e: nil
+	n: nil
+	c: (LDC 2 LD fac AP RTN)
+	--- comp--list
+	e: ((fac (lambda (n) (add n '1))) (fbc (lambda (n) (add n '1))))
+	n: nil
+	c: (LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
+--
+e: (lambda (n) (add n '1))
+n: nil
+c: (LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
+--
+e: (add n '1)
+n: nil
+c: (RTN)
+--
+e: n
+n: nil
+c: (ADD RTN)
+--
+e: '1
+n: nil
+c: (LD n ADD RTN)
+	--- comp--list
+	e: ((fbc (lambda (n) (add n '1))))
+	n: nil
+	c: (LDF ((n) LDC 1 LD n ADD RTN) LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
+--
+e: (lambda (n) (add n '1))
+n: nil
+c: (LDF ((n) LDC 1 LD n ADD RTN) LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
+--
+e: (add n '1)
+n: nil
+c: (RTN)
+--
+e: n
+n: nil
+c: (ADD RTN)
+--
+e: '1
+n: nil
+c: (LD n ADD RTN)
+	--- comp--list
+	e: nil
+	n: nil
+	c: (LDF ((n) LDC 1 LD n ADD RTN) LDF ((n) LDC 1 LD n ADD RTN) LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
+(secd-cycle 'nil '((A . *F*)) clist nil)
+
+(secd-comp--list '(fac (quote 2)) nil '(STOP))	--- comp--list
+	e: (fac '2)
+	n: nil
+	c: (STOP)
 
 
-
+(setq b8
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 )
+       '(
+	 DUM
+	 LDF ((n) LD n LDC 1 ADD RTN)
+	 LDF ((fac) . (LDC 2 LD fac AP RTN))
+	 RAP    
+	 STOP
+	 )
+       nil
+       )
+      )
+clist
 
