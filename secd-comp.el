@@ -1,49 +1,49 @@
 ;;; Compiler
 
-(defun comp (e n c)
+(defun secd-comp--comp (e n c)
   "Compiles expression e, with names n and continuation c."
   (insert (format "--\ne: %s\nn: %s\nc: %s\n" e n c))
   ;; 0 arg
   (if (atom e) (cons 'LD (cons e c))
     ;; 1 arg
     (if (eq (car e) 'car)
-	(comp (car (cdr e)) n (cons 'CAR c))
+	(secd-comp--comp (car (cdr e)) n (cons 'CAR c))
       (if (eq (car e) 'cdr)
-	  (comp (car (cdr e)) n (cons 'CDR c))
+	  (secd-comp--comp (car (cdr e)) n (cons 'CDR c))
 	(if (eq (car e) 'atom)
-	    (comp (car (cdr e)) n (cons 'ATOM c))
+	    (secd-comp--comp (car (cdr e)) n (cons 'ATOM c))
 	  (if (eq (car e) 'quote)
 	      (cons 'LDC (cons (car (cdr e)) c))
     ;; 2 args
 	    (if (eq (car e) 'cons)
-		(comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'CONS c)))
+		(secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'CONS c)))
 	      (if (eq (car e) 'eq)
-		  (comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'EQ c)))
+		  (secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'EQ c)))
 		(if (eq (car e) 'leq)
-		    (comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'LEQ c)))
+		    (secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'LEQ c)))
 		  (if (eq (car e) 'add)
-		      (comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'ADD c)))
+		      (secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'ADD c)))
 		    (if (eq (car e) 'sub)
-			(comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'SUB c)))
+			(secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'SUB c)))
 		      (if (eq (car e) 'mul)
-			  (comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'MUL c)))
+			  (secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'MUL c)))
 			(if (eq (car e) 'div)
-			    (comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'DIV c)))
+			    (secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'DIV c)))
 			  (if (eq (car e) 'rem)
-			      (comp (car (cdr (cdr e))) n (comp (car (cdr e)) n (cons 'REM c)))
+			      (secd-comp--comp (car (cdr (cdr e))) n (secd-comp--comp (car (cdr e)) n (cons 'REM c)))
 			    ;; 3 args
 			    (if (eq (car e) 'if)
 				((lambda (cont-t cont-f)
-				   (comp (car (cdr e)) n
+				   (secd-comp--comp (car (cdr e)) n
 					 (cons 'SEL (cons cont-t (cons cont-f c)))))
-				 (comp (car (cdr (cdr e))) n '(JOIN))
-				 (comp (car (cdr (cdr (cdr e)))) n '(JOIN)))
+				 (secd-comp--comp (car (cdr (cdr e))) n '(JOIN))
+				 (secd-comp--comp (car (cdr (cdr (cdr e)))) n '(JOIN)))
 			      ;; many args
 			      (if (eq (car e) 'lambda)
 				  (cons 'LDF
 					(cons
 					 (cons (car (cdr e))
-					       (comp (car (cdr (cdr e))) n '(RTN)))
+					       (secd-comp--comp (car (cdr (cdr e))) n '(RTN)))
 					 c)
 					)
 				(if (eq (car e) 'let)
@@ -51,12 +51,12 @@
 					  (secd-comp--list
 					   (car (cdr e))
 					   n
-					   (cons 'LDF (cons (cons (secd-comp--vars (car (cdr e))) (comp (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
+					   (cons 'LDF (cons (cons (secd-comp--vars (car (cdr e))) (secd-comp--comp (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
 				  ;; Rest has to be an application
 				  (secd-comp--args
 				   (cdr e)
 				   n
-				   (comp (car e) n (cons 'AP c)))
+				   (secd-comp--comp (car e) n (cons 'AP c)))
 				  ;; Done
 				  )
 				)
@@ -77,7 +77,7 @@
     (secd-comp--list
      (cdr elist)
      n
-     (comp (car (cdr (car elist))) n c)
+     (secd-comp--comp (car (cdr (car elist))) n c)
     )
     )
   )
@@ -90,8 +90,25 @@
     (secd-comp--args
      (cdr elist)
      n
-     (comp (car elist) n c)
+     (secd-comp--comp (car elist) n c)
     )
+    )
+  )
+
+;;; Commands
+(defun secd-compile (file)
+  "Compiles source code in `file.lsp' into control list file `file.fasl'" 
+  (let* ((source (with-temp-buffer
+		  (insert-file-contents file)
+		  (buffer-string)))
+	)
+    (with-temp-file (format "%s.fasl" (file-name-sans-extension file))
+      (insert (format "(setq bytecode (secd-comp--comp '%s nil '(STOP)))" source))
+      (let ((ignore (eval-buffer)))
+	(erase-buffer)
+	(insert (format "%s" bytecode))
+	)
+      )
     )
   )
 

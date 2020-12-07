@@ -65,17 +65,28 @@ if a is not a promise.
   (if (and (listp (car s)) (eq 'PROMISE (car (car s))))
       ;; Trace
       (let* (
+	     ;; Issue of DUM + <LDF>s or DUM + <LDE>s?
+	     (eprime-F-or-E (cdr (cdr (car s))))
+	     (eprime
+	      (if (listp (car (car eprime-F-or-E)))
+		  (car eprime-F-or-E)
+		eprime-F-or-E))
+	     (cprime (car (cdr (car s))))
 	     (ignore
 	      (save-current-buffer
 		(set-buffer (get-buffer-create "*SECD*"))
 		(insert (format "PROMISE at s:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c d (car c)))
+		(insert (format "eprime F/E : %s\t%s\t%s\n"  eprime-F-or-E (listp (car eprime-F-or-E )) (listp (car (car eprime-F-or-E)))))
+		(insert (format "eprime : %s\n"  eprime))
+		(insert (format "cprime : %s\n" cprime))
 		))
-	     (eprime (cdr (cdr (car s))))
-	     (cprime (car (cdr (car s))))
 	     )
-	(list nil eprime cprime
-	      (cons s (cons e (cons (cdr c) d)))
-	      )
+	(list
+	 nil
+	 eprime
+	 cprime
+	 (cons s (cons e (cons (cdr c) d)))
+	 )
 	)
     (list s e (cdr c) d)
     )

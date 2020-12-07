@@ -2,6 +2,11 @@
 #+SUBTITLE: NXP Runtime
 #+AUTHOR: jmc
 
+* DONE Strict compiler <2020-12-05 sam.>
+First implementation, following Henderson's book (p. 340), of a compiler for the simple variant of Lispkit, without the NXP extensions.
+
+The variant has QUOTE, ATOM, CAR, CDR, CONS, EQ, LEQ, ADD/SUB/MUL/DIV/REM, IF, LAMBDA, LET and Application. Values are quoted, any other atom is a variable.
+
 * DONE NXP Goal/Subgoal hierachy <2020-11-30 lun.>
 Implemented the specific control used in NXP goal/subgoal hierachies
 under specific mnemonics ANY, ALL which operates like sequences of

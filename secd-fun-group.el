@@ -49,6 +49,7 @@ stack, here `v', to the front of the environment alist.
   ;; Could check for singleton?
   (list
    (cons (car s) (car d))
+   ;; (cons s (car d))
    (car (cdr d))
    (car (cdr (cdr d)))
    (cdr (cdr (cdr d)))
@@ -63,43 +64,83 @@ stack, here `v', to the front of the environment alist.
   (list s (cons 'OMEGA e) (cdr c) d)
   )
 
+;; (defun secd-rap (s e c d)
+;;   "RAP Similar to AP but uses `rplaca' to replace the `nil' (omega) set by DUM.
+;; ((n . (c' . e')) v . s) (OMEGA . e) (RAP . c) d --> NIL rplaca(e', v) c' (s e c . d)
+;; "
+;;   ;; (insert (format "Enter  RAP: caar s, cdr s \n\t%s\n\t%s\n" (car (car s)) (cdr s)))
+;;   (let* (;; Preserves entry environment as the argument `e' is edited in place
+;; 	 (new-e (cdr (copy-tree e)))
+;; 	 (e-s (secd--zip-rest (car (car s)) (cdr s)))
+;; 	 (eprime (car e-s))
+;; 	 (rap-s  (cdr e-s))
+;; 	 ;; impacts `e' which shares car with `eprime'
+;; 	 (rap-e (dolist (closure eprime eprime)
+;; 		  (setcdr
+;; 		   (cdr (cdr (cdr closure)))
+;; 		   (append (cdr eprime) (cdr (cdr (cdr (cdr closure))))) )
+;; 		  (setcar
+;; 		   (cdr (cdr (cdr closure)))
+;; 		   (car eprime))
+;; 		  ))
+;; 	 )
+
+;;     (save-current-buffer
+;;       (set-buffer (get-buffer-create "*SECD*"))
+;;       (insert (format "RAP e1: %s\n" (car e-s)))
+;;       (insert (format "RAP s1: %s\n" (cdr e-s)))
+;;       (insert (format "RAP  2: %s\n" e))
+;;       (insert (format "\n"))
+;;       )
+
+;;     (list
+;;      nil
+;;      e ;; not eprime, we need the original emcompassing env for globals
+;;      (car (cdr (car s)))     
+;;      (cons rap-s (cons new-e (cons (cdr c) d)))
+;;      )
+;;     )
+;;   )
+
 (defun secd-rap (s e c d)
   "RAP Similar to AP but uses `rplaca' to replace the `nil' (omega) set by DUM.
 ((n . (c' . e')) v . s) (OMEGA . e) (RAP . c) d --> NIL rplaca(e', v) c' (s e c . d)
 "
   ;; (insert (format "Enter  RAP: caar s, cdr s \n\t%s\n\t%s\n" (car (car s)) (cdr s)))
   (let* (;; Preserves entry environment as the argument `e' is edited in place
-	 (new-e (cdr (copy-tree e)))
+	 (e-orig (copy-tree (cdr e)))
 	 (e-s (secd--zip-rest (car (car s)) (cdr s)))
-	 (eprime (car e-s))
-	 (rap-s  (cdr e-s))
-	 ;; impacts `e' which shares car with `eprime'
-	 (rap-e (dolist (closure eprime eprime)
-		  (setcdr
-		   (cdr (cdr (cdr closure)))
-		   (append (cdr eprime) (cdr (cdr (cdr (cdr closure))))) )
-		  (setcar
-		   (cdr (cdr (cdr closure)))
-		   (car eprime))
-		  ))
+	 (e-prime  (car e-s))
+	 (s-prime  (cdr e-s))
 	 )
 
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD*"))
-      (insert (format "RAP e1: %s\n" (car e-s)))
-      (insert (format "RAP s1: %s\n" (cdr e-s)))
-      (insert (format "RAP  2: %s\n" e))
+      (insert (format "RAP e': %s\n" (car e-s)))
+      (insert (format "RAP s': %s\n" (cdr e-s)))
+      (insert (format "RAP e : %s\n" e))
+      (insert (format "\n"))
+      )
+
+    (setcar e e-prime)
+
+    (save-current-buffer
+      (set-buffer (get-buffer-create "*SECD*"))
+      (insert (format "RAP e': %s\n" (car e-s)))
+      (insert (format "RAP s': %s\n" (cdr e-s)))
+      (insert (format "RAP e : %s\n" e))
       (insert (format "\n"))
       )
 
     (list
      nil
-     e ;; not eprime, we need the original emcompassing env for globals
+     e-prime
      (car (cdr (car s)))     
-     (cons rap-s (cons new-e (cons (cdr c) d)))
+     (cons s-prime (cons e-orig (cons (cdr c) d)))
      )
     )
   )
+
 
 (provide 'secd-fun-group)
 

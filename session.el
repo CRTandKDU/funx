@@ -5,7 +5,9 @@
 (require 'secd-exec)
 
 
-(setq a (secd-cycle nil '((x . 7)) '(LDC 14 LD x ASK y LDC 8 STOP) nil))
+
+(setq a (secd-cycle nil '((x . 7)) '(LDC 14 LD x ASK y LDC 8 STOP) nil))What is the value of y?
+
 ;; (car (secd--s a))
 ;; (secd--e a)
 ;; (car (secd--c a))
@@ -453,7 +455,7 @@ STOP
 		     CONS
 		     RTN
 		     ))
-	 LDF ((terms) . (LDC 1 LD terms AP CDR AP0 CDR AP0 CAR RTN))
+	 LDF ((terms) . (LDC 1 LD terms AP CDR AP0 CDR AP0 CDR AP0 CAR RTN))
 	 RAP    
 	 STOP
 	 )
@@ -563,6 +565,7 @@ STOP
        )
       )
 What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
 
 (setq b5
       (secd-answer b5 "agree" t))
@@ -620,74 +623,6 @@ What is the value of C12?
 	       )
 	    nil '(STOP)
 	    ))
---
-e: (let ((fac (lambda (n) (add n '1))) (fbc (lambda (n) (add n '1)))) (fac '2))
-n: nil
-c: (STOP)
---
-e: (fac '2)
-n: nil
-c: (RTN)
---
-e: fac
-n: nil
-c: (AP RTN)
-	--- comp--args
-	e: ('2)
-	n: nil
-	c: (LD fac AP RTN)
---
-e: '2
-n: nil
-c: (LD fac AP RTN)
-	--- comp--args
-	e: nil
-	n: nil
-	c: (LDC 2 LD fac AP RTN)
-	--- comp--list
-	e: ((fac (lambda (n) (add n '1))) (fbc (lambda (n) (add n '1))))
-	n: nil
-	c: (LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
---
-e: (lambda (n) (add n '1))
-n: nil
-c: (LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
---
-e: (add n '1)
-n: nil
-c: (RTN)
---
-e: n
-n: nil
-c: (ADD RTN)
---
-e: '1
-n: nil
-c: (LD n ADD RTN)
-	--- comp--list
-	e: ((fbc (lambda (n) (add n '1))))
-	n: nil
-	c: (LDF ((n) LDC 1 LD n ADD RTN) LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
---
-e: (lambda (n) (add n '1))
-n: nil
-c: (LDF ((n) LDC 1 LD n ADD RTN) LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
---
-e: (add n '1)
-n: nil
-c: (RTN)
---
-e: n
-n: nil
-c: (ADD RTN)
---
-e: '1
-n: nil
-c: (LD n ADD RTN)
-	--- comp--list
-	e: nil
-	n: nil
-	c: (LDF ((n) LDC 1 LD n ADD RTN) LDF ((n) LDC 1 LD n ADD RTN) LDF ((fac fbc) LDC 2 LD fac AP RTN) RAP STOP)
 (secd-cycle 'nil '((A . *F*)) clist nil)
 
 (secd-comp--list '(fac (quote 2)) nil '(STOP))	--- comp--list
@@ -712,4 +647,135 @@ c: (LD n ADD RTN)
        )
       )
 clist
+
+(secd-compile "ex1.lsp")
+
+(setq clist
+      (comp '(let ((fac (lambda (n) (if (eq n '1) '1 (mul n (fac (sub '1 n))))))
+
+		   )
+	       (fac (quote 5))
+	       )
+	    nil '(STOP)
+	    ))
+clist
+
+;; New CPS implementation (in branch)
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 ;; (CRT_and_KDU . (ASK CRT_and_KDU LDC "agree" EQ UPD))
+	 ;; (C11 . (LDP CRT_and_KDU AP0 UPD))
+	 ;; (C12 . (ASK C12 UPD))
+	 ;; (R1  . (LDP C12 LDP C11 ALL 2 UPD))
+	 ;; (R2  . (LDC 5 LDC 6 EQ UPD))
+	 ;; (R3  . *F*)
+	 ;; (H   . (LDP R1 LDP R3 LDP R2 ANY 3 UPD))
+	 )
+       '(
+	 DUM
+	 LDE (LDC 5 LDC 6 EQ UPD)
+	 LDE (ASK R3 UPD)
+	 LDE (LD R1 LD R3 ALL 2 UPD)
+	 LDF ((H R3 R1) . (LD H AP0 RTN))
+	 RAP
+	 STOP
+	 )
+       nil
+       )
+      )
+What is the value of R3?
+What is the value of R3?
+What is the value of R3?
+(setq b5
+      (secd-answer b5 '*T* t))
+
+
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 )
+       '(
+	 DUM
+	 LDF ((n) .  (LDC 1 LD n EQ SEL
+			  (LDC 1 JOIN)
+			  (LD n LDC 1 SUB LD fac AP LD n MUL JOIN)
+			  RTN))
+	 LDF ((fac) . (LDC 7 LD fac AP RTN))
+	 RAP
+	 STOP
+	 )
+       nil
+       )
+      )
+
+;; New CPS implementation (in branch)
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 ;; (CRT_and_KDU . (ASK CRT_and_KDU LDC "agree" EQ UPD))
+	 ;; (C11 . (LDP CRT_and_KDU AP0 UPD))
+	 ;; (C12 . (ASK C12 UPD))
+	 ;; (R1  . (LDP C12 LDP C11 ALL 2 UPD))
+	 ;; (R2  . (LDC 5 LDC 6 EQ UPD))
+	 ;; (R3  . *F*)
+	 ;; (H   . (LDP R1 LDP R3 LDP R2 ANY 3 UPD))
+	 )
+       '(
+	 DUM
+	 LDE (LDC 5 LDC 5 EQ UPD)
+	 LDE (ASK R3 UPD)
+	 LDE (LD R1 LD R3 ALL 2 UPD)
+	 LDF ((H R3 R1) . (LD H AP0 RTN))
+	 RAP
+	 STOP
+	 )
+       nil
+       )
+      )
+What is the value of R3?
+
+(setq b5
+      (secd-answer b5 '*T* t))
+
+
+
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 ;; (CRT_and_KDU . (ASK CRT_and_KDU LDC "agree" EQ UPD))
+	 ;; (C11 . (LDP CRT_and_KDU AP0 UPD))
+	 ;; (C12 . (ASK C12 UPD))
+	 ;; (R1  . (LDP C12 LDP C11 ALL 2 UPD))
+	 ;; (R2  . (LDC 5 LDC 6 EQ UPD))
+	 ;; (R3  . *F*)
+	 ;; (H   . (LDP R1 LDP R3 LDP R2 ANY 3 UPD))
+	 )
+       '(
+	 DUM
+	 LDE (ASK CRT_and_KDU LDC "agree" EQ UPD)
+	 LDE (LD CRT_and_KDU AP0 UPD)
+	 LDE (ASK C12 UPD)
+	 LDE (LD C12 LD C11 ALL 2 UPD)
+	 LDE (LDC 5 LDC 6 EQ UPD)
+	 LDE (LDC *F* UPD)
+	 LDE (LD R1 LD R3 LD R2 ANY 3 UPD)
+	 LDF ((H R3 R2 R1 C12 C11 CRT_and_KDU) . (LD H AP0 RTN))
+	 RAP
+	 STOP
+	 )
+       nil
+       )
+      )
+What is the value of CRT_and_KDU?
+(setq b5
+      (secd-answer b5 "agree" t))
+What is the value of C12?
+(setq b5
+      (secd-answer b5 '*T* t))
+
 
