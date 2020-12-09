@@ -111,11 +111,28 @@ it is updated in-place.
 		    (car (cdr (car (car d))))
 		    (car (cdr d))))
     )
+    
+  
   ;; *SIDE-EFFECT*: if the same control list appears in the environment
   ;; the thunk is also updated!
-  (if (rassoc  (car (cdr (car (car d)))) (car (cdr d)))
-      ;; Alter promise in environment
-      (setcdr  (rassoc  (car (cdr (car (car d)))) (car (cdr d))) (car s))
+  ;; Two situations: the alist is an environment with no `PROMISE' keyword
+  ;; or the alist is an environment built by RAP with `PROMISE' keywords
+  (let ((clist (car (cdr (car (car d)))))
+	(env   (car (cdr d)))
+	       )
+	(if (rassoc clist env)
+	    ;; Alter promise in environment
+	    (setcdr  (rassoc clist env)  (car s))
+	  (if (-first (lambda (binding) (and (listp (cdr binding))
+					     (equal (caddr binding) clist)))
+		      env)
+	      (setcdr (-first
+		       (lambda (binding)
+			 (and (listp (cdr binding))
+			      (equal (caddr binding) clist)))
+		       env)
+		      (car s)))
+      )
     )
   (save-current-buffer
     (set-buffer (get-buffer-create "*SECD*"))

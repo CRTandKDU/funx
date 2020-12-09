@@ -566,6 +566,7 @@ STOP
       )
 What is the value of CRT_and_KDU?
 What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
 
 (setq b5
       (secd-answer b5 "agree" t))
@@ -741,8 +742,6 @@ What is the value of R3?
 (setq b5
       (secd-answer b5 '*T* t))
 
-
-
 (setq b5
       (secd-cycle
        nil
@@ -761,21 +760,42 @@ What is the value of R3?
 	 LDE (LD CRT_and_KDU AP0 UPD)
 	 LDE (ASK C12 UPD)
 	 LDE (LD C12 LD C11 ALL 2 UPD)
-	 LDE (LDC 5 LDC 6 EQ UPD)
+	 LDE (LD C12 LD C11 ALL 2 UPD)
 	 LDE (LDC *F* UPD)
 	 LDE (LD R1 LD R3 LD R2 ANY 3 UPD)
-	 LDF ((H R3 R2 R1 C12 C11 CRT_and_KDU) . (LD H AP0 RTN))
+	 LDF ((H R3 R2 R1 C12 C11 CRT_and_KDU) . (STOP LD H AP0 RTN))
 	 RAP
 	 STOP
 	 )
        nil
        )
       )
-What is the value of CRT_and_KDU?
 (setq b5
-      (secd-answer b5 "agree" t))
-What is the value of C12?
+      (secd-answer b5 "disagree" t))
 (setq b5
       (secd-answer b5 '*T* t))
+(assoc 'C11 (car (cdr b5)))
 
-
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 ;; (CRT_and_KDU . (ASK CRT_and_KDU LDC "agree" EQ UPD))
+	 ;; (C11 . (LDP CRT_and_KDU AP0 UPD))
+	 ;; (C12 . (ASK C12 UPD))
+	 ;; (R1  . (LDP C12 LDP C11 ALL 2 UPD))
+	 ;; (R2  . (LDC 5 LDC 6 EQ UPD))
+	 ;; (R3  . *F*)
+	 ;; (H   . (LDP R1 LDP R3 LDP R2 ANY 3 UPD))
+	 )
+       '(
+	 DUM
+	 LDE (LDC 3 LDC 5 MUL UPD)
+	 LDE (LDC 1 LD funA AP0 ADD UPD)
+	 LDF ((funB funA) . (LD funB AP0 RTN))
+	 RAP
+	 STOP
+	 )
+       nil
+       )
+      )
