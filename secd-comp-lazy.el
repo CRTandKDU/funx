@@ -138,10 +138,12 @@ Returns environment and list of terminals found in conditions."
     ;; Pass #2
     ;; Increment environment with terminals
     (dolist (sign signs env)
-      (push
-       (cons sign (cons 'ASK (cons sign (cons 'UPD nil))))
-       env
-       )
+      (if (null (assoc sign hypos))
+	  (push
+	   (cons sign (cons 'ASK (cons sign (cons 'UPD nil))))
+	   env
+	   )
+	)
       )
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))

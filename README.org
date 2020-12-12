@@ -2,6 +2,19 @@
 #+SUBTITLE: NXP Runtime
 #+AUTHOR: jmc
 
+* DONE Knowledge base compiler <2020-12-12 sam.>
+Fixed the strict compiler so that AP0/UPD allow promises to be fetched either from the environment with LDP or from the control list with LDE.
+
+Initial knowledge base compiler, based on a lazy variant of the fixed strict compiler. The variant compiles all variables in conditions to promises LDP <var> AP0 rather than LD <var>. Note that the variant is strict: it evaluates the promise immediately.
+
+Syntax for knowledge bases:
+
+((rule <hypo> ((cond-sexp) ... (cond-sexp)))
+ (rule <hypo> ((cond-sexp) ... (cond-sexp)))
+ ...
+ (rule <hypo> ((cond-sexp) ... (cond-sexp)))
+)
+
 * DONE Strict compiler <2020-12-05 sam.>
 First implementation, following Henderson's book (p. 340), of a compiler for the simple variant of Lispkit, without the NXP extensions.
 

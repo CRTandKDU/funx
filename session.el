@@ -831,5 +831,44 @@ What is the value of R3?
 
 (setq b7 (secd-comp--kb2env kb))
 
-(secd-compile-sexp--lazy '(eq '0 (add (mul '4 x) y)))
+(setq b5
+      (secd-cycle
+       nil
+       b7
+       '(
+	 LDP H
+	 AP0    
+	 STOP
+	 )
+       nil
+       )
+      )
+What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+(setq b5
+      (secd-answer b5 "disagree" t))
+What is the value of DOOR?
+What is the value of PRESSURE?
+What is the value of PRESSURE?
+(setq b5
+      (secd-answer b5 "open" t))
+What is the value of PRESSURE?
+(setq b5
+      (secd-answer b5 25 t))
+
+
+(setq kb
+      '(
+	(rule H ((eq CRT_and_KDU (quote "agree")) (leq PRESSURE (quote 100))))
+	(rule H ((eq CRT_and_KDU (quote "disagree"))
+		 (eq H1 '*T*)
+		 (leq PRESSURE (quote 50))))
+	(rule H1 ((eq DOOR (quote "open"))))
+	)
+      )
+
+(setq b7 (secd-comp--kb2env kb))
+(secd-compile-sexp--lazy '(x) nil)
 

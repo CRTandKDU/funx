@@ -84,7 +84,7 @@
 
 (defun secd-comp--args (elist n c)
   "Compiles a list of expressions in order stated (in application forms)."
-  (insert (format "\t--- comp--args\n\te: %s\n\tn: %s\n\tc: %s\n" elist n c))
+  ;; (insert (format "\t--- comp--args\n\te: %s\n\tn: %s\n\tc: %s\n" elist n c))
   
   (if (eq elist nil) c
     (secd-comp--args
