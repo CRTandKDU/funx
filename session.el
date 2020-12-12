@@ -799,3 +799,37 @@ What is the value of R3?
        nil
        )
       )
+
+(setq b5
+      (secd-cycle
+       nil
+       '((a . 12) (b . 5)
+	 (CRT_and_KDU . (ASK CRT_and_KDU LDC "agree" EQ UPD))
+	 (C11 . (LDP CRT_and_KDU AP0 UPD))
+	 (C12 . (ASK C12 UPD))
+	 (R1  . (LDP C12 LDP C11 ALL 2 UPD))
+	 (R2  . (LDC 5 LDC 6 EQ UPD))
+	 (R3  . *F*)
+	 (H   . (LDP R1 LDP R3 LDP R2 ANY 3 UPD))
+	 )
+       '(
+	 LDP H
+	 AP0    
+	 STOP
+	 )
+       nil
+       )
+      )
+
+(setq kb
+      '(
+	(rule H ((eq CRT_and_KDU (quote "agree")) (leq PRESSURE (quote 100))))
+	(rule H ((eq CRT_and_KDU (quote "disagree")) (leq PRESSURE (quote 50))))
+	(rule H1 ((eq DOOR (quote "open"))))
+	)
+      )
+
+(setq b7 (secd-comp--kb2env kb))
+
+(secd-compile-sexp--lazy '(eq '0 (add (mul '4 x) y)))
+

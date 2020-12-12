@@ -1,7 +1,7 @@
-;;; Compiler
-
+;;; Compilers
+;;; Strict Compiler
 (defun secd-comp--comp (e n c)
-  "Compiles expression e, with names n and continuation c."
+  "Compiles strictly expression e, with names n and continuation c."
   (insert (format "--\ne: %s\nn: %s\nc: %s\n" e n c))
   ;; 0 arg
   (if (atom e) (cons 'LD (cons e c))
@@ -111,5 +111,6 @@
       )
     )
   )
+
 
 (provide 'secd-comp)
