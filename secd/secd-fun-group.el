@@ -1,3 +1,5 @@
+(require 'secd-env-group)
+
 (defun secd--zip-rest (names values)
   "Analog to the Python `zip' function; creates an alist of (name . value) in car of result. Residual values are returned in the cdr of the result.
 "
@@ -27,7 +29,7 @@ stack, here `v', to the front of the environment alist.
   (let* (
 	 (s-e (secd--zip-rest (car (car s)) (cdr s)))
 	 (ap-s (cdr s-e))
-	 (ap-e (if (null (car s-e)) e (append (car s-e) e) ))
+	 (ap-e (if (null (car s-e)) e (secd-env--push e (car s-e))))
 	 )
     ;; (insert (format "Exit  AP: e = %s\n" ap-e))
     ;; (insert (format "Exit  AP: c = %s\n" (car (cdr (car s)))))

@@ -1,3 +1,5 @@
+(require 'secd-env-group)
+
 ;; Is the flagged CAR necessary? The `rplaca' should take care of
 ;; repeated forcing? Only if there are global promises for signs, conds,
 ;; rules and hypos in the environment.
@@ -27,7 +29,7 @@ to build a promise as in LDE, or simply the value resulting from
 a previously evaluated promise (with AP0) which is then
 simply loaded as with LD.
 "
-  (let ((cprime (secd-ld--locate (car (cdr c)) e))
+  (let ((cprime (secd-env--locate e (car (cdr c))))
 	)
     (list
      (if (atom cprime)
@@ -119,21 +121,16 @@ it is updated in-place.
   ;; or the alist is an environment built by RAP with `PROMISE' keywords
   (let ((clist (car (cdr (car (car d)))))
 	(env   (car (cdr d)))
-	       )
-	(if (rassoc clist env)
-	    ;; Alter promise in environment
-	    (setcdr  (rassoc clist env)  (car s))
-	  (if (-first (lambda (binding) (and (listp (cdr binding))
-					     (equal (caddr binding) clist)))
-		      env)
-	      (setcdr (-first
-		       (lambda (binding)
-			 (and (listp (cdr binding))
-			      (equal (caddr binding) clist)))
-		       env)
-		      (car s)))
+	)
+    (if (null (secd-env--rupdate env clist (car s)))
+	(secd-env--rupdate-promise
+	 (-first (lambda (binding)
+		   (and (listp (cdr binding)) (equal (caddr binding) clist)))
+		 env)
+	 (car s))
       )
     )
+
   (save-current-buffer
     (set-buffer (get-buffer-create "*SECD*"))
     (insert (format "Out of UPD\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n"

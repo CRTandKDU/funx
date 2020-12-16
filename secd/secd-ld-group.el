@@ -1,3 +1,5 @@
+(require 'secd-env-group)
+
 (defun secd-ldc (s e c d)
   "LDC Loads a constant on top of the stack.
 s e (LDC x . c) d --> (x . s) e c d
@@ -7,16 +9,11 @@ s e (LDC x . c) d --> (x . s) e c d
 
 ;; Environment as a cons of 2 lists of list of atoms (n . v)
 ;; Environment as an alist
-(defun secd-ld--locate (var e)
-  "Locates a variable in environment and returns its value."
-  (cdr (assoc var e))
-  )
-
 (defun secd-ld (s e c d)
   "LD Loads variable value on stack.
 s e (LD a . c) d --> (locate(a,e) . s) e c d 
 "
-  (list (cons (secd-ld--locate (car (cdr c)) e)  s) e (cdr (cdr c)) d)
+  (list (cons (secd-env--locate e (car (cdr c)))  s) e (cdr (cdr c)) d)
   )
 
 (defun secd-ldf (s e c d)

@@ -1,5 +1,7 @@
+(require 'secd-env-group)
+
 (defun secd-ask (s e c d)
-  "ASK for variable pushed on stack.
+  "ASK for variable pushed on stack. Pauses evaluation.
 s e (ASK v . c) d --> (v . s) e c d
 "
   ;; Trace
@@ -18,15 +20,17 @@ s e (ASK v . c) d --> (v . s) e c d
 s e c d --> cdr(s) (push(cons(car(s),val),e) c d
 "
   (let* ((e (secd--e state))
-	 (entry (assoc (car (secd--s state)) e))
+	 (promise (car (secd--s state)))
+;;	 (entry (assoc (car (secd--s state)) e))
 	 )
-    (if entry
-	(setcdr entry val)
-      ;; Should not be in the situation where variable is not a
-      ;; promise in the environment. The new binding will be lost at
-      ;; next UPD.
-      (setq e (cons (cons (car (secd--s state)) val) e))
-      )
+    ;; (if entry
+    ;; 	(setcdr entry val)
+    ;;   ;; Should not be in the situation where variable is not a
+    ;;   ;; promise in the environment. The new binding will be lost at
+    ;;   ;; next UPD.
+    ;;   (setq e (cons (cons (car (secd--s state)) val) e))
+    ;;   )
+    (secd-env--update e promise val)
     (if resume
 	(secd-cycle (cons val (cdr (secd--s state)))
 	      e

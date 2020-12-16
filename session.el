@@ -764,15 +764,17 @@ What is the value of R3?
 	 LDE (LD C12 LD C11 ALL 2 UPD)
 	 LDE (LDC *F* UPD)
 	 LDE (LD R1 LD R3 LD R2 ANY 3 UPD)
-	 LDF ((H R3 R2 R1 C12 C11 CRT_and_KDU) . (STOP LD H AP0 RTN))
+	 LDF ((H R3 R2 R1 C12 C11 CRT_and_KDU) . ( LD H AP0 RTN))
 	 RAP
 	 STOP
 	 )
        nil
        )
       )
+What is the value of CRT_and_KDU?
 (setq b5
       (secd-answer b5 "disagree" t))
+What is the value of C12?
 (setq b5
       (secd-answer b5 '*T* t))
 (assoc 'C11 (car (cdr b5)))
@@ -848,21 +850,31 @@ What is the value of CRT_and_KDU?
 What is the value of CRT_and_KDU?
 What is the value of CRT_and_KDU?
 What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+
 (setq b5
       (secd-answer b5 "disagree" t))
 What is the value of DOOR?
-What is the value of PRESSURE?
-What is the value of PRESSURE?
+What is the value of DOOR?
+What is the value of DOOR?
+What is the value of DOOR?
+
 (setq b5
       (secd-answer b5 "open" t))
+What is the value of PRESSURE?
+What is the value of PRESSURE?
+What is the value of PRESSURE?
+What is the value of PRESSURE?
+What is the value of PRESSURE?
 What is the value of PRESSURE?
 (setq b5
       (secd-answer b5 25 t))
 
-
+(require 'secd-comp-kb)
 (setq kb
       '(
-	(rule H ((eq CRT_and_KDU (quote "agree")) (leq PRESSURE (quote 100))))
+	(rule H ((eq CRT_and_KDU (quote "agree"))
+		 (leq PRESSURE (quote 100))))
 	(rule H ((eq CRT_and_KDU (quote "disagree"))
 		 (eq H1 '*T*)
 		 (leq PRESSURE (quote 50))))
@@ -871,5 +883,9 @@ What is the value of PRESSURE?
       )
 
 (setq b7 (secd-comp--kb2env kb))
-(secd-compile-sexp--lazy '(x) nil)
 
+(secd-compile-sexp--lazy '(x) nil)
+(insert (format "%s\n" b7))
+((*FWRD-RULES* (R120 H1) (R116 H) (R113 H)) (*FWRD-SIGNS* (DOOR R120) (H1 R116) (PRESSURE R116 R113) (CRT_and_KDU R116 R113)) (H LDP R113 LDP R116 ANY 2 UPD) (H1 LDP R120 ANY 1 UPD) (CRT_and_KDU ASK CRT_and_KDU UPD) (PRESSURE ASK PRESSURE UPD) (DOOR ASK DOOR UPD) (R113 LDP C115 LDP C114 ALL 2 UPD) (C115 LDC 100 LDP PRESSURE AP0 LEQ UPD) (C114 LDC agree LDP CRT_and_KDU AP0 EQ UPD) (R116 LDP C119 LDP C118 LDP C117 ALL 3 UPD) (C119 LDC 50 LDP PRESSURE AP0 LEQ UPD) (C118 LDC *T* LDP H1 AP0 EQ UPD) (C117 LDC disagree LDP CRT_and_KDU AP0 EQ UPD) (R120 LDP C121 ALL 1 UPD) (C121 LDC open LDP DOOR AP0 EQ UPD))
+
+(assoc 'DOOR (cdr (assoc '*FWRD-SIGNS* b7)))

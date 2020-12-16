@@ -1,9 +1,11 @@
 ;;; A compiler variant for compiling knowledge bases to environments
 (require 'secd-comp)
+(defconst secd--kb-forward-chaining-signs  '*FWRD-SIGNS*)
+(defconst secd--kb-forward-chaining-rules  '*FWRD-RULES*)
 
 (defun secd-compile-sexp--lazy (e c)
-  "Compiles sexp `e' with continuaton `c' with variable bound to promises.
-Returns control list and variable names in sexp."
+  "Compiles sexp `e' with continuation `c' and all variables bound to promises.
+Returns a cons of control list and variable names found in sexp `e'."
   (let* ((names nil)
 	 (clist (secd-comp--comp-lazy e 'names c))
 	 )
@@ -11,7 +13,7 @@ Returns control list and variable names in sexp."
   )
 
 (defun secd-comp--comp-lazy (e n c)
-  "Compiles lazily expression `e', with names (quoted) `n' and continuation c.
+  "Compiles expression `e', with names (quoted) `n' and continuation c.
 Adds variables to list of names in `n', altering it.
 "
   ;; (insert (format "--\ne: %s\nn: %s\nc: %s\n" e n c))
@@ -110,9 +112,11 @@ Returns environment and list of terminals found in conditions."
 (defun secd-comp--kb2env (kb)
   "Compiles a complete environment for knowledge base `kb'."
   (let (
-	(env nil)
-	(hypos nil)
-	(signs nil)
+	(env nil)     ;; Environment incrementally built from rule sexps
+	(hypos nil)   ;; Collect hypotheses
+	(signs nil)   ;; Collect signs, i.e. non-hypo terminals in conds
+	(flist nil)   ;; Forward-chaining signs -> rule alist
+	(frlst nil)   ;; Forward-chaining rule -> hypo alist
 	)
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
@@ -122,20 +126,26 @@ Returns environment and list of terminals found in conditions."
     ;; Pass #1
     ;; Accumulate hypos and associated rules in `hypos'.
     ;; Compiles rules into `env', collecting terminals in `signs'.
+    ;; Forward-chaining liks are collected as an alist `(var . (rules))'
     (dolist (rule kb env)
       (let* (
 	     (rn (gensym 'R))
 	     (rcompiled (secd-comp--rule2env rule rn))
-	    )
+	     )
+	(if (assoc rn frlst) (push (cadr rule) (cdr (assoc rn frlst)))
+	  (push (cons rn (cons (cadr rule) nil)) frlst))
 	(if (assoc (cadr rule) hypos) (push rn (cdr (assoc (cadr rule) hypos)))
 	  (push (cons (cadr rule) (cons rn nil)) hypos))
 	(setq env (append env (car rcompiled)))
+	(dolist (var (cdr rcompiled) flist)
+	  (if (assoc var flist) (push rn (cdr (assoc var flist)))
+	    (push (cons var (cons rn nil)) flist)))
 	(dolist (var (cdr rcompiled) signs) (add-to-list 'signs var))
 	)
       )
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
-      (insert (format "---Pass 1:\nH: %s\nE: %s\nT: %s\n" hypos env signs))
+      (insert (format "---Pass 1:\nH: %s\nE: %s\nT: %s\nF: %s\n" hypos env signs flist))
       )
     ;; Pass #2
     ;; Increment environment with terminals
@@ -163,6 +173,10 @@ Returns environment and list of terminals found in conditions."
 	(push (cons (car h) (append rlist suffix)) env)
 	)
       )
+    ;; Pass #4
+    ;; Increment environment with forward-chaining links
+    (push (cons secd--kb-forward-chaining-signs flist) env )
+    (push (cons secd--kb-forward-chaining-rules frlst) env )
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
       (insert (format "---Pass 3:\nH: %s\nE: %s\nT: %s\n" hypos env signs))
@@ -171,4 +185,4 @@ Returns environment and list of terminals found in conditions."
     )
   )
 
-(provide 'secd-comp-lazy)
+(provide 'secd-comp-kb)
