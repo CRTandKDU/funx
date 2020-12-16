@@ -319,26 +319,5 @@ Returns as soon as a promise evaluates to `*F*'
     )
   )
 
-;; (defun secd-not (s e c d)
-;;   "NOT Eager logical NOT.
-;; ( <secd--ops-{true|false}> . s) e (NOT . c ) d --> ( <secd--ops-{false|true}> . s) e c d
-
-;; Prerequisite: a boolean promise, executed or not, on the stack. Forces evaluation.
-;; "
-;;   (let ((state (secd-cycle (list (car s)) e '(AP0 STOP) nil))
-;; 	)
-;;     (list
-;;      (cons
-;;       (if (eq secd--ops-false (car (car state)))
-;; 	  secd--ops-true
-;; 	secd--ops-false)
-;;       (cdr s))
-;;      e
-;;      (cdr c)
-;;      d
-;;      )
-;;     )
-;;   )
-
 
 (provide 'secd-lazy-group)

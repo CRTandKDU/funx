@@ -2,6 +2,7 @@
 ;; To create a file, visit it with C-x C-f and enter text in its buffer.
 
 (push "C:/Users/jmc/Documents/code/funx" load-path)
+(normal-top-level-add-subdirs-to-load-path)
 (require 'secd-exec)
 
 

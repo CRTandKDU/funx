@@ -1,4 +1,4 @@
-;;; Lazy compilers and variants
+;;; A compiler variant for compiling knowledge bases to environments
 (require 'secd-comp)
 
 (defun secd-compile-sexp--lazy (e c)
@@ -95,7 +95,9 @@ Returns environment and list of terminals found in conditions."
 	      ;; (insert (format "---\nc: %s\nrclist :%s\ncclist: %s\n" c rclist cclist))
 	    )
 	    )
-	  (setq rclist (append rclist (cons 'ALL (cons (/ (length rclist) 2) (cons 'UPD nil)))))
+	  (setq rclist
+		(append rclist
+			(cons 'ALL (cons (/ (length rclist) 2) (cons 'UPD nil)))))
 	  (push (cons rn rclist) env)
 	  (setq env (append env cclist))
 	  (cons env rvars)
