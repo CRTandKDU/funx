@@ -122,12 +122,14 @@ it is updated in-place.
   (let ((clist (car (cdr (car (car d)))))
 	(env   (car (cdr d)))
 	)
-    (if (null (secd-env--rupdate env clist (car s)))
+    (if (null (secd-env--rupdate env clist (car s) (list s e c d)))
 	(secd-env--rupdate-promise
 	 (-first (lambda (binding)
 		   (and (listp (cdr binding)) (equal (caddr binding) clist)))
 		 env)
-	 (car s))
+	 (car s)
+	 (list s e c d)
+	 )
       )
     )
 

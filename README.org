@@ -2,6 +2,17 @@
 #+SUBTITLE: NXP Runtime
 #+AUTHOR: jmc
 
+* DONE Factored out environment management. Forward infra.
+The access and update environment functions are isolated in their own group, and hooks are installed for update events. Hook functions support the tentative signature ~(lambda (var-name value &optional state)~.
+
+This is to be used in conjunction with additional kb-globals compiled to the environment by the kb-compiler:
+#+BEGIN_SRC emacs-lisp
+(defconst secd--kb-forward-chaining-signs  '*FWRD-SIGNS*)
+(defconst secd--kb-forward-chaining-rules  '*FWRD-RULES*)
+#+END_SRC
+
+Both are alists from signs to list of rules, and from rules to hypos respectively. They represent forward-chaining links at runtime.
+
 * DONE Knowledge base compiler <2020-12-12 sam.>
 Fixed the strict compiler so that AP0/UPD allow promises to be fetched either from the environment with LDP or from the control list with LDE.
 

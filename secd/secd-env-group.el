@@ -1,30 +1,42 @@
 ;; Environment management : implementation as an alist
+;; Installs forward-chaining using hooks in Emacs-Lisp
 
-(defun secd-env--locate (env var)
+(defvar env-update-hook nil)
+
+(defun secd-env--locate (env var &optional state)
   "Implementation of LD mnemonic as a simple alist lookup."
   (cdr (assoc var env))
   )
 
-(defun secd-env--update (env promise val)
+(defun secd-env--update (env promise val &optional state)
   "Updates `promise' in environment `env' with `val' or creates binding."
   (if (assoc promise env)
       (setcdr (assoc promise env) val)
     (push (cons promise val) env))
+  (run-hook-with-args 'env-update-hook promise val)
   env
   )
 
-(defun secd-env--rupdate (env clist val)
+(defun secd-env--rupdate (env clist val &optional state)
   "Replaces `clist' in first found promise in `env' with `val', to implement the UPD mnemonic. Returns update or nil if not found."
-  (if (rassoc clist env)
-      (setcdr (rassoc clist env) val))
+  (let ((promise (rassoc clist env)))
+    (cond
+     (promise
+      (setcdr promise val)
+      (run-hook-with-args 'env-update-hook (car promise) val)
+      env)
+     (t nil)
+     )
+    )
   )
 
-(defun secd-env--rupdate-promise (promise val)
+(defun secd-env--rupdate-promise (promise val &optional state)
   "Updates `promise' if not nil with `val', to implement the UPD mnemonic. Returns promise or nil."
   (if promise (setcdr promise val))
+  (if promise (run-hook-with-args 'env-update-hook promise val))
   )
 
-(defun secd-env--push (env alist)
+(defun secd-env--push (env alist &optional state)
   "Pushes alist into environment, returning extended environment. Used in AP."
   (append alist env)
   )

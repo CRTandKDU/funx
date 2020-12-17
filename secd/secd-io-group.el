@@ -1,5 +1,6 @@
 (require 'secd-env-group)
 
+
 (defun secd-ask (s e c d)
   "ASK for variable pushed on stack. Pauses evaluation.
 s e (ASK v . c) d --> (v . s) e c d
@@ -30,7 +31,7 @@ s e c d --> cdr(s) (push(cons(car(s),val),e) c d
     ;;   ;; next UPD.
     ;;   (setq e (cons (cons (car (secd--s state)) val) e))
     ;;   )
-    (secd-env--update e promise val)
+    (secd-env--update e promise val state)
     (if resume
 	(secd-cycle (cons val (cdr (secd--s state)))
 	      e

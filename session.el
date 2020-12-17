@@ -851,9 +851,14 @@ What is the value of CRT_and_KDU?
 What is the value of CRT_and_KDU?
 What is the value of CRT_and_KDU?
 What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
 
 (setq b5
       (secd-answer b5 "disagree" t))
+CRT_and_KDU: disagree
+nil: *T*
+What is the value of DOOR?
 What is the value of DOOR?
 What is the value of DOOR?
 What is the value of DOOR?
@@ -861,6 +866,12 @@ What is the value of DOOR?
 
 (setq b5
       (secd-answer b5 "open" t))
+DOOR: open
+nil: *T*
+nil: *T*
+nil: *T*
+nil: *T*
+What is the value of PRESSURE?
 What is the value of PRESSURE?
 What is the value of PRESSURE?
 What is the value of PRESSURE?
