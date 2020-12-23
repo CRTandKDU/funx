@@ -9,7 +9,7 @@
 	 )
     (with-temp-file (format "%s.out" (file-name-sans-extension file))
       (insert
-       (format "(push \"C:/Users/jmc/Documents/code/funx\" load-path)\n(require 'secd-exec)\n(setq res (secd-cycle nil '%s '%s nil))" env clist))
+       (format "(let ((default-directory \"C:/Users/jmc/Documents/code/funx\"))(normal-top-level-add-subdirs-to-load-path))\n(require 'secd-exec)\n(setq res (secd-cycle nil '%s '%s nil))" env clist))
       (let ((ignore (eval-buffer)))
 	(erase-buffer)
 	(insert (format "%s" res))

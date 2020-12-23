@@ -1,9 +1,10 @@
 ;; This buffer is for text that is not saved, and for Lisp evaluation.
 ;; To create a file, visit it with C-x C-f and enter text in its buffer.
 
-(push "C:/Users/jmc/Documents/code/funx" load-path)
+;; (push "C:/Users/jmc/Documents/code/funx" load-path)
 (normal-top-level-add-subdirs-to-load-path)
 (require 'secd-exec)
+(require 'secd-comp-kb)
 
 
 
@@ -847,56 +848,103 @@ What is the value of C12?
        )
       )
 What is the value of CRT_and_KDU?
-What is the value of CRT_and_KDU?
-What is the value of CRT_and_KDU?
-What is the value of CRT_and_KDU?
-What is the value of CRT_and_KDU?
-What is the value of CRT_and_KDU?
-What is the value of CRT_and_KDU?
 
 (setq b5
       (secd-answer b5 "disagree" t))
-CRT_and_KDU: disagree
-nil: *T*
-What is the value of DOOR?
-What is the value of DOOR?
-What is the value of DOOR?
 What is the value of DOOR?
 What is the value of DOOR?
 
 (setq b5
       (secd-answer b5 "open" t))
-DOOR: open
-nil: *T*
-nil: *T*
-nil: *T*
-nil: *T*
 What is the value of PRESSURE?
 What is the value of PRESSURE?
-What is the value of PRESSURE?
-What is the value of PRESSURE?
-What is the value of PRESSURE?
-What is the value of PRESSURE?
-What is the value of PRESSURE?
+
 (setq b5
-      (secd-answer b5 25 t))
+      (secd-answer b5 125 t))
 
 (require 'secd-comp-kb)
 (setq kb
       '(
-	(rule H ((eq CRT_and_KDU (quote "agree"))
-		 (leq PRESSURE (quote 100))))
+	(rule H
+	      ((eq CRT_and_KDU (quote "agree"))
+	       (leq PRESSURE (quote 100)))
+	      ;; Optional RHS
+	      ((set VOLTAGE (quote 25))
+	       (set WATTS (quote 2))
+	       (set AMPERE (quote 1))
+	       )
+	      )
 	(rule H ((eq CRT_and_KDU (quote "disagree"))
 		 (eq H1 '*T*)
+		 (in SWITCH (quote (1 2 3)))
 		 (leq PRESSURE (quote 50))))
 	(rule H1 ((eq DOOR (quote "open"))))
+	(rule H2 ((eq CRT_and_KDU (quote "disagree"))
+		  (leq TEMPERATURE (quote 100))
+		  (eq DOOR (quote "closed"))))
 	)
       )
 
 (setq b7 (secd-comp--kb2env kb))
 
+
+
+
+(setq b5 (secd-comp--kb-knowcess b7 '(H)))
+What is the value of CRT_and_KDU?
+
+(setq b5
+      (secd-answer b5 "disagree" t))
+On CRT_and_KDU (disagree): (STOP)
+On C369 (*T*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 STOP)
+What is the value of DOOR?
+
+
+
+
+(setq b5
+      (secd-answer b5 "closed" t))
+On DOOR (closed): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 STOP)
+On C373 (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 STOP)
+On R372 (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 STOP)
+On H1 (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 STOP)
+On C370 (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 STOP)
+On R368 (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 STOP)
+On C366 (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 STOP)
+On R365 (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 STOP)
+On H (*F*): (LDP R374 AP0 LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 STOP)
+On C375 (*T*): (LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 STOP)
+What is the value of TEMPERATURE?
+
+
+(setq b5
+      (secd-answer b5 25 t))
+On TEMPERATURE (25): (LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 STOP)
+On C376 (*T*): (LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 LDP R374 AP0 STOP)
+On C377 (*T*): (LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 LDP R374 AP0 STOP)
+On R374 (*T*): (LDP R368 AP0 LDP R365 AP0 LDP R374 AP0 LDP R372 AP0 LDP R368 AP0 LDP R374 AP0 STOP)
+On H2 (*T*): (STOP)
+
+(setq widgets (widget b7))
+(length widgets)
 (secd-compile-sexp--lazy '(x) nil)
 (insert (format "%s\n" b7))
 ((*FWRD-RULES* (R120 H1) (R116 H) (R113 H)) (*FWRD-SIGNS* (DOOR R120) (H1 R116) (PRESSURE R116 R113) (CRT_and_KDU R116 R113)) (H LDP R113 LDP R116 ANY 2 UPD) (H1 LDP R120 ANY 1 UPD) (CRT_and_KDU ASK CRT_and_KDU UPD) (PRESSURE ASK PRESSURE UPD) (DOOR ASK DOOR UPD) (R113 LDP C115 LDP C114 ALL 2 UPD) (C115 LDC 100 LDP PRESSURE AP0 LEQ UPD) (C114 LDC agree LDP CRT_and_KDU AP0 EQ UPD) (R116 LDP C119 LDP C118 LDP C117 ALL 3 UPD) (C119 LDC 50 LDP PRESSURE AP0 LEQ UPD) (C118 LDC *T* LDP H1 AP0 EQ UPD) (C117 LDC disagree LDP CRT_and_KDU AP0 EQ UPD) (R120 LDP C121 ALL 1 UPD) (C121 LDC open LDP DOOR AP0 EQ UPD))
 
-(assoc 'DOOR (cdr (assoc '*FWRD-SIGNS* b7)))
+(setq b5
+      (secd-cycle
+       nil
+       '((AMPERE . 12) (WATTS . 5) (VOLTAGE . 0)
+	 )
+       '(
+	 LDE (LDC 1 LDC AMPERE AP0 SET UPD)
+	 AP0
+	 LDE (LDC 2 LDC WATTS AP0 SET UPD)
+	 AP0
+	 LDE (LDC 25 LDC VOLTAGE SET UPD)
+	 AP0
+	 STOP
+	 )
+       nil
+       )
+      )

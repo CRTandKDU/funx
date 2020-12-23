@@ -12,6 +12,13 @@
   (append (butlast seq) (list x) (last seq))
   )
 
+(defun secd--cps-set-bot (x seq)
+  (let ((bot (copy-tree (last seq))))
+    (setcar (last seq) x)
+    (setcdr (last seq) bot)
+    seq)
+  )
+
 (defun secd-any-cps (s e c d)
   "ANY <n> Eager logical OR.
 (<n> . s) e (ANY <n> . c ) d --> (ORed-n . s) e c d

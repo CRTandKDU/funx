@@ -36,7 +36,6 @@ according to whether `a' is an atom or not.
 (defun secd-eq (s e c d)
   "Pops twice the stack and push back true or false if or not equal.
 (a b . s) e (EQ . c) d --> (secd--ops-bool . s) e c d
-according to equality of `a' and `b'.
 "
   ;; (if (eq (car s) (car (cdr s)))
   (if (equal (car s) (car (cdr s)))
@@ -48,9 +47,18 @@ according to equality of `a' and `b'.
 (defun secd-leq (s e c d)
   "Pops twice the stack and push back true or false if or not less.
 (a b . s) e (LEQ . c) d --> (secd--ops-bool . s) e c d
-according to equality of `a' and `b'.
 "
   (if (<= (car s) (car (cdr s)))
+      (list (cons secd--ops-true (cdr (cdr s))) e (cdr c) d)
+    (list (cons secd--ops-false (cdr (cdr s))) e (cdr c) d)
+    )
+  )
+
+(defun secd-in (s e c d)
+  "Pops twice the stack and push back true or false if or not member.
+(a b . s) e (IN . c) d --> (secd--ops-bool . s) e c d
+"
+  (if (member (car s) (car (cdr s)))
       (list (cons secd--ops-true (cdr (cdr s))) e (cdr c) d)
     (list (cons secd--ops-false (cdr (cdr s))) e (cdr c) d)
     )
@@ -77,6 +85,16 @@ s e (JOIN) (c . d) --> s e c d
 "
   (list s e (car d) (cdr d))
   )
+
+;; RHS operators
+(defun secd-set (s e c d)
+  "Pops twice the stack and updates environment
+(a b . s) e (SET . c) d --> s ((b . a) . e) c d
+"
+  (secd-env--update e (car s) (car (cdr s)) (list s e c d))
+  (list (cdr (cdr s)) e (cdr c) d)
+  )
+ 
 
 
 (provide 'secd-ops-group)

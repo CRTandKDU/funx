@@ -1,0 +1,101 @@
+@INBOOK{Bundy1984,
+author		="Bundy, Alan and Wallen, Lincoln",
+editor		="Bundy, Alan and Wallen, Lincoln",
+title		="Lispkit",
+bookTitle	="Catalogue of Artificial Intelligence Tools",
+year		="1984",
+publisher	="Springer Berlin Heidelberg",
+address		="Berlin, Heidelberg",
+pages		="62--62",
+abstract	="Lispkit is a variant of full Lisp designed to support programming in a purely functional style. Its implementation is an abstract machine, which can be emulated in hardware or software, and a range of programs (compilers, editors etc.) each of which runs on the abstract machine and which together provide the program development environment for Lispkit programming. Currently Lispkit implementations are available on the Perq, the Vax, the Sirius and the Sage. The system is easily moved to new machines simply by reprogramming the abstract machine.",
+isbn		="978-3-642-96868-6",
+doi		="10.1007/978-3-642-96868-6_124",
+url		="https://doi.org/10.1007/978-3-642-96868-6_124"
+}
+
+
+@INPROCEEDINGS{Henderson1976,
+author		= {Henderson, Peter and Morris, James H.},
+title		= {A Lazy Evaluator},
+year		= {1976},
+isbn		= {9781450374774},
+publisher	= {Association for Computing Machinery},
+address		= {New York, NY, USA},
+url		= {https://doi.org/10.1145/800168.811543},
+doi		= {10.1145/800168.811543},
+abstract	= {A different way to execute pure LISP programs is presented. It delays the evaluation of parameters and list structures without ever having to perform more evaluation steps than the usual method. Although the central idea can be found in earlier work this paper is of interest since it treats a rather well-known language and works out an algorithm which avoids full substitution. A partial correctness proof using Scott-Strachey semantics is sketched in a later section.},
+booktitle	= {Proceedings of the 3rd ACM SIGACT-SIGPLAN Symposium on Principles on Programming Languages},
+pages		= {95-103},
+numpages	= {9},
+location	= {Atlanta, Georgia},
+series		= {POPL '76}
+}
+
+@BOOK{Henderson1980a,
+          editor = {C. A. R. Hoare},
+           month = {March},
+           title = {Functional Programming - Application and Implementation},
+          author = {P. Henderson},
+       publisher = {Prentice-Hall Int. Series in Computer Science},
+            year = {1980},
+            note = {Address: Englewood Cliffs, New Jersey},
+             url = {https://eprints.soton.ac.uk/253064/}
+}
+
+@BOOK{Henderson1980b,
+  author    = {Peter Henderson},
+  title     = {Functional programming - application and implementation},
+  series    = {Prentice Hall International Series in Computer Science},
+  publisher = {Prentice Hall},
+  year      = {1980},
+  isbn      = {978-0-13-331579-0},
+  timestamp = {Wed, 18 Oct 2017 12:19:10 +0200},
+  biburl    = {https://dblp.org/rec/books/daglib/0068837.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@BOOK{Traub1991,
+  author    = {Kenneth R. Traub},
+  title     = {Implementation of non-strict functional programming languages},
+  series    = {Research monographs in parallel and distributed computing},
+  publisher = {Pitman},
+  year      = {1991},
+  timestamp = {Tue, 19 Apr 2011 17:04:46 +0200},
+  biburl    = {https://dblp.org/rec/books/daglib/0071432.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@INPROCEEDINGS{FriedmanWise1976,
+  author    = {Daniel P. Friedman and
+               David S. Wise},
+  editor    = {S. Michaelson and
+               Robin Milner},
+  title     = {{CONS} Should Not Evaluate its Arguments},
+  booktitle = {Third International Colloquium on Automata, Languages and Programming,
+               University of Edinburgh, UK, July 20-23, 1976},
+  pages     = {257--284},
+  publisher = {Edinburgh University Press},
+  year      = {1976},
+  timestamp = {Mon, 08 Jul 2019 11:03:55 +0200},
+  biburl    = {https://dblp.org/rec/conf/icalp/FriedmanW76.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@INPROCEEDINGS{Keller1979,
+author		={R. M. {KELLER} and G. {LINDSTROM} and S. {PATIL}},
+booktitle	={1979 International Workshop on Managing Requirements Knowledge (MARK)},
+title		={A loosely-coupled applicative multi-processing system*},
+year		={1979},
+volume		={},
+number		={},
+pages		={613-622},
+doi		={10.1109/MARK.1979.8817294}
+}
+
+@ARTICLE{Turner1979,
+  title={A new implementation technique for applicative languages},
+  author={D. Turner},
+  journal={Software: Practice and Experience},
+  year={1979},
+  volume={9}
+}

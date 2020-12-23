@@ -21,8 +21,10 @@
     (CONS	. secd-cons)    
     (EQ	        . secd-eq)
     (LEQ  	. secd-leq)
+    (IN  	. secd-in)
     (SEL  	. secd-sel)
     (JOIN  	. secd-join)
+    (SET        . secd-set)
     ;; Functions (fun) Group
     (AP  	. secd-ap)    
     (RTN  	. secd-rtn)
@@ -45,6 +47,8 @@
     (CPS	. secd-cps)
     (NOT	. secd-not)
     ))
+
+(defvar secd-exec-hook nil)
 
 (defun secd--s (state) (car state))
 (defun secd--e (state) (car (cdr state)))
@@ -78,6 +82,7 @@
     ;; Steps through the instructions in control list `control'
     (catch 'STOP
       (while c
+	(run-hook-with-args 'secd-exec-hook (list s e c d))
 	;; Trace
 	(save-current-buffer
 	  (set-buffer (get-buffer-create "*SECD*"))

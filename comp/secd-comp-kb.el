@@ -1,7 +1,18 @@
 ;;; A compiler variant for compiling knowledge bases to environments
+(require 'secd-env-group)
+(require 'secd-cps-group)
+(require 'secd-exec)
 (require 'secd-comp)
+
+;; OR-AND Tree decorations: global alists, stored in compiled environment
+;; Forward chaining decorations
 (defconst secd--kb-forward-chaining-signs  '*FWRD-SIGNS*)
 (defconst secd--kb-forward-chaining-rules  '*FWRD-RULES*)
+;; WHAT-IF decorations
+
+;; Control options
+;; If true, rule values post their hypo evaluation only if `*T*' (gating on)
+(defvar secd--kb-option-forward-chaining-gate t)
 
 (defun secd-compile-sexp--lazy (e c)
   "Compiles sexp `e' with continuation `c' and all variables bound to promises.
@@ -29,55 +40,59 @@ Adds variables to list of names in `n', altering it.
 	    (secd-comp--comp-lazy (car (cdr e)) n (cons 'ATOM c))
 	  (if (eq (car e) 'quote)
 	      (cons 'LDC (cons (car (cdr e)) c))
-    ;; 2 args
+	    ;; 2 args
 	    (if (eq (car e) 'cons)
 		(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'CONS c)))
+	    (if (eq (car e) 'set)
+		(secd-comp--comp-lazy (car (cdr (cdr e))) (add-to-list n (car (cdr e))) (cons 'LDC (cons (car (cdr e)) (cons 'SET c))))
 	      (if (eq (car e) 'eq)
 		  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'EQ c)))
-		(if (eq (car e) 'leq)
-		    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'LEQ c)))
-		  (if (eq (car e) 'add)
-		      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'ADD c)))
-		    (if (eq (car e) 'sub)
-			(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'SUB c)))
-		      (if (eq (car e) 'mul)
-			  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'MUL c)))
-			(if (eq (car e) 'div)
-			    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'DIV c)))
-			  (if (eq (car e) 'rem)
-			      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'REM c)))
-			    ;; 3 args
-			    (if (eq (car e) 'if)
-				((lambda (cont-t cont-f)
-				   (secd-comp--comp-lazy (car (cdr e)) n
-					 (cons 'SEL (cons cont-t (cons cont-f c)))))
-				 (secd-comp--comp-lazy (car (cdr (cdr e))) n '(JOIN))
-				 (secd-comp--comp-lazy (car (cdr (cdr (cdr e)))) n '(JOIN)))
-			      ;; many args
-			      (if (eq (car e) 'lambda)
-				  (cons 'LDF
-					(cons
-					 (cons (car (cdr e))
-					       (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN)))
-					 c)
-					)
-				(if (eq (car e) 'let)
-				    (cons 'DUM
-					  (secd-comp--list
-					   (car (cdr e))
-					   n
-					   (cons 'LDF (cons (cons (secd-comp--vars (car (cdr e))) (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
-				  ;; Rest has to be an application
-				  (secd-comp--args
-				   (cdr e)
-				   n
-				   (secd-comp--comp-lazy (car e) n (cons 'AP c)))
-				  ;; Done
+		(if (eq (car e) 'in)
+		    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'IN c)))
+		  (if (eq (car e) 'leq)
+		      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'LEQ c)))
+		    (if (eq (car e) 'add)
+			(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'ADD c)))
+		      (if (eq (car e) 'sub)
+			  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'SUB c)))
+			(if (eq (car e) 'mul)
+			    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'MUL c)))
+			  (if (eq (car e) 'div)
+			      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'DIV c)))
+			    (if (eq (car e) 'rem)
+				(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'REM c)))
+			      ;; 3 args
+			      (if (eq (car e) 'if)
+				  ((lambda (cont-t cont-f)
+				     (secd-comp--comp-lazy (car (cdr e)) n
+							   (cons 'SEL (cons cont-t (cons cont-f c)))))
+				   (secd-comp--comp-lazy (car (cdr (cdr e))) n '(JOIN))
+				   (secd-comp--comp-lazy (car (cdr (cdr (cdr e)))) n '(JOIN)))
+				;; many args
+				(if (eq (car e) 'lambda)
+				    (cons 'LDF
+					  (cons
+					   (cons (car (cdr e))
+						 (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN)))
+					   c)
+					  )
+				  (if (eq (car e) 'let)
+				      (cons 'DUM
+					    (secd-comp--list
+					     (car (cdr e))
+					     n
+					     (cons 'LDF (cons (cons (secd-comp--vars (car (cdr e))) (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
+				    ;; Rest has to be an application
+				    (secd-comp--args
+				     (cdr e)
+				     n
+				     (secd-comp--comp-lazy (car e) n (cons 'AP c)))
+				    ;; Done
+				    )
 				  )
 				)
-			      )
-    )))))))))))))
-  )
+			      )))))))))))))))
+    )
 
 ;; KB compilers
 (defun secd-comp--rule2env (kb rn)
@@ -85,7 +100,7 @@ Adds variables to list of names in `n', altering it.
 Returns environment and list of terminals found in conditions."
   (let ((env nil))
     (if (eq (car kb) 'rule)
-	(let ((rclist nil) (cclist nil) (rvars  nil))
+	(let ((rclist nil) (cclist nil) (axlist nil) (rvars  nil))
 	  ;; Push each condition in environment. Accumulate rule, variables.
 	  (dolist (c (car (cdr (cdr kb))))
 	    (let ((cn (gensym 'C))
@@ -95,11 +110,34 @@ Returns environment and list of terminals found in conditions."
 	      (setq cclist (push (cons cn (car ccompiled)) cclist))
 	      (setq rvars  (append rvars (cdr ccompiled)))
 	      ;; (insert (format "---\nc: %s\nrclist :%s\ncclist: %s\n" c rclist cclist))
+	      )
 	    )
+	  ;; Compile RHS actions if any
+	  (dolist (ax (car (cdr (cdr (cdr kb)))))
+	    (let ((axcompiled (secd-compile-sexp--lazy ax '(UPD)))
+		  )
+	      (setq axlist (cons 'LDE (cons (car axcompiled) (cons 'AP0 axlist))))
+	      (setq rvars  (append rvars (cdr axcompiled)))
+	      )
 	    )
-	  (setq rclist
-		(append rclist
-			(cons 'ALL (cons (/ (length rclist) 2) (cons 'UPD nil)))))
+	  (insert (format "---\nax: %s\nrv: %s\n" axlist rvars))
+	  
+	  (setq
+	   rclist
+	   (append
+	    rclist
+	    (cons
+	     'ALL
+	     (cons
+	      (/ (length rclist) 2)
+	      (if axlist
+		  (cons
+		   'SEL
+		   (append
+		    (list (append axlist (cons 'JOIN nil)))
+		    (list (cons 'JOIN nil))
+		    (cons 'UPD nil)))
+		(cons 'UPD nil))))))
 	  (push (cons rn rclist) env)
 	  (setq env (append env cclist))
 	  (cons env rvars)
@@ -184,5 +222,48 @@ Returns environment and list of terminals found in conditions."
     env
     )
   )
+
+;;; Commands: Operating the kb compiler
+
+;; Forward-chaining hook: signs to rules, conditionally rules to hypos
+(defun secd-comp--kb-forward-hook (var val state)
+  (insert (format "On %s (%s): %s\n" var val (car (last (secd--d state)))))
+  ;; Post hypos from rules
+  (if (assoc var (cdr (assoc secd--kb-forward-chaining-rules (secd--e state))))
+      (if (or (null secd--kb-option-forward-chaining-gate)
+	      (and  secd--kb-option-forward-chaining-gate
+		    (equal val secd--ops-true)))
+	  (let ((d (car (last (secd--d state))))
+		(hypos (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-rules (secd--e state)))))))
+	    (dolist (hypo hypos d)
+	      (secd--cps-set-bot 'LDP d)
+	      (secd--cps-set-bot hypo d)
+	      (secd--cps-set-bot 'AP0 d)
+	      )
+	    )
+	)
+    )	  
+	
+  ;; Post rules from signs
+  (let ((d (car (last (secd--d state))))
+	(rules (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-signs (secd--e state)))))))
+    (dolist (rule rules d)
+      (secd--cps-set-bot 'LDP d)
+      (secd--cps-set-bot rule d)
+      (secd--cps-set-bot 'AP0 d)
+      )
+    )
+  )
+
+(defun secd-comp--kb-knowcess (e goals &optional s)
+  (let ((clist (cons 'STOP nil)))
+    (dolist (goal goals clist)
+      (setq clist (cons 'LDP (cons goal (cons 'AP0 clist))))
+      )
+    (add-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)
+    (secd-cycle s e clist nil)
+    )
+  )
+
 
 (provide 'secd-comp-kb)
