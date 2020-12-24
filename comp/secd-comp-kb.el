@@ -100,7 +100,7 @@ Adds variables to list of names in `n', altering it.
 Returns environment and list of terminals found in conditions."
   (let ((env nil))
     (if (eq (car kb) 'rule)
-	(let ((rclist nil) (cclist nil) (axlist nil) (rvars  nil))
+	(let ((rclist nil) (cclist nil) (aclist nil) (axlist nil) (rvars  nil))
 	  ;; Push each condition in environment. Accumulate rule, variables.
 	  (dolist (c (car (cdr (cdr kb))))
 	    (let ((cn (gensym 'C))
@@ -114,14 +114,16 @@ Returns environment and list of terminals found in conditions."
 	    )
 	  ;; Compile RHS actions if any
 	  (dolist (ax (car (cdr (cdr (cdr kb)))))
-	    (let ((axcompiled (secd-compile-sexp--lazy ax '(UPD)))
+	    (let ((axn (gensym 'A))
+		  (axcompiled (secd-compile-sexp--lazy ax '(UPD)))
 		  )
-	      (setq axlist (cons 'LDE (cons (car axcompiled) (cons 'AP0 axlist))))
+	      (setq axlist (cons 'LDP (cons axn axlist)))
+	      (setq aclist (push (cons axn (car axcompiled)) aclist))
 	      (setq rvars  (append rvars (cdr axcompiled)))
 	      )
 	    )
-	  (insert (format "---\nax: %s\nrv: %s\n" axlist rvars))
-	  
+	  ;; (insert (format "---\nax: %s\nrv: %s\n" axlist rvars))
+	  ;; Generates: (LDP C_i ALL <n> SEL (LDP AX_i SEQ <m> LDC *T* JOIN) (LDC *F* JOIN)
 	  (setq
 	   rclist
 	   (append
@@ -134,11 +136,17 @@ Returns environment and list of terminals found in conditions."
 		  (cons
 		   'SEL
 		   (append
-		    (list (append axlist (cons 'JOIN nil)))
-		    (list (cons 'JOIN nil))
+		    (list (append
+			   axlist
+			   (cons 'SEQ
+				 (cons (/ (length axlist) 2)
+				       (cons 'LDC (cons '*T* (cons 'JOIN nil))))))
+		    (cons 'LDC (cons '*F* (cons 'JOIN nil))))
 		    (cons 'UPD nil)))
 		(cons 'UPD nil))))))
+
 	  (push (cons rn rclist) env)
+	  (setq env (append env aclist))
 	  (setq env (append env cclist))
 	  (cons env rvars)
 	  )
@@ -236,21 +244,23 @@ Returns environment and list of terminals found in conditions."
 	  (let ((d (car (last (secd--d state))))
 		(hypos (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-rules (secd--e state)))))))
 	    (dolist (hypo hypos d)
-	      (secd--cps-set-bot 'LDP d)
-	      (secd--cps-set-bot hypo d)
-	      (secd--cps-set-bot 'AP0 d)
+	      (when (listp (cdr (assoc hypo (secd--e state))))
+		(secd--cps-set-bot 'LDP d)
+		(secd--cps-set-bot hypo d)
+		(secd--cps-set-bot 'AP0 d))
 	      )
 	    )
 	)
     )	  
-	
   ;; Post rules from signs
   (let ((d (car (last (secd--d state))))
 	(rules (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-signs (secd--e state)))))))
     (dolist (rule rules d)
-      (secd--cps-set-bot 'LDP d)
-      (secd--cps-set-bot rule d)
-      (secd--cps-set-bot 'AP0 d)
+      (when (listp (cdr (assoc rule (secd--e state))))
+	(secd--cps-set-bot 'LDP d)
+	(secd--cps-set-bot rule d)
+	(secd--cps-set-bot 'AP0 d)
+	)
       )
     )
   )

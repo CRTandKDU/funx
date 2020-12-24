@@ -44,6 +44,7 @@
     ;;; Extension: CPS operators
     (ANY	. secd-any-cps)
     (ALL	. secd-all-cps)
+    (SEQ	. secd-seq-cps)
     (CPS	. secd-cps)
     (NOT	. secd-not)
     ))

@@ -19,6 +19,21 @@
     seq)
   )
 
+(defun secd-seq-cps (s e c d)
+  "SEQ <n> Eager sequence.
+(<n> . s) e (SEQ <n> . c ) d --> (sequence-of-n . s) e c d
+
+Prerequisite: <n> boolean promises, executed or not, on the
+stack. Ignore return.
+"
+  (list
+   s
+   e
+   (secd--cps-top 'AP0 (secd--cps-top 'CPS (cdr (cdr c))))
+   (cons (cons 'SEQ (car (cdr c))) d)
+   )
+  )
+
 (defun secd-any-cps (s e c d)
   "ANY <n> Eager logical OR.
 (<n> . s) e (ANY <n> . c ) d --> (ORed-n . s) e c d
@@ -138,6 +153,22 @@ stack. Forces evaluation according to logic in car d.
 		)
 	  ))
        )
+      )
+
+     (;; Continuation for SEQ control
+      (eq 'SEQ (car cps-type))
+      (save-current-buffer
+	(set-buffer (get-buffer-create "*SECD*"))
+	(insert (format "s:%s\nc:%s\nd:%s %d\n" s c (car d) n))
+	)
+      
+      (if (eq 0 n)
+	  ;; Last promise, exit and ignore return
+	  (list (nthcdr n s) e (cdr c) d)
+	;; More promises
+	(push (cons (car cps-type) (1- n)) d)
+	(list (cdr s) e (secd--cps-top 'AP0 (secd--cps-top 'CPS (cdr c))) d)
+	)
       )
 
      (t ;; Default: unknown continuation code
