@@ -10,7 +10,10 @@ s e (ASK v . c) d --> (v . s) e c d
     (set-buffer (get-buffer-create "*SECD*"))
     (insert (format "What is the value of %s?\n" (car (cdr c))))
     )
-  (insert (format "What is the value of %s?\n" (car (cdr c))))
+  (save-current-buffer
+    (set-buffer (get-buffer-create "*NXP-SESSION*"))
+    (insert (format "What is the value of %s?\n" (car (cdr c))))
+    )
   (list (cons (car (cdr c)) s) e (cdr (cdr c)) d)
   )
 
@@ -46,6 +49,7 @@ s e c d --> cdr(s) (push(cons(car(s),val),e) c d
       )
     )
   )
+
 
 (provide 'secd-io-group)
 

@@ -5,7 +5,7 @@
 (normal-top-level-add-subdirs-to-load-path)
 (require 'secd-exec)
 (require 'secd-comp-kb)
-
+(require 'nxp-ency)
 
 
 (setq a (secd-cycle nil '((x . 7)) '(LDC 14 LD x ASK y LDC 8 STOP) nil))What is the value of y?
@@ -889,41 +889,47 @@ What is the value of PRESSURE?
 
 (setq b7 (secd-comp--kb2env kb))
 
-
-
-
 (setq b5 (secd-comp--kb-knowcess b7 '(H)))
 What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+What is the value of CRT_and_KDU?
+
+
 
 (setq b5
-      (secd-answer b5 "agree" t))
-On CRT_and_KDU (agree): (STOP)
-On C602 (*F*): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 STOP)
-On R601 (*F*): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 STOP)
-On C596 (*T*): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 STOP)
+      (secd-answer b5 "disagree" t))
+What is the value of DOOR?
+What is the value of DOOR?
+What is the value of DOOR?
+What is the value of DOOR?
+
+
+
+
+(setq b5
+      (secd-answer b5 "open" t))
+What is the value of SWITCH?
+What is the value of SWITCH?
+What is the value of SWITCH?
+What is the value of SWITCH?
+
+
+
+(setq b5
+      (secd-answer b5 7 t))
+What is the value of TEMPERATURE?
+What is the value of TEMPERATURE?
 What is the value of PRESSURE?
+What is the value of TEMPERATURE?
 
-
-(setq b5
-      (secd-answer b5 "closed" t))
 
 (setq b5
       (secd-answer b5 10 t))
-On PRESSURE (10): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 STOP)
-On C597 (*T*): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 STOP)
-On VOLTAGE (25): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 STOP)
-On A598 (nil): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 STOP)
-On WATTS (2): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 STOP)
-On A599 (nil): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 STOP)
-On AMPERE (1): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 STOP)
-On A600 (nil): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 STOP)
-On R595 (*T*): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 STOP)
-On H (*T*): (LDP R608 AP0 LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP H AP0 STOP)
-On C609 (*F*): (LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP H AP0 STOP)
-On R608 (*F*): (LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP R595 AP0 LDP H AP0 STOP)
 
 (setq widgets (widget b7))
 (length widgets)
+
 (secd-compile-sexp--lazy '(x) nil)
 (insert (format "%s\n" b7))
 ((*FWRD-RULES* (R120 H1) (R116 H) (R113 H)) (*FWRD-SIGNS* (DOOR R120) (H1 R116) (PRESSURE R116 R113) (CRT_and_KDU R116 R113)) (H LDP R113 LDP R116 ANY 2 UPD) (H1 LDP R120 ANY 1 UPD) (CRT_and_KDU ASK CRT_and_KDU UPD) (PRESSURE ASK PRESSURE UPD) (DOOR ASK DOOR UPD) (R113 LDP C115 LDP C114 ALL 2 UPD) (C115 LDC 100 LDP PRESSURE AP0 LEQ UPD) (C114 LDC agree LDP CRT_and_KDU AP0 EQ UPD) (R116 LDP C119 LDP C118 LDP C117 ALL 3 UPD) (C119 LDC 50 LDP PRESSURE AP0 LEQ UPD) (C118 LDC *T* LDP H1 AP0 EQ UPD) (C117 LDC disagree LDP CRT_and_KDU AP0 EQ UPD) (R120 LDP C121 ALL 1 UPD) (C121 LDC open LDP DOOR AP0 EQ UPD))
@@ -945,3 +951,59 @@ On R608 (*F*): (LDP R601 AP0 LDP R595 AP0 LDP R601 AP0 LDP R595 AP0 LDP R595 AP0
        nil
        )
       )
+
+(defun nxp-session (kb)
+  "The NXP session alist contains all runtime information."
+  (let ((session nil) (env nil))
+    (setq env (secd-comp--kb2env kb))
+    (setq widgets (widget env))
+    (remove-hook 'secd-env-update-hook
+		 '(lambda (var val &optional state)
+		    (dolist (w widgets)
+		      (update-widget w var val))))
+    (add-hook 'secd-env-update-hook
+	      '(lambda (var val &optional state)
+		 (dolist (w widgets)
+		   (update-widget w var val))))
+    (push (cons 'KB kb) session) ;; KB source code 
+    (push (cons 'FASKB (copy-tree env)) session) ;; KB compiled code, immutable
+    (push (cons 'ENVIRONMENT env) session) ;; Initial environment 
+    (push (cons 'ENCY widgets) session) ;; Encyclopedia ewoc-based GUI
+    session
+    )
+  )
+    
+
+(setq session
+      (nxp-session
+       '((rule H1 ((eq CRT_and_KDU (quote "agree"))
+		   (leq PRESSURE '50))
+	       )
+	 (rule H2 ((leq PRESSURE '60)
+		   (eq TEMPERATURE '100))
+	       )
+	 (rule H2 ((leq '100 VOLUME))
+	       )
+	 )
+       )
+      )
+
+(assoc 'QUESTION session)
+
+
+
+(setq b5 (secd-comp--kb-knowcess
+	  (cdr (assoc 'FASKB session))
+	  '(H1)
+	  )
+      )
+What is the value of CRT_and_KDU?
+(setq b5 (secd-answer b5  "agree" t))
+What is the value of PRESSURE?
+What is the value of PRESSURE?
+
+(setq b5 (secd-answer b5 40 t))
+What is the value of TEMPERATURE?
+What is the value of TEMPERATURE?
+
+(setq b5 (secd-answer b5  150 t))

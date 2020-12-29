@@ -1,4 +1,4 @@
-;;; A compiler variant for compiling knowledge bases to environments
+;;; A functional compiler variant:  compiling knowledge bases to environments
 (require 'secd-env-group)
 (require 'secd-cps-group)
 (require 'secd-exec)
@@ -8,28 +8,44 @@
 ;; Forward chaining decorations
 (defconst secd--kb-forward-chaining-signs  '*FWRD-SIGNS*)
 (defconst secd--kb-forward-chaining-rules  '*FWRD-RULES*)
+(defconst secd--kb-backward-chaining-signs '*BWRD-SIGNS*)
+;; Backward chaining decorations
+(defconst secd--kb-RHS-set-variable  '*RHS*)
+(defconst secd--kb-LHS-variable  '*LHS*)
+
 ;; WHAT-IF decorations
 
 ;; Control options
-;; If true, rule values post their hypo evaluation only if `*T*' (gating on)
+;; If true, rule values post their hypo for evaluation only if `*T*' (gating on)
 (defvar secd--kb-option-forward-chaining-gate t)
+;; If true, when signs need evaluation backward immediately on rules the RHS
+;; of which `set's the signs. (Note: backward on hypos is automatic.)
+(defvar secd--kb-option-backward-chaining-rhs nil)
 
 (defun secd-compile-sexp--lazy (e c)
   "Compiles sexp `e' with continuation `c' and all variables bound to promises.
-Returns a cons of control list and variable names found in sexp `e'."
-  (let* ((names nil)
+Returns a cons of control list and LHS, RHS variable names found in sexp `e' in an alist with keys `*LHS' and `*RHS*' respectively."
+  (let* ((lhs-names nil) (rhs-names nil) (names nil)
 	 (clist (secd-comp--comp-lazy e 'names c))
 	 )
-    (cons  clist names))
+    ;; Splits between LHS and RHS
+    (dolist (deco names names)
+      (if (eq secd--kb-LHS-variable (car deco))
+	  (add-to-list 'lhs-names (cdr deco)))
+      (if (eq secd--kb-RHS-set-variable (car deco))
+	  (add-to-list 'rhs-names (cdr deco)))
+      )
+    (cons  clist (cons lhs-names rhs-names))
+    )
   )
 
 (defun secd-comp--comp-lazy (e n c)
   "Compiles expression `e', with names (quoted) `n' and continuation c.
-Adds variables to list of names in `n', altering it.
+Adds variables to alist of names in `n', altering it.
 "
   ;; (insert (format "--\ne: %s\nn: %s\nc: %s\n" e n c))
   ;; 0 arg
-  (if (atom e) (add-to-list n e))
+  (if (atom e) (add-to-list n (cons secd--kb-LHS-variable e)))
   (if (atom e) (cons 'LDP (cons e (cons 'AP0 c)))
     ;; 1 arg
     (if (eq (car e) 'car)
@@ -43,8 +59,9 @@ Adds variables to list of names in `n', altering it.
 	    ;; 2 args
 	    (if (eq (car e) 'cons)
 		(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'CONS c)))
+	      ;; Special processing for `set'.
 	    (if (eq (car e) 'set)
-		(secd-comp--comp-lazy (car (cdr (cdr e))) (add-to-list n (car (cdr e))) (cons 'LDC (cons (car (cdr e)) (cons 'SET c))))
+		(secd-comp--comp-lazy (car (cdr (cdr e))) (add-to-list n (cons secd--kb-RHS-set-variable (car (cdr e)))) (cons 'LDC (cons (car (cdr e)) (cons 'SET c))))
 	      (if (eq (car e) 'eq)
 		  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'EQ c)))
 		(if (eq (car e) 'in)
@@ -100,7 +117,9 @@ Adds variables to list of names in `n', altering it.
 Returns environment and list of terminals found in conditions."
   (let ((env nil))
     (if (eq (car kb) 'rule)
-	(let ((rclist nil) (cclist nil) (aclist nil) (axlist nil) (rvars  nil))
+	(let ((rclist nil) (cclist nil) (aclist nil) (axlist nil)
+	      (rhs-rvars nil) (rvars  nil))
+	  ;; Compile LHS conditions
 	  ;; Push each condition in environment. Accumulate rule, variables.
 	  (dolist (c (car (cdr (cdr kb))))
 	    (let ((cn (gensym 'C))
@@ -108,7 +127,7 @@ Returns environment and list of terminals found in conditions."
 		  )
 	      (setq rclist (cons 'LDP (cons cn rclist)))
 	      (setq cclist (push (cons cn (car ccompiled)) cclist))
-	      (setq rvars  (append rvars (cdr ccompiled)))
+	      (setq rvars  (append rvars (cadr ccompiled)))
 	      ;; (insert (format "---\nc: %s\nrclist :%s\ncclist: %s\n" c rclist cclist))
 	      )
 	    )
@@ -119,7 +138,8 @@ Returns environment and list of terminals found in conditions."
 		  )
 	      (setq axlist (cons 'LDP (cons axn axlist)))
 	      (setq aclist (push (cons axn (car axcompiled)) aclist))
-	      (setq rvars  (append rvars (cdr axcompiled)))
+	      (setq rvars  (append rvars (cadr axcompiled)))
+	      (setq rhs-rvars  (append rhs-rvars (cddr axcompiled)))
 	      )
 	    )
 	  ;; (insert (format "---\nax: %s\nrv: %s\n" axlist rvars))
@@ -148,7 +168,7 @@ Returns environment and list of terminals found in conditions."
 	  (push (cons rn rclist) env)
 	  (setq env (append env aclist))
 	  (setq env (append env cclist))
-	  (cons env rvars)
+	  (cons env (cons rvars rhs-rvars))
 	  )
       nil
       )
@@ -157,12 +177,14 @@ Returns environment and list of terminals found in conditions."
 
 (defun secd-comp--kb2env (kb)
   "Compiles a complete environment for knowledge base `kb'."
+  ;; Adds typed graph edges in several passes
   (let (
 	(env nil)     ;; Environment incrementally built from rule sexps
 	(hypos nil)   ;; Collect hypotheses
 	(signs nil)   ;; Collect signs, i.e. non-hypo terminals in conds
 	(flist nil)   ;; Forward-chaining signs -> rule alist
 	(frlst nil)   ;; Forward-chaining rule -> hypo alist
+	(blist nil)   ;; Backward-chaining set-variable -> rule
 	)
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
@@ -183,24 +205,26 @@ Returns environment and list of terminals found in conditions."
 	(if (assoc (cadr rule) hypos) (push rn (cdr (assoc (cadr rule) hypos)))
 	  (push (cons (cadr rule) (cons rn nil)) hypos))
 	(setq env (append env (car rcompiled)))
-	(dolist (var (cdr rcompiled) flist)
+	;; Separate lists for bwrd on set-variables and fwrd on signs
+	(dolist (var (cadr rcompiled) flist)
 	  (if (assoc var flist) (push rn (cdr (assoc var flist)))
 	    (push (cons var (cons rn nil)) flist)))
-	(dolist (var (cdr rcompiled) signs) (add-to-list 'signs var))
+	(dolist (var (cddr rcompiled) blist)
+	  (if (assoc var blist) (push rn (cdr (assoc var blist)))
+	    (push (cons var (cons rn nil)) blist)))
+	(dolist (var (cadr rcompiled) signs) (add-to-list 'signs var))
+	(dolist (var (cddr rcompiled) signs) (add-to-list 'signs var))
 	)
       )
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
-      (insert (format "---Pass 1:\nH: %s\nE: %s\nT: %s\nF: %s\n" hypos env signs flist))
+      (insert (format "---Pass 1:\nH: %s\nE: %s\nT: %s\nF: %s\nB: %s\n" hypos env signs flist blist))
       )
     ;; Pass #2
-    ;; Increment environment with terminals
+    ;; Increment environment with terminals (both LHS and RHS)
     (dolist (sign signs env)
       (if (null (assoc sign hypos))
-	  (push
-	   (cons sign (cons 'ASK (cons sign (cons 'UPD nil))))
-	   env
-	   )
+	  (push (cons sign (cons 'ASK (cons sign (cons 'UPD nil)))) env)
 	)
       )
     (save-current-buffer
@@ -223,6 +247,7 @@ Returns environment and list of terminals found in conditions."
     ;; Increment environment with forward-chaining links
     (push (cons secd--kb-forward-chaining-signs flist) env )
     (push (cons secd--kb-forward-chaining-rules frlst) env )
+    (push (cons secd--kb-backward-chaining-signs blist) env )
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
       (insert (format "---Pass 3:\nH: %s\nE: %s\nT: %s\n" hypos env signs))
@@ -235,14 +260,27 @@ Returns environment and list of terminals found in conditions."
 
 ;; Forward-chaining hook: signs to rules, conditionally rules to hypos
 (defun secd-comp--kb-forward-hook (var val state)
-  (insert (format "On %s (%s): %s\n" var val (car (last (secd--d state)))))
-  ;; Post hypos from rules
+  (save-current-buffer
+    (set-buffer (get-buffer-create "*SECD*"))
+    (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
+      (insert
+       (propertize
+	(format "FWRD: On %s (%s): %s\n" var val (car (last (secd--d state))))
+	'face `(foreground-color . ,cstr))
+       )
+      )
+    )
+  ;; Post delayed hypos from rules
   (if (assoc var (cdr (assoc secd--kb-forward-chaining-rules (secd--e state))))
       (if (or (null secd--kb-option-forward-chaining-gate)
 	      (and  secd--kb-option-forward-chaining-gate
 		    (equal val secd--ops-true)))
 	  (let ((d (car (last (secd--d state))))
 		(hypos (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-rules (secd--e state)))))))
+	    (save-current-buffer
+	      (set-buffer (get-buffer-create "*SECD*"))
+	      (insert (format "FWRD GATE:%s (%s): %s\n" var val (car (last (secd--d state))))))
+	    
 	    (dolist (hypo hypos d)
 	      (when (listp (cdr (assoc hypo (secd--e state))))
 		(secd--cps-set-bot 'LDP d)
@@ -252,7 +290,7 @@ Returns environment and list of terminals found in conditions."
 	    )
 	)
     )	  
-  ;; Post rules from signs
+  ;; Post delayed rules from signs
   (let ((d (car (last (secd--d state))))
 	(rules (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-signs (secd--e state)))))))
     (dolist (rule rules d)
@@ -263,6 +301,9 @@ Returns environment and list of terminals found in conditions."
 	)
       )
     )
+  (save-current-buffer
+    (set-buffer (get-buffer-create "*SECD*"))
+    (insert (format "FWRD:    %s (%s): %s\n" var val (car (last (secd--d state))))))
   )
 
 (defun secd-comp--kb-knowcess (e goals &optional s)
@@ -274,6 +315,5 @@ Returns environment and list of terminals found in conditions."
     (secd-cycle s e clist nil)
     )
   )
-
 
 (provide 'secd-comp-kb)

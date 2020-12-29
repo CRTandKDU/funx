@@ -49,7 +49,8 @@
     (NOT	. secd-not)
     ))
 
-(defvar secd-exec-hook nil)
+(defvar secd-exec-control-hook nil)
+(defvar secd-exec-stop-hook nil)
 
 (defun secd--s (state) (car state))
 (defun secd--e (state) (car (cdr state)))
@@ -78,16 +79,16 @@
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD*"))
       (erase-buffer)
-      (insert (format "-- NEW THREAD:\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c d (car c)))
+      (insert (format "-- NEW THREAD:\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c nil (car c)))
       )
     ;; Steps through the instructions in control list `control'
     (catch 'STOP
       (while c
-	(run-hook-with-args 'secd-exec-hook (list s e c d))
+	(run-hook-with-args 'secd-exec-control-hook (list s e c d))
 	;; Trace
 	(save-current-buffer
 	  (set-buffer (get-buffer-create "*SECD*"))
-	  (insert (format "s:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c d (car c)))
+	  (insert (format "s:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c nil (car c)))
 	  ;; (insert
 	  ;;  (format "%s,%s,%s,%s,%s\n" (car c) s e c d))
 	  )
@@ -98,7 +99,9 @@
 	  (throw 'STOP
 		 (funcall transition (cdr (assoc (car c) secd--mnemonics)))))
 	 ;; Without transition, ends loop
-	 ((eq 'STOP (car c)) (throw 'STOP (list s e c d)))
+	 ((eq 'STOP (car c))
+	  (run-hook-with-args 'secd-exec-stop-hook (list s e c d))
+	  (throw 'STOP (list s e c d)))
 	 ;; Execute controls from mnemonics alist
 	 ((assoc (car c) secd--mnemonics)
 	    (funcall transition (cdr (assoc (car c) secd--mnemonics)))
