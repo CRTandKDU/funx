@@ -2,6 +2,45 @@
 #+SUBTITLE: NXP Runtime
 #+AUTHOR: jmc
 
+* DONE Reviving satfault.kb! <2021-01-03 dim.>
+Utilities to convert from the XML knowledge base format used in the LLVM C++ implementation to the sexps of the simple LISP variant. (Also converts to an Emacs ~tree-widget~ showing the XML structure.)
+
+Introduced the /not/ operator in simple LISP variant for knowledge bases.
+
+Introduced ~*T*~ and ~*F*~ "constant" promises in rule compilation, in order to handle conditions like ~(eq <VAR> *T*)~ where logical constants appear as promises to the compiler.
+
+* DONE Forward chaining. RHS. Initial text client (Encyclopedia) <2020-12-29 mar.>
+** Forward chaining
+Forward chaining is implemented as an Emacs hook into the group of environment related functions ~(defvar secd-env-update-hook nil)~. It is installed in the utility /Knowcess/ function provided by the knowledge base compiler:
+
+#+BEGIN_SRC: emacs-lisp
+(defun secd-comp--kb-knowcess (e goals &optional s)
+  (let ((clist (cons 'STOP nil)))
+    (dolist (goal goals clist)
+      (setq clist (cons 'LDP (cons goal (cons 'AP0 clist))))
+      )
+    (add-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)
+    (secd-cycle s e clist nil)
+    )
+  )
+#+END_SRC
+
+It basically posts all rules which LHSes mention the updated sign, or the hypo of the rule when its evaluation is known (according to an inference option flag for /gating/ ~(defvar secd--kb-option-forward-chaining-gate t)~.
+
+** Right-hand sides
+RHS are the /then do/ part of rules and consist of a sequence of functional expressions in the simple LISP variant. A new operator is introduced to operate on the environment, i.e. on signs, ~set: var val~ which directly assigns to promise ~var~ the value ~val~ ignoring its control list. (Triggering forward-chaining as the environment is updated.)
+
+The implementation of a RHS execution follows the CPS already used in LHSes. A new control is introduced, ~SEQ~ which like ~ANY~ and ~ALL~ works in conjunction with ~CPS~, by sequentially pushing the control sublists for RHS actions onto the global control list.
+
+** Experimental text-based client
+An implementation of the /Encyclopedia/ is suggested using Emacs /ewoc/ structures and simple commands to /Knowcess/, /Answer/ and /Reset/ at this (early) stage.
+
+A standard MVC pattern is installed to link environment, encyclopedia and commands using Emacs hooks again (into the environment related group of functions).
+
+#+CAPTION: An example session running on Emacs. Top left: the knowledge base, top right: the session trace and bottom: the Encyclopedia.
+#+NAME:   fig:Session
+[[./NXP-Session.png]]
+
 * DONE Factored out environment management. Forward infra.
 The access and update environment functions are isolated in their own group, and hooks are installed for update events. Hook functions support the tentative signature ~(lambda (var-name value &optional state)~.
 

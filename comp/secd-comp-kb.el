@@ -56,59 +56,61 @@ Adds variables to alist of names in `n', altering it.
 	    (secd-comp--comp-lazy (car (cdr e)) n (cons 'ATOM c))
 	  (if (eq (car e) 'quote)
 	      (cons 'LDC (cons (car (cdr e)) c))
-	    ;; 2 args
-	    (if (eq (car e) 'cons)
-		(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'CONS c)))
-	      ;; Special processing for `set'.
-	    (if (eq (car e) 'set)
-		(secd-comp--comp-lazy (car (cdr (cdr e))) (add-to-list n (cons secd--kb-RHS-set-variable (car (cdr e)))) (cons 'LDC (cons (car (cdr e)) (cons 'SET c))))
-	      (if (eq (car e) 'eq)
-		  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'EQ c)))
-		(if (eq (car e) 'in)
-		    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'IN c)))
-		  (if (eq (car e) 'leq)
-		      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'LEQ c)))
-		    (if (eq (car e) 'add)
-			(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'ADD c)))
-		      (if (eq (car e) 'sub)
-			  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'SUB c)))
-			(if (eq (car e) 'mul)
-			    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'MUL c)))
-			  (if (eq (car e) 'div)
-			      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'DIV c)))
-			    (if (eq (car e) 'rem)
-				(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'REM c)))
-			      ;; 3 args
-			      (if (eq (car e) 'if)
-				  ((lambda (cont-t cont-f)
-				     (secd-comp--comp-lazy (car (cdr e)) n
-							   (cons 'SEL (cons cont-t (cons cont-f c)))))
-				   (secd-comp--comp-lazy (car (cdr (cdr e))) n '(JOIN))
-				   (secd-comp--comp-lazy (car (cdr (cdr (cdr e)))) n '(JOIN)))
-				;; many args
-				(if (eq (car e) 'lambda)
-				    (cons 'LDF
-					  (cons
-					   (cons (car (cdr e))
-						 (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN)))
-					   c)
-					  )
-				  (if (eq (car e) 'let)
-				      (cons 'DUM
-					    (secd-comp--list
-					     (car (cdr e))
-					     n
-					     (cons 'LDF (cons (cons (secd-comp--vars (car (cdr e))) (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
-				    ;; Rest has to be an application
-				    (secd-comp--args
-				     (cdr e)
-				     n
-				     (secd-comp--comp-lazy (car e) n (cons 'AP c)))
-				    ;; Done
+	    (if (eq (car e) 'not)
+		(secd-comp--comp-lazy (car (cdr e)) n (cons 'NOT c))
+	      ;; 2 args
+	      (if (eq (car e) 'cons)
+		  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'CONS c)))
+		;; Special processing for `set'.
+		(if (eq (car e) 'set)
+		    (secd-comp--comp-lazy (car (cdr (cdr e))) (add-to-list n (cons secd--kb-RHS-set-variable (car (cdr e)))) (cons 'LDC (cons (car (cdr e)) (cons 'SET c))))
+		  (if (eq (car e) 'eq)
+		      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'EQ c)))
+		    (if (eq (car e) 'in)
+			(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'IN c)))
+		      (if (eq (car e) 'leq)
+			  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'LEQ c)))
+			(if (eq (car e) 'add)
+			    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'ADD c)))
+			  (if (eq (car e) 'sub)
+			      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'SUB c)))
+			    (if (eq (car e) 'mul)
+				(secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'MUL c)))
+			      (if (eq (car e) 'div)
+				  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'DIV c)))
+				(if (eq (car e) 'rem)
+				    (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'REM c)))
+				  ;; 3 args
+				  (if (eq (car e) 'if)
+				      ((lambda (cont-t cont-f)
+					 (secd-comp--comp-lazy (car (cdr e)) n
+							       (cons 'SEL (cons cont-t (cons cont-f c)))))
+				       (secd-comp--comp-lazy (car (cdr (cdr e))) n '(JOIN))
+				       (secd-comp--comp-lazy (car (cdr (cdr (cdr e)))) n '(JOIN)))
+				    ;; many args
+				    (if (eq (car e) 'lambda)
+					(cons 'LDF
+					      (cons
+					       (cons (car (cdr e))
+						     (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN)))
+					       c)
+					      )
+				      (if (eq (car e) 'let)
+					  (cons 'DUM
+						(secd-comp--list
+						 (car (cdr e))
+						 n
+						 (cons 'LDF (cons (cons (secd-comp--vars (car (cdr e))) (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
+					;; Rest has to be an application
+					(secd-comp--args
+					 (cdr e)
+					 n
+					 (secd-comp--comp-lazy (car e) n (cons 'AP c)))
+					;; Done
+					)
+				      )
 				    )
-				  )
-				)
-			      )))))))))))))))
+				  ))))))))))))))))
     )
 
 ;; KB compilers
@@ -127,8 +129,14 @@ Returns environment and list of terminals found in conditions."
 		  )
 	      (setq rclist (cons 'LDP (cons cn rclist)))
 	      (setq cclist (push (cons cn (car ccompiled)) cclist))
-	      (setq rvars  (append rvars (cadr ccompiled)))
-	      ;; (insert (format "---\nc: %s\nrclist :%s\ncclist: %s\n" c rclist cclist))
+	      ;; (setq rvars  (append rvars (cadr ccompiled)))
+	      ;; Prepare list of signs -> condition forward decorations
+	      ;; with the exception of constant promises `*T*' and `*F*'
+	      (dolist (var (cadr ccompiled) rvars)
+		(if (and (not (equal var secd--ops-true))
+			 (not (equal var secd--ops-false)))
+		    (push (cons var (cons cn rn)) rvars)))
+	      ;; (insert (format "---\nc: %s\nrvars :%s\ncclist: %s\n" c rvars cclist))
 	      )
 	    )
 	  ;; Compile RHS actions if any
@@ -138,8 +146,10 @@ Returns environment and list of terminals found in conditions."
 		  )
 	      (setq axlist (cons 'LDP (cons axn axlist)))
 	      (setq aclist (push (cons axn (car axcompiled)) aclist))
-	      (setq rvars  (append rvars (cadr axcompiled)))
-	      (setq rhs-rvars  (append rhs-rvars (cddr axcompiled)))
+	      ;; (setq rvars  (append rvars (cadr axcompiled)))
+	      (dolist (var (cadr axcompiled) rvars)
+		(push (cons var (cons axn rn)) rvars))
+	      (setq rhs-rvars  (append rhs-rvars (cddr axcompiled))) 
 	      )
 	    )
 	  ;; (insert (format "---\nax: %s\nrv: %s\n" axlist rvars))
@@ -206,13 +216,17 @@ Returns environment and list of terminals found in conditions."
 	  (push (cons (cadr rule) (cons rn nil)) hypos))
 	(setq env (append env (car rcompiled)))
 	;; Separate lists for bwrd on set-variables and fwrd on signs
-	(dolist (var (cadr rcompiled) flist)
-	  (if (assoc var flist) (push rn (cdr (assoc var flist)))
-	    (push (cons var (cons rn nil)) flist)))
+	;; Merge (var Ci Rj) from different rules
+	(dolist (var-c-r (cadr rcompiled) flist)
+	  ;; (if (assoc var flist) (push rn (cdr (assoc var flist)))
+	  ;;   (push (cons var (cons rn nil)) flist)))
+	  (if (assoc (car var-c-r) flist)
+	      (push (cdr var-c-r) (cdr (assoc (car var-c-r) flist)))
+	    (push (cons (car var-c-r) (list (cdr var-c-r))) flist)))
 	(dolist (var (cddr rcompiled) blist)
 	  (if (assoc var blist) (push rn (cdr (assoc var blist)))
 	    (push (cons var (cons rn nil)) blist)))
-	(dolist (var (cadr rcompiled) signs) (add-to-list 'signs var))
+	(dolist (var (cadr rcompiled) signs) (add-to-list 'signs (car var)))
 	(dolist (var (cddr rcompiled) signs) (add-to-list 'signs var))
 	)
       )
@@ -221,12 +235,49 @@ Returns environment and list of terminals found in conditions."
       (insert (format "---Pass 1:\nH: %s\nE: %s\nT: %s\nF: %s\nB: %s\n" hypos env signs flist blist))
       )
     ;; Pass #2
-    ;; Increment environment with terminals (both LHS and RHS)
+    ;; Increment environment with terminals (both from LHS and from RHS)
+    ;; Create *BWRD-SIGNS*
+    (push (cons secd--kb-backward-chaining-signs blist) env )
+    ;; Push constant promises
+    (push (cons secd--ops-true
+		(cons 'LDC (cons secd--ops-true (cons 'UPD nil))))
+	  env)
+    (push (cons secd--ops-false
+		(cons 'LDC (cons secd--ops-false (cons 'UPD nil))))
+	  env)
+
     (dolist (sign signs env)
+      ;; Do nothing if sign is an hypo, backward chaining is built-in
       (if (null (assoc sign hypos))
-	  (push (cons sign (cons 'ASK (cons sign (cons 'UPD nil)))) env)
+	  ;; Do we backward chain on RHS settable signs?
+	  (let ((rhs-rules
+		 (cdr (assoc sign (cdr (assoc secd--kb-backward-chaining-signs env)))))
+		)
+	    (if (and secd--kb-option-backward-chaining-rhs rhs-rules)
+		(let* ((n (length rhs-rules))
+		       ;; (ctrls (list 'ANY n 'SEL '(JOIN) (list 'ASK sign 'JOIN) 'UPD))
+		       (ctrls (list 'ANY n
+				    'SEL
+				    (list 'LDP sign 'JOIN)
+				    (list 'ASK sign 'JOIN) 'UPD))
+		      )   
+		  (save-current-buffer
+		    (set-buffer (get-buffer-create "*SECD-COMP*"))
+		    (insert (format "---RHS B-C:\nS: %s (%d rules)\n" sign n))
+		    )
+		  (dolist (r rhs-rules)
+		    (push r ctrls)
+		    (push 'LDP ctrls)
+		    )
+		  (push (cons sign ctrls) env)
+		  )
+	      (push (cons sign (cons 'ASK (cons sign (cons 'UPD nil)))) env))
+	    )
+	;; No: standard ASK <SIGN> UPD control list
+	(push (cons sign (cons 'ASK (cons sign (cons 'UPD nil)))) env)
 	)
       )
+
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
       (insert (format "---Pass 2:\nH: %s\nE: %s\nT: %s\n" hypos env signs))
@@ -247,7 +298,7 @@ Returns environment and list of terminals found in conditions."
     ;; Increment environment with forward-chaining links
     (push (cons secd--kb-forward-chaining-signs flist) env )
     (push (cons secd--kb-forward-chaining-rules frlst) env )
-    (push (cons secd--kb-backward-chaining-signs blist) env )
+
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))
       (insert (format "---Pass 3:\nH: %s\nE: %s\nT: %s\n" hypos env signs))
@@ -290,13 +341,17 @@ Returns environment and list of terminals found in conditions."
 	    )
 	)
     )	  
-  ;; Post delayed rules from signs
+  ;; Post delayed condition then rules, from signs
   (let ((d (car (last (secd--d state))))
-	(rules (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-signs (secd--e state)))))))
-    (dolist (rule rules d)
-      (when (listp (cdr (assoc rule (secd--e state))))
+	(cond-rule-list
+	 (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-signs (secd--e state)))))))
+    (dolist (c-r cond-rule-list d)
+      (when (listp (cdr (assoc (car c-r) (secd--e state))))
 	(secd--cps-set-bot 'LDP d)
-	(secd--cps-set-bot rule d)
+	(secd--cps-set-bot (car c-r) d)
+	(secd--cps-set-bot 'AP0 d)
+	(secd--cps-set-bot 'LDP d)
+	(secd--cps-set-bot (cdr c-r) d)
 	(secd--cps-set-bot 'AP0 d)
 	)
       )

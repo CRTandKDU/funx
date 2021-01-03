@@ -1,5 +1,6 @@
 ;; Experimental client to the NXP architecture
 ;; Encyclopedia buffer, using ewocs. (Ewoc means “Emacs’s Widget for Object Collections”)
+(require 'secd-comp-kb)
 
 (defun nxp-ency--promise-pp (p)
   (let ((col1 (car p))
@@ -90,7 +91,7 @@
   (save-current-buffer
     (set-buffer (get-buffer-create "*NXP-SESSION*"))
     (goto-char (point-max))
-    (insert (format "USER> %s\n" val))
+    (insert (format "ANSWER> %s\n" val))
     )
   (if (assoc 'QUESTION session)
       (let ((question
@@ -119,12 +120,15 @@
   (setq major-mode 'nxp-ency-mode mode-name "NXP Encyclopedia mode")
   (use-local-map nxp-ency-mode-map)
   (erase-buffer)
-  (let ((fsigns (cdr (assoc '*FWRD-SIGNS* env)))
+  (let ((fsigns
+	 (let ((-compare-fn (lambda (x y) (equal (car x) (car y)))))
+	   (-union (cdr (assoc secd--kb-forward-chaining-signs env))
+		   (cdr (assoc secd--kb-backward-chaining-signs env)))))
 	(wsigns (ewoc-create 'nxp-ency--promise-pp (format "%19s" "Signs")
 			     (substitute-command-keys
                               "\n\\{nxp-ency-mode-map}")
 			     ))
-	(fhypos (cdr (assoc '*FWRD-RULES* env)))
+	(fhypos (cdr (assoc secd--kb-forward-chaining-rules env)))
 	(whypos (ewoc-create 'nxp-ency--promise-pp (format "%19s" "Hypos") "Footer"))
 	)
     (let ((signs (-sort 'string< (mapcar 'car fsigns))))

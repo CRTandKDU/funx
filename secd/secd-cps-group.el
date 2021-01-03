@@ -162,7 +162,7 @@ stack. Forces evaluation according to logic in car d.
 	(insert (format "s:%s\nc:%s\nd:%s %d\n" s c (car d) n))
 	)
       
-      (if (eq 0 n)
+      (if (eq 1 n)
 	  ;; Last promise, exit and ignore return
 	  (list (nthcdr n s) e (cdr c) d)
 	;; More promises
