@@ -59,7 +59,14 @@
 
 (require 'kb-xml-parse)
 
-
+;; Use: M-x kb-xml-parse-buffer satfault.xml
 (setq session (nxp-session SATFAULT))
+
+(setq session
+      (nxp-session
+       '((rule H1 ((leq a '100)))
+	 (rule H2 ((leq '100 a)))
+	 )
+       ))
 
 

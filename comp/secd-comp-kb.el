@@ -9,9 +9,11 @@
 (defconst secd--kb-forward-chaining-signs  '*FWRD-SIGNS*)
 (defconst secd--kb-forward-chaining-rules  '*FWRD-RULES*)
 (defconst secd--kb-backward-chaining-signs '*BWRD-SIGNS*)
+(defconst secd--kb-toplevel-control-list   '*SECD-TOPLEVEL-CLIST*)
 ;; Backward chaining decorations
 (defconst secd--kb-RHS-set-variable  '*RHS*)
 (defconst secd--kb-LHS-variable  '*LHS*)
+
 
 ;; WHAT-IF decorations
 
@@ -133,6 +135,8 @@ Returns environment and list of terminals found in conditions."
 	      ;; Prepare list of signs -> condition forward decorations
 	      ;; with the exception of constant promises `*T*' and `*F*'
 	      (dolist (var (cadr ccompiled) rvars)
+		;; Introduced tests on  `*T*' and `*F*' to handle
+		;; (eq var *T*) instead of (eq var (quote *T*)). Useful?
 		(if (and (not (equal var secd--ops-true))
 			 (not (equal var secd--ops-false)))
 		    (push (cons var (cons cn rn)) rvars)))
@@ -218,8 +222,6 @@ Returns environment and list of terminals found in conditions."
 	;; Separate lists for bwrd on set-variables and fwrd on signs
 	;; Merge (var Ci Rj) from different rules
 	(dolist (var-c-r (cadr rcompiled) flist)
-	  ;; (if (assoc var flist) (push rn (cdr (assoc var flist)))
-	  ;;   (push (cons var (cons rn nil)) flist)))
 	  (if (assoc (car var-c-r) flist)
 	      (push (cdr var-c-r) (cdr (assoc (car var-c-r) flist)))
 	    (push (cons (car var-c-r) (list (cdr var-c-r))) flist)))
@@ -238,13 +240,13 @@ Returns environment and list of terminals found in conditions."
     ;; Increment environment with terminals (both from LHS and from RHS)
     ;; Create *BWRD-SIGNS*
     (push (cons secd--kb-backward-chaining-signs blist) env )
-    ;; Push constant promises
-    (push (cons secd--ops-true
-		(cons 'LDC (cons secd--ops-true (cons 'UPD nil))))
-	  env)
-    (push (cons secd--ops-false
-		(cons 'LDC (cons secd--ops-false (cons 'UPD nil))))
-	  env)
+    ;; Push constant promises for *T* and *F*. See also remark above.
+    ;; (push (cons secd--ops-true
+    ;; 		(cons 'LDC (cons secd--ops-true (cons 'UPD nil))))
+    ;; 	  env)
+    ;; (push (cons secd--ops-false
+    ;; 		(cons 'LDC (cons secd--ops-false (cons 'UPD nil))))
+    ;; 	  env)
 
     (dolist (sign signs env)
       ;; Do nothing if sign is an hypo, backward chaining is built-in
@@ -309,56 +311,125 @@ Returns environment and list of terminals found in conditions."
 
 ;;; Commands: Operating the kb compiler
 
+(defun secd-comp--kb-toplevel-clist (state)
+  (cdr (assoc secd--kb-toplevel-control-list (secd--d state)))
+  )
+
 ;; Forward-chaining hook: signs to rules, conditionally rules to hypos
 (defun secd-comp--kb-forward-hook (var val state)
-  (save-current-buffer
-    (set-buffer (get-buffer-create "*SECD*"))
-    (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
-      (insert
-       (propertize
-	(format "FWRD: On %s (%s): %s\n" var val (car (last (secd--d state))))
-	'face `(foreground-color . ,cstr))
-       )
+  ;; Searching for the top-level control list
+  ;; (let ((tlcl
+  ;; 	 (or
+  ;; 	  (and (car (last (secd--d state)))
+  ;; 	       (null (eq 'SEQ (car (car (last (secd--d state))))))
+  ;; 	       (car (last (secd--d state))))
+  ;; 	  (secd--c state))))
+  (let ((tlcl (secd-comp--kb-toplevel-clist state)))
+    ;; Entry
+    (save-current-buffer
+      (set-buffer (get-buffer-create "*SECD*"))
+      (goto-char (point-max))
+      (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
+	(insert
+	 (propertize
+	  (format "FWRD-HOOK: On %s (%s):\n %s\nTLCL: %s\n"
+		  var val
+		  (car (last (secd--d state))) tlcl)
+	  'face `(foreground-color . ,cstr))
+	 )
+	)
       )
-    )
-  ;; Post delayed hypos from rules
-  (if (assoc var (cdr (assoc secd--kb-forward-chaining-rules (secd--e state))))
-      (if (or (null secd--kb-option-forward-chaining-gate)
-	      (and  secd--kb-option-forward-chaining-gate
-		    (equal val secd--ops-true)))
-	  (let ((d (car (last (secd--d state))))
-		(hypos (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-rules (secd--e state)))))))
-	    (save-current-buffer
-	      (set-buffer (get-buffer-create "*SECD*"))
-	      (insert (format "FWRD GATE:%s (%s): %s\n" var val (car (last (secd--d state))))))
-	    
-	    (dolist (hypo hypos d)
-	      (when (listp (cdr (assoc hypo (secd--e state))))
-		(secd--cps-set-bot 'LDP d)
-		(secd--cps-set-bot hypo d)
-		(secd--cps-set-bot 'AP0 d))
-	      )
+    ;; Pass #1: A rule truth value forwards its yet unevaluated hypo
+    (let ((r-to-h (cdr (assoc secd--kb-forward-chaining-rules (secd--e state))))
+	  )
+      ;; Is rule in FWRD-CHAIN rule-to-hypo alist?
+      (if (assoc var r-to-h)
+	  ;; Is forwarding-on-true-rules-only ON?
+	  (if (or (null secd--kb-option-forward-chaining-gate)
+		  (and  secd--kb-option-forward-chaining-gate
+			(equal val secd--ops-true)))
+	      ;; Find the top-level control list which is either in c
+	      ;; if we already are at top-level or in the last element of d
+	      ;; if we are in an application of a promise (through `A0').
+	      (let (;;(tlcl  (or (car (last (secd--d state))) (secd--c state)))
+		    (hypos (cdr (assoc var r-to-h)))
+		    )
+		(save-current-buffer
+		  (set-buffer (get-buffer-create "*SECD*"))
+		  (goto-char (point-max))
+		  (insert (format "\tFWRD GATE:%s (%s):\n\t %s\n"
+				  var val	tlcl))
+		  )
+		
+		(dolist (hypo
+			 hypos
+			 (let ((nhypos (length hypos)))
+			   (when (> nhypos 0)
+			     (secd--cps-set-bot 'SEQ tlcl)
+			     (secd--cps-set-bot nhypos tlcl)
+			     )
+			   tlcl)
+			 )
+		  (when (listp (cdr (assoc hypo (secd--e state))))
+		    (secd--cps-set-bot 'LDP tlcl)
+		    (secd--cps-set-bot hypo tlcl)
+		    )
+		  )
+		)
 	    )
 	)
-    )	  
-  ;; Post delayed condition then rules, from signs
-  (let ((d (car (last (secd--d state))))
-	(cond-rule-list
-	 (cdr (assoc var (cdr (assoc secd--kb-forward-chaining-signs (secd--e state)))))))
-    (dolist (c-r cond-rule-list d)
-      (when (listp (cdr (assoc (car c-r) (secd--e state))))
-	(secd--cps-set-bot 'LDP d)
-	(secd--cps-set-bot (car c-r) d)
-	(secd--cps-set-bot 'AP0 d)
-	(secd--cps-set-bot 'LDP d)
-	(secd--cps-set-bot (cdr c-r) d)
-	(secd--cps-set-bot 'AP0 d)
+      )
+    
+    (save-current-buffer
+      (set-buffer (get-buffer-create "*SECD*"))
+      (goto-char (point-max))
+      (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
+	(insert
+	 (propertize
+	  (format "FWRD (1) d: %s\n" (secd--d state))
+	  'face `(foreground-color . ,cstr))
+	 )
+	)
+      )
+
+    ;; Pass #2: A known sign forwards its conditions, then rules
+    ;; Find top-level control list, see above.
+    (let (;;(tlcl  (or (car (last (secd--d state))) (secd--c state)))
+	  (cond-rule-list
+	   (cdr
+	    (assoc var
+		   (cdr
+		    (assoc secd--kb-forward-chaining-signs (secd--e state)))))))
+      (dolist (c-r
+	       cond-rule-list
+	       (let ((npromises (* 2 (length cond-rule-list))))
+		 (when (> npromises 0)
+		   (secd--cps-set-bot 'SEQ tlcl)
+		   (secd--cps-set-bot npromises tlcl)
+		   )
+		 tlcl
+		 )
+	       )
+	(when (listp (cdr (assoc (car c-r) (secd--e state))))
+	  (secd--cps-set-bot 'LDP tlcl)
+	  (secd--cps-set-bot (cdr c-r) tlcl)
+	  (secd--cps-set-bot 'LDP tlcl)
+	  (secd--cps-set-bot (car c-r) tlcl)
+	  )
+	)
+      )
+    
+    (save-current-buffer
+      (set-buffer (get-buffer-create "*SECD*"))
+      (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
+	(insert
+	 (propertize
+	  (format "FWRD (2) d: %s\n" (secd--d state))
+	  'face `(foreground-color . ,cstr))
+	 )
 	)
       )
     )
-  (save-current-buffer
-    (set-buffer (get-buffer-create "*SECD*"))
-    (insert (format "FWRD:    %s (%s): %s\n" var val (car (last (secd--d state))))))
   )
 
 (defun secd-comp--kb-knowcess (e goals &optional s)
@@ -367,7 +438,7 @@ Returns environment and list of terminals found in conditions."
       (setq clist (cons 'LDP (cons goal (cons 'AP0 clist))))
       )
     (add-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)
-    (secd-cycle s e clist nil)
+    (secd-cycle s e clist (cons (cons secd--kb-toplevel-control-list clist) nil))
     )
   )
 

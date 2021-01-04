@@ -159,7 +159,7 @@ stack. Forces evaluation according to logic in car d.
       (eq 'SEQ (car cps-type))
       (save-current-buffer
 	(set-buffer (get-buffer-create "*SECD*"))
-	(insert (format "s:%s\nc:%s\nd:%s %d\n" s c (car d) n))
+	(insert (format "CPS SEQ\ns: %s\nc:%s\nd:%s %d\n" s c (car d) n))
 	)
       
       (if (eq 1 n)

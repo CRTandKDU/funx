@@ -79,7 +79,13 @@
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD*"))
       (erase-buffer)
-      (insert (format "-- NEW THREAD:\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c nil (car c)))
+      (insert
+       (format "-- NEW THREAD:\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n"
+	       s
+	       e
+	       c
+	       d
+	       (car c)))
       )
     ;; Steps through the instructions in control list `control'
     (catch 'STOP
@@ -88,9 +94,8 @@
 	;; Trace
 	(save-current-buffer
 	  (set-buffer (get-buffer-create "*SECD*"))
-	  (insert (format "s:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c nil (car c)))
-	  ;; (insert
-	  ;;  (format "%s,%s,%s,%s,%s\n" (car c) s e c d))
+	  (insert (format "Entry:\ns:%s\ne:%s\nc:%s\nd:%s\nControl: %s\n"
+			  s e c d (car c)))
 	  )
 	(cond
 	 ;; Exits from while loop
