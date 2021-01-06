@@ -69,4 +69,39 @@
 	 )
        ))
 
+(setq prompts
+      (secd-comp--kb-prompts
+       '((rule H1 ((leq a (quote 100))
+		   (leq a (quote 20))
+		   (eq quux (quote 5))
+		   (eq foo (quote BAR))
+		   ))
+	 (rule H2 ((in quux (quote (a b c d e f)))
+		   (in foo (quote (BAR BAZ)))
+		   (leq (quote 300) a)))
+	 )
+       )
+      )
+
+(setq prompts
+      (secd-comp--kb-prompts SATFAULT))
+
+(setq session
+      (nxp-session
+       '((rule H1 ((leq a '100))
+	       ((set b '20))
+	       )
+	 (rule H2 ((leq '100 b)))
+	 )
+       ))
+(setq secd--kb-option-backward-chaining-rhs t)
+
+(insert (format "%s\n"
+		(cdr (assoc '*SECD-TOPLEVEL-CLIST* (secd--d (cdr (assoc 'QUESTION session)))))
+		)
+	)
+
+
+
+
 

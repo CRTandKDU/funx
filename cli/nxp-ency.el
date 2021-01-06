@@ -82,16 +82,31 @@
   )
 
 (defun nxp-ency--answer (val)
-  "Answers pending question from encyclopedia window."
+  "Answers pending question from the Encyclopedia buffer."
   (interactive
-   (list (read-from-minibuffer
-	  (format "What is the value of %s: "
-		  (car (car (cdr (assoc 'QUESTION session)))))
-	  nil nil t)))
+   (list
+    (let ((prompts (cdr (assoc secd--kb-prompts
+			       (cdr (assoc 'ENVIRONMENT session)))))
+	  (var (car (car (cdr (assoc 'QUESTION session))))))
+      ;; (read-from-minibuffer
+      ;;  (format "What is the value of %s: " var) nil nil t)
+      (car (read-from-string
+	    (completing-read
+	     (format "What is the value of %s: " var)
+	     (mapcar #'(lambda (x) (format "%s" x))
+		     (cdr (assoc var prompts))))))
+      )
+    )
+   )
   (save-current-buffer
-    (set-buffer (get-buffer-create "*NXP-SESSION*"))
-    (goto-char (point-max))
-    (insert (format "ANSWER> %s\n" val))
+    (let ((prompts (cdr (assoc secd--kb-prompts
+			       (cdr (assoc 'ENVIRONMENT session)))))
+	  (var (car (car (cdr (assoc 'QUESTION session))))))
+      (set-buffer (get-buffer-create "*NXP-SESSION*"))
+      (goto-char (point-max))
+      (insert (format "KNOWN VALUES> %s\n" (cdr (assoc var prompts))))
+      (insert (format "ANSWER> %s\n" val))
+      )
     )
   (if (assoc 'QUESTION session)
       (let ((question
