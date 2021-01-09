@@ -1,6 +1,7 @@
 ;; Experimental client to the NXP architecture
 ;; Encyclopedia buffer, using ewocs. (Ewoc means “Emacs’s Widget for Object Collections”)
 (require 'secd-comp-kb)
+(require 'nxp-tree)
 
 (defun nxp-ency--promise-pp (p)
   (let ((col1 (car p))
@@ -53,10 +54,26 @@
   (let ((new (copy-tree (cdr (assoc 'FASKB session)))))
     (setq session (assq-delete-all 'QUESTION session))
     (setcdr (assoc 'ENVIRONMENT session) new )
+    ;; Dissociate tree representation
+    (setq session (assq-delete-all 'TREE session))
+    (with-current-buffer (get-buffer-create cli-nxp-tree-buffer)
+      (erase-buffer))
+    ;; Reassociate encyclopedia widgets
     (nxp-ency--widgets-update (cdr (assoc 'ENCY session)) new)
     )
   ;; (dolist (w (cdr (assoc 'ENCY session))) (ewoc-refresh w))
   )
+
+;; session global has to be defined at this point
+(defun nxp-ency--tree ()
+  "Tree representation of hypo at point."
+  (interactive)
+  (let* ((node (ewoc-locate (cadr (cdr (assoc 'ENCY session)))))
+	 (tree  (nxp-tree-init (car (ewoc-data node)) session)))
+    (if (assoc 'TREE session)
+	(setcdr (assoc 'tree session) tree)
+      (push (cons 'TREE tree) session))))
+
 
 ;; session global has to be defined at this point
 (defun nxp-ency--knowcess ()
@@ -124,6 +141,7 @@
       (let ((m (make-sparse-keymap)))
         (suppress-keymap m t)
         (define-key m "r" 'nxp-ency--reset)
+        (define-key m "t" 'nxp-ency--tree)
         (define-key m "k" 'nxp-ency--knowcess)
         (define-key m "a" 'nxp-ency--answer)
         (define-key m "q" 'nxp-ency--kill-and-exit)
@@ -200,7 +218,10 @@
   )
 
 (defun nxp-ency--hook (var val &optional state)
-  (dolist (w widgets) (nxp-ency-update-widget w var val)))
+  (dolist (w (cdr (assoc 'ENCY session))) (nxp-ency-update-widget w var val))
+  (if (assoc 'TREE session)
+      (ewoc-refresh (cdr (assoc 'TREE session))))
+  )
 
 (defun nxp-ency--stop-hook (state)
   (save-current-buffer

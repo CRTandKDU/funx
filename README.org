@@ -2,6 +2,13 @@
 #+SUBTITLE: NXP Runtime
 #+AUTHOR: jmc
 
+* DONE Tree representation. Global control list. Prompts.
+Installed a new globale in the environment compiled from knowledge bases to properly handle question with Emacs Lisp ~completing-read~.
+
+Installed a new globale in the d-register of the SECD machine to keep track of the top level control list, which is modified by the CPS-controls.
+
+Introduced a tree representation for hypotheses (interactively displaying the backward chaining). It is hooked to the ~t~ command in the Encyclopedia buffer.
+
 * DONE Reviving satfault.kb! <2021-01-03 dim.>
 Utilities to convert from the XML knowledge base format used in the LLVM C++ implementation to the sexps of the simple LISP variant. (Also converts to an Emacs ~tree-widget~ showing the XML structure.)
 

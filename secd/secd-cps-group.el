@@ -157,11 +157,12 @@ stack. Forces evaluation according to logic in car d.
 
      (;; Continuation for SEQ control
       (eq 'SEQ (car cps-type))
-      (save-current-buffer
-	(set-buffer (get-buffer-create "*SECD*"))
-	(insert (format "CPS SEQ\ns: %s\nc:%s\nd:%s %d\n" s c (car d) n))
+      (if secd-exec-verbose      
+	  (save-current-buffer
+	    (set-buffer (get-buffer-create "*SECD*"))
+	    (insert (format "CPS SEQ\ns: %s\nc:%s\nd:%s %d\n" s c (car d) n))
+	    )
 	)
-      
       (if (eq 1 n)
 	  ;; Last promise, exit and ignore return
 	  (list (nthcdr n s) e (cdr c) d)

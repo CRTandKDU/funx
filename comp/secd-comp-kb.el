@@ -26,6 +26,7 @@
 ;; Variables in conditions and actions are also compiled to promises.
 (defconst secd--kb-RHS-set-variable	'*RHS*)
 (defconst secd--kb-LHS-variable		'*LHS*)
+(defconst secd--kb-cond-source		'*COND-SOURCE*)
 
 
 ;; WHAT-IF decorations
@@ -61,18 +62,20 @@
   ;; 	  (secd--c state))))
   (let ((tlcl (secd-comp--kb-toplevel-clist state)))
     ;; Entry
-    (save-current-buffer
-      (set-buffer (get-buffer-create "*SECD*"))
-      (goto-char (point-max))
-      (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
-	(insert
-	 (propertize
-	  (format "FWRD-HOOK: On %s (%s):\n %s\nTLCL: %s\n"
-		  var val
-		  (car (last (secd--d state))) tlcl)
-	  'face `(foreground-color . ,cstr))
-	 )
-	)
+    (if secd-exec-verbose
+	(save-current-buffer
+	  (set-buffer (get-buffer-create "*SECD*"))
+	  (goto-char (point-max))
+	  (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
+	    (insert
+	     (propertize
+	      (format "FWRD-HOOK: On %s (%s):\n %s\nTLCL: %s\n"
+		      var val
+		      (car (last (secd--d state))) tlcl)
+	      'face `(foreground-color . ,cstr))
+	     )
+	    )
+	  )
       )
     ;; Pass #1: A rule truth value forwards its yet unevaluated hypo
     (let ((r-to-h (cdr (assoc secd--kb-forward-chaining-rules (secd--e state))))
@@ -89,13 +92,15 @@
 	      (let (;;(tlcl  (or (car (last (secd--d state))) (secd--c state)))
 		    (hypos (cdr (assoc var r-to-h)))
 		    )
-		(save-current-buffer
-		  (set-buffer (get-buffer-create "*SECD*"))
-		  (goto-char (point-max))
-		  (insert (format "\tFWRD GATE:%s (%s):\n\t %s\n"
-				  var val	tlcl))
+			  
+		(if secd-exec-verbose
+		    (save-current-buffer
+		      (set-buffer (get-buffer-create "*SECD*"))
+		      (goto-char (point-max))
+		      (insert (format "\tFWRD GATE:%s (%s):\n\t %s\n"
+				      var val	tlcl))
+		      )
 		  )
-		
 		(dolist (hypo
 			 hypos
 			 (let ((nhypos (length hypos)))
@@ -114,17 +119,18 @@
 	    )
 	)
       )
-    
-    (save-current-buffer
-      (set-buffer (get-buffer-create "*SECD*"))
-      (goto-char (point-max))
-      (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
-	(insert
-	 (propertize
-	  (format "FWRD (1) d: %s\n" (secd--d state))
-	  'face `(foreground-color . ,cstr))
-	 )
-	)
+    (if secd-exec-verbose
+	(save-current-buffer
+	  (set-buffer (get-buffer-create "*SECD*"))
+	  (goto-char (point-max))
+	  (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
+	    (insert
+	     (propertize
+	      (format "FWRD (1) d: %s\n" (secd--d state))
+	      'face `(foreground-color . ,cstr))
+	     )
+	    )
+	  )
       )
 
     ;; Pass #2: A known sign forwards its conditions, then rules
@@ -153,16 +159,17 @@
 	  )
 	)
       )
-    
-    (save-current-buffer
-      (set-buffer (get-buffer-create "*SECD*"))
-      (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
-	(insert
-	 (propertize
-	  (format "FWRD (2) d: %s\n" (secd--d state))
-	  'face `(foreground-color . ,cstr))
-	 )
-	)
+    (if secd-exec-verbose
+	(save-current-buffer
+	  (set-buffer (get-buffer-create "*SECD*"))
+	  (let ((cstr (format "#%02X%02X%02X" 0 255 128)))
+	    (insert
+	     (propertize
+	      (format "FWRD (2) d: %s\n" (secd--d state))
+	      'face `(foreground-color . ,cstr))
+	     )
+	    )
+	  )
       )
     )
   )

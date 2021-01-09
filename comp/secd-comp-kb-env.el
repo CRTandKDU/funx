@@ -3,14 +3,20 @@
 Returns environment and list of terminals found in conditions."
   (let ((env nil))
     (if (eq (car kb) 'rule)
-	(let ((rclist nil) (cclist nil) (aclist nil) (axlist nil)
-	      (rhs-rvars nil) (rvars  nil))
+	(let ((source-list nil)
+	      (rclist nil)
+	      (cclist nil)
+	      (aclist nil)
+	      (axlist nil)
+	      (rhs-rvars nil)
+	      (rvars  nil))
 	  ;; Compile LHS conditions
 	  ;; Push each condition in environment. Accumulate rule, variables.
 	  (dolist (c (car (cdr (cdr kb))))
 	    (let ((cn (gensym 'C))
 		  (ccompiled (secd-compile-sexp--lazy c '(UPD)))
 		  )
+	      (push (cons cn (cons c nil)) source-list)
 	      (setq rclist (cons 'LDP (cons cn rclist)))
 	      (setq cclist (push (cons cn (car ccompiled)) cclist))
 	      ;; (setq rvars  (append rvars (cadr ccompiled)))
@@ -30,6 +36,7 @@ Returns environment and list of terminals found in conditions."
 	    (let ((axn (gensym 'A))
 		  (axcompiled (secd-compile-sexp--lazy ax '(UPD)))
 		  )
+	      (push (cons axn (cons ax nil)) source-list)
 	      (setq axlist (cons 'LDP (cons axn axlist)))
 	      (setq aclist (push (cons axn (car axcompiled)) aclist))
 	      ;; (setq rvars  (append rvars (cadr axcompiled)))
@@ -38,7 +45,7 @@ Returns environment and list of terminals found in conditions."
 	      (setq rhs-rvars  (append rhs-rvars (cddr axcompiled))) 
 	      )
 	    )
-	  ;; (insert (format "---\nax: %s\nrv: %s\n" axlist rvars))
+	  ;; (insert (format "---\npost ax: %s\nrv: %s\n" source-list rvars))
 	  ;; Generates: (LDP C_i ALL <n> SEL (LDP AX_i SEQ <m> LDC *T* JOIN) (LDC *F* JOIN)
 	  (setq
 	   rclist
@@ -62,6 +69,11 @@ Returns environment and list of terminals found in conditions."
 		(cons 'UPD nil))))))
 
 	  (push (cons rn rclist) env)
+	  (if (assoc secd--kb-cond-source env)
+	      (dolist (x source-list)
+		(push x (cdr (assoc secd--kb-cond-source env))))
+	    (push (cons secd--kb-cond-source source-list) env)
+	    )
 	  (setq env (append env aclist))
 	  (setq env (append env cclist))
 	  (cons env (cons rvars rhs-rvars))
@@ -100,7 +112,16 @@ Returns environment and list of terminals found in conditions."
 	  (push (cons rn (cons (cadr rule) nil)) frlst))
 	(if (assoc (cadr rule) hypos) (push rn (cdr (assoc (cadr rule) hypos)))
 	  (push (cons (cadr rule) (cons rn nil)) hypos))
-	(setq env (append env (car rcompiled)))
+
+	;; (setq env (append env (car rcompiled)))
+	(dolist (lst (car rcompiled))
+	  (if (eq secd--kb-cond-source (car lst))
+	      (if (assoc secd--kb-cond-source env)
+		  (dolist (edge (cdr lst))
+		    (push edge (cdr (assoc secd--kb-cond-source env))))
+		(push (cons secd--kb-cond-source (cdr lst)) env))
+	    (push lst env)))
+
 	;; Separate lists for bwrd on set-variables and fwrd on signs
 	;; Merge (var Ci Rj) from different rules
 	(dolist (var-c-r (cadr rcompiled) flist)

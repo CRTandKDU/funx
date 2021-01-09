@@ -115,25 +115,26 @@ stack, here `v', to the front of the environment alist.
 	 (e-prime  (car e-s))
 	 (s-prime  (cdr e-s))
 	 )
-
-    (save-current-buffer
-      (set-buffer (get-buffer-create "*SECD*"))
-      (insert (format "RAP e': %s\n" (car e-s)))
-      (insert (format "RAP s': %s\n" (cdr e-s)))
-      (insert (format "RAP e : %s\n" e))
-      (insert (format "\n"))
+    (if secd-exec-verbose
+	(save-current-buffer
+	  (set-buffer (get-buffer-create "*SECD*"))
+	  (insert (format "RAP e': %s\n" (car e-s)))
+	  (insert (format "RAP s': %s\n" (cdr e-s)))
+	  (insert (format "RAP e : %s\n" e))
+	  (insert (format "\n"))
+	  )
       )
 
     (setcar e e-prime)
-
-    (save-current-buffer
-      (set-buffer (get-buffer-create "*SECD*"))
-      (insert (format "RAP e': %s\n" (car e-s)))
-      (insert (format "RAP s': %s\n" (cdr e-s)))
-      (insert (format "RAP e : %s\n" e))
-      (insert (format "\n"))
+    (if secd-exec-verbose
+	(save-current-buffer
+	  (set-buffer (get-buffer-create "*SECD*"))
+	  (insert (format "RAP e': %s\n" (car e-s)))
+	  (insert (format "RAP s': %s\n" (cdr e-s)))
+	  (insert (format "RAP e : %s\n" e))
+	  (insert (format "\n"))
+	  )
       )
-
     (list
      nil
      e-prime

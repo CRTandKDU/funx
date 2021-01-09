@@ -6,13 +6,15 @@
 s e (ASK v . c) d --> (v . s) e c d
 "
   ;; Trace
-  (save-current-buffer
-    (set-buffer (get-buffer-create "*SECD*"))
-    (insert (format "What is the value of %s?\n" (car (cdr c))))
-    )
-  (save-current-buffer
-    (set-buffer (get-buffer-create "*NXP-SESSION*"))
-    (insert (format "What is the value of %s?\n" (car (cdr c))))
+  (if secd-exec-verbose
+      (save-current-buffer
+	(set-buffer (get-buffer-create "*SECD*"))
+	(insert (format "What is the value of %s?\n" (car (cdr c))))
+	)
+    (save-current-buffer
+      (set-buffer (get-buffer-create "*NXP-SESSION*"))
+      (insert (format "What is the value of %s?\n" (car (cdr c))))
+      )
     )
   (list (cons (car (cdr c)) s) e (cdr (cdr c)) d)
   )

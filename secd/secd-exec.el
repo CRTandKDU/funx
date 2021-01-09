@@ -52,6 +52,8 @@
 (defvar secd-exec-control-hook nil)
 (defvar secd-exec-stop-hook nil)
 
+(defvar secd-exec-verbose nil)
+
 (defun secd--s (state) (car state))
 (defun secd--e (state) (car (cdr state)))
 (defun secd--c (state) (car (cdr (cdr state))))
@@ -76,26 +78,29 @@
 	  )
 	 )
     ;; Trace
-    (save-current-buffer
-      (set-buffer (get-buffer-create "*SECD*"))
-      (erase-buffer)
-      (insert
-       (format "-- NEW THREAD:\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n"
-	       s
-	       e
-	       c
-	       d
-	       (car c)))
-      )
+    (if secd-exec-verbose
+	(save-current-buffer
+	  (set-buffer (get-buffer-create "*SECD*"))
+	  (erase-buffer)
+	  (insert
+	   (format "-- NEW THREAD:\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n"
+		   s
+		   e
+		   c
+		   d
+		   (car c)))
+	  ))
     ;; Steps through the instructions in control list `control'
     (catch 'STOP
       (while c
 	(run-hook-with-args 'secd-exec-control-hook (list s e c d))
 	;; Trace
-	(save-current-buffer
+	(if secd-exec-verbose
+	    (save-current-buffer
 	  (set-buffer (get-buffer-create "*SECD*"))
 	  (insert (format "Entry:\ns:%s\ne:%s\nc:%s\nd:%s\nControl: %s\n"
 			  s e c d (car c)))
+	  )
 	  )
 	(cond
 	 ;; Exits from while loop

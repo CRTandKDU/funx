@@ -6,6 +6,9 @@
 (require 'secd-exec)
 (require 'secd-comp-kb)
 (require 'nxp-ency)
+(require 'kb-xml-parse)
+
+;; Use: M-x kb-xml-parse-buffer satfault.xml
 
 (setq secd--kb-option-backward-chaining-rhs t)
 (setq session
@@ -64,8 +67,14 @@
 
 (setq session
       (nxp-session
-       '((rule H1 ((leq a '100)))
-	 (rule H2 ((leq '100 a)))
+       '((rule H1 ((leq a '100)
+		   (leq b '100)
+		   (leq c '100)
+		   )
+	       )
+	 (rule H2 ((leq '100 a))
+	       ((set foo '10))
+	       )
 	 )
        ))
 
@@ -100,6 +109,25 @@
 		(cdr (assoc '*SECD-TOPLEVEL-CLIST* (secd--d (cdr (assoc 'QUESTION session)))))
 		)
 	)
+
+(setq session (nxp-session SATFAULT))
+
+(nxp-tree-init 'ACTION_19 session)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -75,13 +75,14 @@ if a is not a promise.
 		eprime-F-or-E))
 	     (cprime (car (cdr (car s))))
 	     (ignore
-	      (save-current-buffer
-		(set-buffer (get-buffer-create "*SECD*"))
-		(insert (format "PROMISE at s:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c d (car c)))
-		(insert (format "eprime F/E : %s\t%s\t%s\n"  eprime-F-or-E (listp (car eprime-F-or-E )) (listp (car (car eprime-F-or-E)))))
-		(insert (format "eprime : %s\n"  eprime))
-		(insert (format "cprime : %s\n" cprime))
-		))
+	      (if secd-exec-verbose
+		  (save-current-buffer
+		    (set-buffer (get-buffer-create "*SECD*"))
+		    (insert (format "PROMISE at s:%s\ne:%s\nc:%s\nd:%s\n\t%s\n" s e c d (car c)))
+		    (insert (format "eprime F/E : %s\t%s\t%s\n"  eprime-F-or-E (listp (car eprime-F-or-E )) (listp (car (car eprime-F-or-E)))))
+		    (insert (format "eprime : %s\n"  eprime))
+		    (insert (format "cprime : %s\n" cprime))
+		    )))
 	     )
 	(list
 	 nil
@@ -107,11 +108,13 @@ if a is not a promise.
 If the promise code is found in the environment associated to a unique atom,
 it is updated in-place.
 "
-  (save-current-buffer
-    (set-buffer (get-buffer-create "*SECD*"))
-    (insert (format "UPD at key:%s\ne:%s\n"
-		    (car (cdr (car (car d))))
-		    (car (cdr d))))
+  (if secd-exec-verbose
+      (save-current-buffer
+	(set-buffer (get-buffer-create "*SECD*"))
+	(insert (format "UPD at key:%s\ne:%s\n"
+			(car (cdr (car (car d))))
+			(car (cdr d))))
+	)
     )
     
   
@@ -132,15 +135,16 @@ it is updated in-place.
 	 )
       )
     )
-
-  (save-current-buffer
-    (set-buffer (get-buffer-create "*SECD*"))
-    (insert (format "Out of UPD\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n"
-		    (cons (car s) (cdr (car d)))
-		    (car (cdr d))
-		    (car (cdr (cdr d)))
-		    (cdr (cdr (cdr d)))
-		    (car c)))
+  (if secd-exec-verbose
+      (save-current-buffer
+	(set-buffer (get-buffer-create "*SECD*"))
+	(insert (format "Out of UPD\ns:%s\ne:%s\nc:%s\nd:%s\n\t%s\n"
+			(cons (car s) (cdr (car d)))
+			(car (cdr d))
+			(car (cdr (cdr d)))
+			(cdr (cdr (cdr d)))
+			(car c)))
+	)
     )
   (list (cons (car s) (cdr (car d)))
    (car (cdr d))
