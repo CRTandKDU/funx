@@ -112,7 +112,7 @@
 
 (setq session (nxp-session SATFAULT))
 
-(nxp-tree-init 'ACTION_19 session)
+(assoc 'TREE session)
 
 
 

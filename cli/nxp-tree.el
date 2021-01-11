@@ -126,6 +126,7 @@
   )
 
 (defun nxp-tree-init (h session)
+  "Initializes a signle data node ewoc with hypo and returns the ewoc."
   (with-current-buffer (get-buffer-create cli-nxp-tree-buffer)
     (erase-buffer)
     (let ((ewoc (ewoc-create 'nxp-tree--pp "Header" "Footer")))

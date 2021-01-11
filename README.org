@@ -2,15 +2,23 @@
 #+SUBTITLE: NXP Runtime
 #+AUTHOR: jmc
 
-* DONE Tree representation. Global control list. Prompts.
+* DONE Tree representation. Global control list. Prompts. <2021-01-11 lun.>
 Installed a new globale in the environment compiled from knowledge bases to properly handle question with Emacs Lisp ~completing-read~.
 
 Installed a new globale in the d-register of the SECD machine to keep track of the top level control list, which is modified by the CPS-controls.
+
+#+CAPTION: Tree representation, a poor man's Network!
+#+NAME:   fig:tree
+[[./NXP-SATFAULT-Tree.png]]
 
 Introduced a tree representation for hypotheses (interactively displaying the backward chaining). It is hooked to the ~t~ command in the Encyclopedia buffer.
 
 * DONE Reviving satfault.kb! <2021-01-03 dim.>
 Utilities to convert from the XML knowledge base format used in the LLVM C++ implementation to the sexps of the simple LISP variant. (Also converts to an Emacs ~tree-widget~ showing the XML structure.)
+
+#+CAPTION: The emblematic SATFAULT is back!
+#+NAME:   fig:satfault
+[[./NXP-SATFAULT-CRT_and_KDU.png]]
 
 Introduced the /not/ operator in simple LISP variant for knowledge bases.
 
@@ -45,7 +53,7 @@ An implementation of the /Encyclopedia/ is suggested using Emacs /ewoc/ structur
 A standard MVC pattern is installed to link environment, encyclopedia and commands using Emacs hooks again (into the environment related group of functions).
 
 #+CAPTION: An example session running on Emacs. Top left: the knowledge base, top right: the session trace and bottom: the Encyclopedia.
-#+NAME:   fig:Session
+#+NAME:   fig:session
 [[./NXP-Session.png]]
 
 * DONE Factored out environment management. Forward infra.

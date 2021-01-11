@@ -1,5 +1,6 @@
 ;; Experimental client to the NXP architecture
 ;; Encyclopedia buffer, using ewocs. (Ewoc means “Emacs’s Widget for Object Collections”)
+(require 'secd-trace)
 (require 'secd-comp-kb)
 (require 'nxp-tree)
 
@@ -53,9 +54,10 @@
   (interactive)
   (let ((new (copy-tree (cdr (assoc 'FASKB session)))))
     (setq session (assq-delete-all 'QUESTION session))
+    (secd-trace-init)
     (setcdr (assoc 'ENVIRONMENT session) new )
     ;; Dissociate tree representation
-    (setq session (assq-delete-all 'TREE session))
+    ;; (setq session (assq-delete-all 'TREE session))
     (with-current-buffer (get-buffer-create cli-nxp-tree-buffer)
       (erase-buffer))
     ;; Reassociate encyclopedia widgets
@@ -68,12 +70,18 @@
 (defun nxp-ency--tree ()
   "Tree representation of hypo at point."
   (interactive)
-  (let* ((node (ewoc-locate (cadr (cdr (assoc 'ENCY session)))))
-	 (tree  (nxp-tree-init (car (ewoc-data node)) session)))
-    (if (assoc 'TREE session)
-	(setcdr (assoc 'tree session) tree)
-      (push (cons 'TREE tree) session))))
-
+  (let* ((node (ewoc-locate (cadr (cdr (assoc 'ENCY session))))))
+    ;; (with-current-buffer (get-buffer-create "*NXP-SESSION*")
+    ;;   (insert (format "TREE: %s %s\n" (ewoc-data node) (assoc 'TREE session))))
+    (cond
+     ((assoc 'TREE session)
+      (with-current-buffer (get-buffer-create cli-nxp-tree-buffer)
+	(erase-buffer)
+	(let ((ewoc (cdr (assoc 'TREE session))))
+	  (ewoc-delete ewoc (ewoc-nth ewoc 0))
+	  (ewoc-enter-last ewoc (car (ewoc-data node))))))
+     (t (push (cons 'TREE (nxp-tree-init (car (ewoc-data node)) session)) session))
+     )))
 
 ;; session global has to be defined at this point
 (defun nxp-ency--knowcess ()
@@ -107,33 +115,39 @@
 	  (var (car (car (cdr (assoc 'QUESTION session))))))
       ;; (read-from-minibuffer
       ;;  (format "What is the value of %s: " var) nil nil t)
-      (car (read-from-string
-	    (completing-read
-	     (format "What is the value of %s: " var)
-	     (mapcar #'(lambda (x) (format "%s" x))
-		     (cdr (assoc var prompts))))))
+      (if var
+	  (car (read-from-string
+		(completing-read
+		 (format "What is the value of %s: " var)
+		 (mapcar #'(lambda (x) (format "%s" x))
+			 (cdr (assoc var prompts))))))
+	(message (format "Session closed"))
+	nil
+	)
       )
     )
    )
-  (save-current-buffer
-    (let ((prompts (cdr (assoc secd--kb-prompts
-			       (cdr (assoc 'ENVIRONMENT session)))))
-	  (var (car (car (cdr (assoc 'QUESTION session))))))
-      (set-buffer (get-buffer-create "*NXP-SESSION*"))
-      (goto-char (point-max))
-      (insert (format "KNOWN VALUES> %s\n" (cdr (assoc var prompts))))
-      (insert (format "ANSWER> %s\n" val))
-      )
-    )
-  (if (assoc 'QUESTION session)
-      (let ((question
-	     (secd-answer (cdr (assoc 'QUESTION session)) val t)))
-	(if (assoc 'QUESTION session)
-	    (setcdr (assoc 'QUESTION session) question)
-	  (push (cons 'QUESTION question) session))
-	(dolist (w (cdr (assoc 'ENCY session)))
-	  (nxp-ency-update-widget w (caar question)))
+  (when val
+    (save-current-buffer
+      (let ((prompts (cdr (assoc secd--kb-prompts
+				 (cdr (assoc 'ENVIRONMENT session)))))
+	    (var (car (car (cdr (assoc 'QUESTION session))))))
+	(set-buffer (get-buffer-create "*NXP-SESSION*"))
+	(goto-char (point-max))
+	(insert (format "KNOWN VALUES> %s\n" (cdr (assoc var prompts))))
+	(insert (format "ANSWER> %s\n" val))
 	)
+      )
+    (if (assoc 'QUESTION session)
+	(let ((question
+	       (secd-answer (cdr (assoc 'QUESTION session)) val t)))
+	  (if (assoc 'QUESTION session)
+	      (setcdr (assoc 'QUESTION session) question)
+	    (push (cons 'QUESTION question) session))
+	  (dolist (w (cdr (assoc 'ENCY session)))
+	    (nxp-ency-update-widget w (caar question)))
+	  )
+      )
     )
   )
 
@@ -219,8 +233,10 @@
 
 (defun nxp-ency--hook (var val &optional state)
   (dolist (w (cdr (assoc 'ENCY session))) (nxp-ency-update-widget w var val))
-  (if (assoc 'TREE session)
-      (ewoc-refresh (cdr (assoc 'TREE session))))
+  (with-current-buffer (get-buffer-create cli-nxp-tree-buffer)
+    (if (assoc 'TREE session)
+	(ewoc-refresh (cdr (assoc 'TREE session))))
+    )
   )
 
 (defun nxp-ency--stop-hook (state)
@@ -238,10 +254,13 @@
     (setq env (secd-comp--kb2env kb))
     ;; Init widgets and callbacks (as Emacs hooks)
     (setq widgets (nxp-ency-init env))
-    (remove-hook 'secd-env-update-hook 'nxp-ency--hook)
-    (add-hook 'secd-env-update-hook 'nxp-ency--hook)
-    (remove-hook 'secd-exec-stop-hook 'nxp-ency--stop-hook)
-    (add-hook 'secd-exec-stop-hook 'nxp-ency--stop-hook)
+    (remove-hook	'secd-env-update-hook 'nxp-ency--hook)
+    (add-hook		'secd-env-update-hook 'nxp-ency--hook)
+    (remove-hook	'secd-exec-stop-hook  'nxp-ency--stop-hook)
+    (add-hook		'secd-exec-stop-hook  'nxp-ency--stop-hook)
+    (secd-trace-init)
+    (remove-hook	'secd-exec-control-hook 'secd-trace-hook)
+    (add-hook		'secd-exec-control-hook 'secd-trace-hook)
     ;; Builds alist
     (push (cons 'KB kb) session) ;; KB source code 
     (push (cons 'FASKB (copy-tree env)) session) ;; KB compiled code, immutable
