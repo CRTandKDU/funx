@@ -1,0 +1,178 @@
+#+TITLE: A Functional Perspective on the NXP Architecture
+#+SUBTITLE: Version {{{version}}}
+#+AUTHOR: jmc
+#+DATE: <2021-01-11 lun.>
+#+OPTIONS: ':t toc:t author:t
+#+LANGUAGE: en
+
+#+MACRO: version 1.0
+
+#+TEXINFO_FILENAME: funxp.info
+#+TEXINFO_HEADER: @syncodeindex fn cp
+
+#+TEXINFO_DIR_CATEGORY: NXP Architecture
+#+TEXINFO_DIR_TITLE: funxp: (funxp)
+#+TEXINFO_DIR_DESC: A Functional NXP Architecture
+
+#+TEXINFO_PRINTED_TITLE: FUNXP
+
+This manual is for FUNXP, a functional perspective on the NXP Architecture (version {{{version}}}).
+
+* Introduction
+
+Historical context of the design ideas. Positioning in the AI cycles. CMU's influential environment, @@texinfo:@xref{IPE1984,,1}.@@
+
+
+Productions and rules systems.
+
+Medical consultation as a task environment.
+
+* How we got here
+
+A quick word on previous implementations. Interpreter v. compilers.
+
+Emacs-Lisp.
+
+* A simplistic functional language, funx
+#+CINDEX: funx
+This section describes a simple functional programming language, ~funx~, evidently based on LISP with a minimal set of built-in functions. 
+
+** Rehash of Henderson's book and other references of the 60s and 70s. Sexps.
+
+** Simple subset of LISP. SECD Machine. Compiling funx to SECD assembly.
+
+* An extension for NXP-style inferencing, funxp
+#+CINDEX: funxp
+
+Promises and delay/force. A mention of thread and parallelism.
+
+NXP-style rules. Rule: Hypo LHS &optional RHS.
+
+Glossary of terms: hypo(thesis), cond(itions), LHS/RHS, actions, sign, goal/subgoal, backward/forward chaining, knowcess, gating...
+
+* Compiling funxp to SECD assembly
+
+Knowledge base, or rule sets, are compiled to funxp environments.
+
+Decorations and globales.
+
+* An Emacs-based client
+
+** Session. Interactivity. Trace and protocol.
+
+** Encyclopedia and tree representation. Commands.
+#+CINDEX: Encylopedia
+
+#+ATTR_TEXINFO: :table-type vtable 
+#+BEGIN_QUOTE
+  - `q' :: Kill Encyclopedia buffer.
+  - `k' :: Suggest hypo at point and knowcess.
+  - `w' :: Volunteer, or What-if, data at point and knowcess.
+  - `a' :: Answer pending question and resume session.
+  - `r' :: Restart session.
+  - `t' :: Open backward-chaining tree of hypo at point.
+#+END_QUOTE
+
+* Bibliography
+Source: ~funx.bib~.
+
+#+NAME: bibliography
+#+BEGIN_SRC emacs-lisp :results value raw :exports results 
+  (require 'parsebib)
+  (require 'subr-x)
+
+  (defun funx-parse (fname)
+    (with-temp-buffer
+      (insert-file-contents fname)
+      (parsebib-collect-entries)))
+
+  (defun funx-trim (str)
+    (let ((re "[ \t\n\r\"{}]+"))
+      (string-trim-left (string-trim-right str re) re)))
+
+  (defun funx-first (keys alist)
+    (if (null keys) ""
+      (if (assoc (car keys) alist)
+	  (cdr (assoc (car keys) alist))
+	(funx-first (cdr keys) alist))))
+
+  (let ((nref 0)
+	(outstr "\n\n")
+	(funx-bib (funx-parse "C:/Users/jmc/Documents/code/funx/funx.bib")))
+    (maphash
+     #'(lambda (key value)
+	 (setq nref (1+ nref))
+	 (setq outstr
+	       (concat
+		outstr
+		(format
+		 "@@texinfo:@anchor{%s}@@%d. %s. /%s/. %s, %s.\n\n"
+		 key nref
+		 (funx-trim (cdr (assoc "author" value)))
+		 (funx-trim (cdr (assoc "title"  value)))
+		 (funx-trim
+		  (funx-first '("publisher" "journal" "institution") value))
+		 (funx-trim (cdr (assoc "year"   value))))
+		)))
+     funx-bib)
+     outstr)
+#+END_SRC
+* Test WIP                                                         :noexport:
+
+From funx.bib
+
+@@texinfo:@anchor{Rougier2005}@@ 1. Rougier, Nicolas P. and Noelle, David C. and Braver, Todd S. and Cohen, Jonathan D. and O{\textquoteright}Reilly, Randall C., Prefrontal cortex and flexible cognitive control: Rules without symbols, (2005) National Academy of Sciences
+
+@@texinfo:@anchor{Newell1972}@@ 2. Newell, Allen and Simon, H. A., Human Problem Solving, (1972) Prentice-Hall, Inc.
+
+@@texinfo:@anchor{PDIS1978}@@ 3. Waterman, D. A. and Hayes-Roth, Frederick, Pattern-Directed Inference Systems, (1978) Academic Press, Inc.
+
+@@texinfo:@anchor{Post1943}@@ 4. Emil L. Post, Formal Reductions of the General Combinatorial Decision Problem, (1943) Association for Symbolic Logic
+
+@@texinfo:@anchor{Markov1957}@@ 5. A. A. Markov, Theory of Algorithms, (1957) Association for Symbolic Logic
+
+@@texinfo:@anchor{Floyd1961}@@ 6. Floyd, Robert W., An Algorithm for Coding Efficient Arithmetic Operations, (1961) Association for Computing Machinery
+
+@@texinfo:@anchor{Chomsky57}@@ 7. Chomsky, Noam, Syntactic Structures, (1957) Mouton and Co.
+
+@@texinfo:@anchor{Paycha1963}@@ 8. Paycha, F., Cybern{\'e}tique de la consultation: logique et morale de la m{\'e}decine, (1963) Gauthier-Villars
+
+@@texinfo:@anchor{Rappaport-1984-15190}@@ 9. Alain Rappaport and Jean-Marie C. Chauvet, Symbolic Knowledge Processing for he Acquisition of Expert Behavior: A Study in Medicine, (1984) Carnegie Mellon University
+
+@@texinfo:@anchor{Buchanan1984}@@ 10. Buchanan, Bruce G. and Shortliffe, Edward H., Rule Based Expert Systems: The Mycin Experiments of the Stanford Heuristic Programming Project (The Addison-Wesley Series in Artificial Intelligence), (1984) Addison-Wesley Longman Publishing Co., Inc.
+
+@@texinfo:@anchor{Steele77}@@ 11. Guy L. Steele Jr., Debunking the "expensive procedure call" myth or, procedure call implementations considered harmful or, {LAMBDA:} The Ultimate {GOTO, (1977) ACM
+
+@@texinfo:@anchor{Steele1976}@@ 12. Steele Jr., Guy Lewis and Sussman, Gerald Jay, LAMBDA: the ultimate imperative, (1976) 
+
+@@texinfo:@anchor{Moses1970}@@ 13. Moses, Joel, The Function of FUNCTION in LISP or Why the FUNARG Problem Should Be Called the Environment Problem, (1970) Association for Computing Machinery
+
+@@texinfo:@anchor{IPE1984}@@ 14. Barstow, David R. and Shrobe, Howard E. and Sandewall, Erik., Interactive programming environments / editors, David R. Barstow, Howard E. Shrobe, Erik Sandewall, (1984) McGraw-Hill New York
+
+@@texinfo:@anchor{Appel1991}@@ 15. Appel, Andrew W., Compiling with Continuations, (1991) Cambridge University Press
+
+@@texinfo:@anchor{Bundy1984}@@ 16. Bundy, Alan and Wallen, Lincoln, Lispkit, (1984) Springer Berlin Heidelberg
+
+@@texinfo:@anchor{Henderson1976}@@ 17. Henderson, Peter and Morris, James H., A Lazy Evaluator, (1976) Association for Computing Machinery
+
+@@texinfo:@anchor{Henderson1980a}@@ 18. P. Henderson, Functional Programming - Application and Implementation, (1980) Prentice-Hall Int. Series in Computer Science
+
+@@texinfo:@anchor{Henderson1980b}@@ 19. Peter Henderson, Functional programming - application and implementation, (1980) Prentice Hall
+
+@@texinfo:@anchor{Traub1991}@@ 20. Kenneth R. Traub, Implementation of non-strict functional programming languages, (1991) Pitman
+
+@@texinfo:@anchor{FriedmanWise1976}@@ 21. Daniel P. Friedman and
+               David S. Wise, CONS} Should Not Evaluate its Arguments, (1976) Edinburgh University Press
+
+@@texinfo:@anchor{Keller1979}@@ 22. R. M. {KELLER} and G. {LINDSTROM} and S. {PATIL, A loosely-coupled applicative multi-processing system*, (1979) 1979 International Workshop on Managing Requirements Knowledge (MARK)
+
+@@texinfo:@anchor{Turner1979}@@ 23. D. Turner, A new implementation technique for applicative languages, (1979) Software: Practice and Experience
+
+@@texinfo:@anchor{Landin1964}@@ 24. Landin, P. J., The Mechanical Evaluation of Expressions, (1964) The Computer Journal
+
+* Index
+  :PROPERTIES:
+  :INDEX:    cp
+  :END:
+
+

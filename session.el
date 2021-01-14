@@ -101,8 +101,14 @@
 	       ((set b '20))
 	       )
 	 (rule H2 ((leq '100 b)))
+	 (rule H3 ((leq a '50))
+	       ((set c '30))
+	       )
+	       
 	 )
        ))
+
+
 (setq secd--kb-option-backward-chaining-rhs t)
 
 (insert (format "%s\n"
@@ -112,7 +118,12 @@
 
 (setq session (nxp-session SATFAULT))
 
-(assoc 'TREE session)
+(insert (format "%s\n" (equal '(STOP) (cadddr (assoc 'QUESTION session)))))
+t
+
+
+
+
 
 
 

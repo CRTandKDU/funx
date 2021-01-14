@@ -22,16 +22,9 @@
 
 (defun nxp-tree--rule (rule env session)
   "Tree representation of a rule. Disassemble control list to extract conditions and actions."
-  (let* ((ccode (cdr (assoc rule env)))
-	 (ccode-lhs (--take-while (null (eq it 'ALL)) ccode))
-	 (ccode-conds (reverse (--remove (eq it 'LDP) ccode-lhs)))
-	 (ccode-rhs (--drop-while (null (eq it 'SEL)) ccode))
-	 (ccode-actions
-	  (and ccode-rhs
-	       (--remove (eq it 'LDP)
-			 (--take-while (null (eq it 'SEQ))
-				       (cadr ccode-rhs)))))
-	 )
+  (let* ((ccode-conds (secd-comp-lhs rule env))
+	 (ccode-actions (secd-comp-rhs rule env)))
+
     (append
      (mapcar #'(lambda (c)
 		(widget-convert

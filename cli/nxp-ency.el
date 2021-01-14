@@ -106,6 +106,63 @@
     )
   )
 
+(defun nxp-ency--whatif (var val)
+  (interactive
+   (list
+    (car (ewoc-data (ewoc-locate (car (cdr (assoc 'ENCY session))))))
+    (let ((prompts (cdr (assoc secd--kb-prompts
+			       (cdr (assoc 'ENVIRONMENT session)))))
+	  ;; (var (car (car (cdr (assoc 'QUESTION session))))))
+	  (promise (car (ewoc-data (ewoc-locate (car (cdr (assoc 'ENCY session)))))))
+	  )
+      ;; (read-from-minibuffer
+      ;;  (format "What is the value of %s: " var) nil nil t)
+      (if promise
+	  (car (read-from-string
+		(completing-read
+		 (format "What is the value of %s: " promise)
+		 (mapcar #'(lambda (x) (format "%s" x))
+			 (cdr (assoc promise prompts))))))
+	(message (format "Session closed"))
+	nil
+	)
+      )
+    )
+   )
+  (when var
+    (let ((hypos (secd-comp--kb-whatif var val session)))
+      (save-current-buffer
+	(set-buffer (get-buffer-create "*NXP-SESSION*"))
+	(insert (format "WHAT IF: %s\n" hypos))
+	)
+      
+      (cond
+       ((and (assoc 'QUESTION session)
+	     (null (equal '(STOP) (cadddr (assoc 'QUESTION session)))))
+	;; In session
+	(let ((env (cdr (assoc 'ENVIRONMENT session))))
+	  (save-current-buffer
+	    (set-buffer (get-buffer-create "*NXP-SESSION*"))
+	    (insert (format "In session, val: %s\n" val))
+	    )
+	  (secd-env--update env var val (cdr (assoc 'QUESTION session))))
+	)
+       (t
+	;; Out of a session
+	(save-current-buffer
+	  (set-buffer (get-buffer-create "*NXP-SESSION*"))
+	  (insert (format "Off session, val: %s\n" val))
+	  )
+	(secd-comp--kb-knowcess (cdr (assoc 'ENVIRONMENT session)) hypos
+				nil var val)
+	)
+       )
+      )
+    )
+  )
+      
+  
+
 (defun nxp-ency--answer (val)
   "Answers pending question from the Encyclopedia buffer."
   (interactive
@@ -115,7 +172,10 @@
 	  (var (car (car (cdr (assoc 'QUESTION session))))))
       ;; (read-from-minibuffer
       ;;  (format "What is the value of %s: " var) nil nil t)
-      (if var
+      (if (and
+	   (assoc 'QUESTION session)
+	   (null (equal '(STOP) (cadddr (assoc 'QUESTION session))))
+	   var)
 	  (car (read-from-string
 		(completing-read
 		 (format "What is the value of %s: " var)
@@ -158,6 +218,7 @@
         (define-key m "t" 'nxp-ency--tree)
         (define-key m "k" 'nxp-ency--knowcess)
         (define-key m "a" 'nxp-ency--answer)
+        (define-key m "w" 'nxp-ency--whatif)
         (define-key m "q" 'nxp-ency--kill-and-exit)
         m))
 			    

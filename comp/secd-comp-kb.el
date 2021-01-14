@@ -43,6 +43,22 @@
 (require 'secd-comp-kb-prompts)
 (require 'secd-comp-kb-env)
 
+;;; Decompiling control lists to LHS and RHS source
+(defun secd-comp-lhs (rule env)
+  (let* ((ccode (cdr (assoc rule env)))
+	 (ccode-lhs (--take-while (null (eq it 'ALL)) ccode))
+	 (ccode-conds (reverse (--remove (eq it 'LDP) ccode-lhs))))
+    ccode-conds))
+
+(defun secd-comp-rhs (rule env)
+  (let* ((ccode (cdr (assoc rule env)))
+	 (ccode-rhs (--drop-while (null (eq it 'SEL)) ccode))
+	 (ccode-actions
+	  (and ccode-rhs
+	       (--remove (eq it 'LDP)
+			 (--take-while (null (eq it 'SEQ))
+				       (cadr ccode-rhs))))))
+    ccode-actions))
 
 ;;; High-Level Interface to KB compilers
 (defun secd-comp--kb-toplevel-clist (state)
@@ -50,7 +66,61 @@
   (cdr (assoc secd--kb-toplevel-control-list (secd--d state)))
   )
 
-;; Forward-chaining hook: signs to rules, conditionally rules to hypos
+;;; What-if command
+(defun secd-comp--kb-reset (promise session)
+  (let ((p-in-env (assoc promise (cdr (assoc 'ENVIRONMENT session))))
+	(p-in-fkb (assoc promise (cdr (assoc 'FASKB session)))))
+    ;; (with-current-buffer (get-buffer-create "*NXP-SESSION*")
+    ;;   (goto-char (point-max))
+    ;;   (insert (format "-- WHAT IF p: %s\n%s\n" p-in-env p-in-fkb))
+    ;;   )
+    (setcdr p-in-env (copy-tree (cdr p-in-fkb))))
+  promise
+  )
+
+(defun secd-comp--kb-whatif (var val session)
+  "Invalidates current forward chaining nodes and resumes session."
+  (let ((top-hypos nil)
+	(cond-rule-list
+	 (cdr
+	  (assoc var
+		 (cdr
+		  (assoc secd--kb-forward-chaining-signs
+			 (cdr (assoc 'ENVIRONMENT session))))))))
+    (dolist (c-r cond-rule-list)
+      (with-current-buffer (get-buffer-create "*NXP-SESSION*")
+	(goto-char (point-max))
+	(insert (format "- WHAT IF C.R : %s\n" c-r))
+	)
+      (secd-comp--kb-reset (car c-r) session) ;; Reset condition
+      (secd-comp--kb-reset (cdr c-r) session) ;; Reset rule
+      ;; From rule reset hypo
+      (let ((h (cadr (assoc (cdr c-r)
+			   (cdr (assoc secd--kb-forward-chaining-rules
+				       (cdr (assoc 'ENVIRONMENT session))))))))
+	(with-current-buffer (get-buffer-create "*NXP-SESSION*")
+	  (goto-char (point-max))
+	  (insert (format "- WHAT IF H: %s\n" h))
+	  )
+	(secd-comp--kb-reset h session)       ;; Reset hypo
+	(add-to-list 'top-hypos h)
+	)
+      ;; From rule reset RHS
+      (let ((actions (secd-comp-rhs (cdr c-r) (cdr (assoc 'FASKB session)))))
+	(with-current-buffer (get-buffer-create "*NXP-SESSION*")
+	  (goto-char (point-max))
+	  (insert (format "- WHAT IF Actions: %s\n" actions))
+	  )
+	(when actions
+	  (dolist (action actions)
+	    (secd-comp--kb-reset action session))))
+      )
+    top-hypos
+    )
+  )
+
+
+;;; Forward-chaining hook: signs to rules, conditionally rules to hypos
 (defun secd-comp--kb-forward-hook (var val state)
   "General forward-chaining hook, triggered on each environment update."
   ;; Searching for the top-level control list
@@ -175,15 +245,19 @@
   )
 
 ;; To be further refined to work on a list of hypos
-(defun secd-comp--kb-knowcess (e goals &optional s)
+(defun secd-comp--kb-knowcess (e goals &optional s var val)
   "A high-level function to start evaluation of hypothesis `goals'."
   (let ((clist (cons 'STOP nil)))
     (dolist (goal goals clist)
       (setq clist (cons 'LDP (cons goal (cons 'AP0 clist))))
       )
     (add-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)
-    (secd-cycle s e clist
-		(cons (cons secd--kb-toplevel-control-list clist) nil))
+    (let ((state (list s e clist
+		       (cons (cons secd--kb-toplevel-control-list clist) nil))))
+      (if (and var val)
+	  (secd-env--update e var val state))
+      (secd-cycle (secd--s state) (secd--e state) (secd--c state) (secd--d state))
+      )
     )
   )
 
