@@ -32,17 +32,21 @@ Returns environment and list of terminals found in conditions."
 	      )
 	    )
 	  ;; Compile RHS actions if any
-	  (dolist (ax (car (cdr (cdr (cdr kb)))))
-	    (let ((axn (gensym 'A))
-		  (axcompiled (secd-compile-sexp--lazy ax '(UPD)))
+	  (let ((actions (cadddr kb)))
+	    (if (and actions (null (atom actions)))
+		(dolist (ax (car (cdr (cdr (cdr kb)))))
+		  (let ((axn (gensym 'A))
+			(axcompiled (secd-compile-sexp--lazy ax '(UPD)))
+			)
+		    (push (cons axn (cons ax nil)) source-list)
+		    (setq axlist (cons 'LDP (cons axn axlist)))
+		    (setq aclist (push (cons axn (car axcompiled)) aclist))
+		    ;; (setq rvars  (append rvars (cadr axcompiled)))
+		    (dolist (var (cadr axcompiled) rvars)
+		      (push (cons var (cons axn rn)) rvars))
+		    (setq rhs-rvars  (append rhs-rvars (cddr axcompiled))) 
+		    )
 		  )
-	      (push (cons axn (cons ax nil)) source-list)
-	      (setq axlist (cons 'LDP (cons axn axlist)))
-	      (setq aclist (push (cons axn (car axcompiled)) aclist))
-	      ;; (setq rvars  (append rvars (cadr axcompiled)))
-	      (dolist (var (cadr axcompiled) rvars)
-		(push (cons var (cons axn rn)) rvars))
-	      (setq rhs-rvars  (append rhs-rvars (cddr axcompiled))) 
 	      )
 	    )
 	  ;; (insert (format "---\npost ax: %s\nrv: %s\n" source-list rvars))
@@ -69,11 +73,21 @@ Returns environment and list of terminals found in conditions."
 		(cons 'UPD nil))))))
 
 	  (push (cons rn rclist) env)
+
+	  ;; Use rule environment to associate decorations
+	  ;; Source control lists for conditions and actions
 	  (if (assoc secd--kb-cond-source env)
 	      (dolist (x source-list)
 		(push x (cdr (assoc secd--kb-cond-source env))))
 	    (push (cons secd--kb-cond-source source-list) env)
 	    )
+	  ;; Context links in rule
+	  (when (secd-comp-kb-context--get kb)
+	    (if (assoc secd--kb-context-signs env)
+		(push (cons (cadr kb) (secd-comp-kb-context--get kb))
+		      (cdr (assoc secd--kb-context-signs env)))
+	      (push (cons secd--kb-context-signs (cons (cons (cadr kb) (secd-comp-kb-context--get kb)) nil)) env)))
+	      
 	  (setq env (append env aclist))
 	  (setq env (append env cclist))
 	  (cons env (cons rvars rhs-rvars))
@@ -103,6 +117,7 @@ Returns environment and list of terminals found in conditions."
     ;; Accumulate hypos and associated rules in `hypos'.
     ;; Compiles rules into `env', collecting terminals in `signs'.
     ;; Forward-chaining liks are collected as an alist `(var . (rules))'
+    ;; Handle context links
     (dolist (rule kb env)
       (let* (
 	     (rn (gensym 'R))
@@ -114,13 +129,22 @@ Returns environment and list of terminals found in conditions."
 	  (push (cons (cadr rule) (cons rn nil)) hypos))
 
 	;; (setq env (append env (car rcompiled)))
+	;; Rule environment contains additional decorations
 	(dolist (lst (car rcompiled))
-	  (if (eq secd--kb-cond-source (car lst))
-	      (if (assoc secd--kb-cond-source env)
-		  (dolist (edge (cdr lst))
-		    (push edge (cdr (assoc secd--kb-cond-source env))))
-		(push (cons secd--kb-cond-source (cdr lst)) env))
-	    (push lst env)))
+	  (cond
+	   ;; Decoration: condition/action source
+	   ((eq secd--kb-cond-source (car lst))
+	    (if (assoc secd--kb-cond-source env)
+		(dolist (edge (cdr lst))
+		  (push edge (cdr (assoc secd--kb-cond-source env))))
+	      (push (cons secd--kb-cond-source (cdr lst)) env)))
+	   ;; Decoration: context links
+	   ((eq secd--kb-context-signs (car lst))
+	    (setq env (secd-comp-kb-context--merge lst env)))
+	   ;; Not a decoration
+	   (t (push lst env))
+	   )
+	  )
 
 	;; Separate lists for bwrd on set-variables and fwrd on signs
 	;; Merge (var Ci Rj) from different rules
@@ -204,7 +228,9 @@ Returns environment and list of terminals found in conditions."
     (push (cons secd--kb-forward-chaining-signs flist) env )
     (push (cons secd--kb-forward-chaining-rules frlst) env )
     ;; Increment environment with prompts
-    (push (cons secd--kb-prompts (secd-comp--kb-prompts kb)) env) 
+    (push (cons secd--kb-prompts (secd-comp--kb-prompts kb)) env)
+    ;; Increment environment with nclosed context links
+    (push (cons secd--kb-context-hypos (secd-comp-kb-context--nclose env)) env)
 
     (save-current-buffer
       (set-buffer (get-buffer-create "*SECD-COMP*"))

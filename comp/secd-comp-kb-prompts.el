@@ -82,8 +82,9 @@
 	     )
 	    )
 	  ;; Parse RHS
-	  (dolist (a actions)
-	    (setq prompts (funcall parse a prompts)))
+	  (if (and actions (null (atom actions)))
+	      (dolist (a actions)
+		(setq prompts (funcall parse a prompts))))
 	  )
 	)
       prompts

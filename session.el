@@ -121,7 +121,33 @@
 (insert (format "%s\n" (equal '(STOP) (cadddr (assoc 'QUESTION session)))))
 t
 
+;; Testing context links
+(setq session
+      (nxp-session
+       '((rule H1 ((leq (mul '2 a) '100)) ((set b '20))
+	       :context (S1 S2)
+	       )
+	 (rule H2 ((leq '100 b))
+	       )
+	 (rule H1 ((leq a '50)) ((set c '30))
+	       :context (S2 S3)
+	       )
+	 (rule G1 ((leq x '10) (leq y '10))
+	       :context (S4)
+	       )
+	 (rule G2 ((leq x '5) (leq y '5))
+	       :context (S4 S5)
+	       )
+	 )
+       ))
 
+(setq alist (cdr (assoc '*CONTEXT-SIGNS* (cdr (assoc 'ENVIRONMENT session)))))
+(mat-nclose (mat-adjacency alist))
+[[1 2 0] [2 1 0] [0 0 0]]
+(secd-comp-kb-context alist)
+((G2 . [1 2 0]) (G1 . [2 1 0]) (H1 . [0 0 0]))
+alist
+((G2 S4 S5) (G1 S4) (H1 S3 S1 S2))
 
 
 

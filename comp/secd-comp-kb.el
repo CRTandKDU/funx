@@ -27,6 +27,8 @@
 (defconst secd--kb-RHS-set-variable	'*RHS*)
 (defconst secd--kb-LHS-variable		'*LHS*)
 (defconst secd--kb-cond-source		'*COND-SOURCE*)
+(defconst secd--kb-context-signs	'*CONTEXT-SIGNS*)
+(defconst secd--kb-context-hypos	'*CONTEXT-HYPOS*)
 
 
 ;; WHAT-IF decorations
@@ -41,6 +43,7 @@
 ;; KB compiler components
 (require 'secd-comp-kb-sexp)
 (require 'secd-comp-kb-prompts)
+(require 'secd-comp-kb-context)
 (require 'secd-comp-kb-env)
 
 ;;; Decompiling control lists to LHS and RHS source

@@ -20,8 +20,37 @@ This manual is for FUNXP, a functional perspective on the NXP Architecture (vers
 
 * Introduction
 
-Historical context of the design ideas. Positioning in the AI cycles. CMU's influential environment, @@texinfo:@xref{IPE1984,,1}.@@
+Most of the ideas expressed in the historical series of computer programs, termed /NXP Architecture/ in this paper, were originally designed at the apex of one of the recurring cycle in the 30-year returns of the Artificial Intelligence (AI) debate, @@texinfo:@xref{JMC2018,,1}.@@ 
 
+** A Dominant View, Symbolic Artificial Intelligence
+#+CINDEX: Symbolic AI
+Progressively in the late 70s and early 80s, the symbolic thread triumphed as the dominant paradigm of AI research. In 1984 for instance, at the climax of this cycle, early efforts to transfer research work to industrial applications were so introduced:
+
+#+BEGIN_QUOTE
+Artificial Intelligence is the subfield of computer science concerned with symbolic reasoning and problem-solving. [...] Knowledge Engineering is the process of incorporating symbolic knowledge into computer systems to solve problems normally requiring human attention and intelligence.[fn:1]
+#+END_QUOTE 
+
+#+CINDEX: Expert System
+These computer systems incorporating symbolic knowledge became known as /Expert Systems/ and were all the rage, as industrial applications of AI, from the early eighties to the mid-nineties.
+
+This somewhat restricted, to contemporary eyes, view of AI as a "subfield of computer science" geared towards augmenting traditional programs with symbolic knowledge was, however, perfectly in line with the precepts of the symbolic thread of AI research, established at the /Dartmouth Summer Research Project on Artificial Intelligence/ in 1956. Out of the variety of conceptual tenets of research on "thinking machines" in the 1950s, diversely known as /cybernetics/, /automata theory/ or /complex information processing/, stemmed out the original characteristics of the symbolic approach to AI: the importance of (mathematical) logic in high-level cognitive processes, and the prevalence of symbols in all aspects of cognition.
+
+#+CINDEX: Physical Symbol System Hypothesis
+The defining assumption, /the physical symbol system hypothesis/, is the philosophical perspective on AI assessed by Allen Newell and Herbert A. Simon:
+
+#+BEGIN_QUOTE
+A physical symbol system has the necessary and sufficient means for general intelligent action, @@texinfo:@xref{Newell1972,,3}.@@
+#+END_QUOTE 
+
+#+CINDEX: goal
+#+CINDEX: working memory
+#+CINDEX: computer/brain analogy
+With symbols, structures come naturally as list of symbols and cognitive processes are understood as controlled by signal and symbol structures in /working memory/, i.e. arbitrary list structures in an extensive database-like system, called /goals/, @@texinfo:@xref{PDIS1978,,4}.@@ On the one hand, note the implicit analogy with the Turing machine model of a computer[fn:2], where perceptions are turned into symbols in memory, feeding a processor which elects further actions, operating changes in the environment. And, on the other hand, delineating further this analogy, the notions of symbols and lists from which LISP, and all its functional programming languages descendance in computer science, was derived, by the same contributors to the seminal Dartmouth workshop[fn:3].
+
+#+CINDEX: CMU
+While the seminal ideas for the NXP Architecture stemmed from a very early interest in what would be now termed /learning concepts/ (see [[How we got here]]), they were readily influenced and refined by the dominant view at the time, all the more so that they matured in the cultural environment of Carnegie-Mellon University (CMU), namely of its Computer Science and Robotics Institute departments, from 1982 to 1984.
+
+** Production Systems and Rule-based Systems.
 
 Productions and rules systems.
 
@@ -32,6 +61,8 @@ Medical consultation as a task environment.
 A quick word on previous implementations. Interpreter v. compilers.
 
 Emacs-Lisp.
+
+~funxp~ is both a programming language and an interactive programming environment for expert systems. (Ref IPE1984.) It embeds NCLOSE, an earlier inference engine, in a simple -- even simplistic -- functional programming language called ~funx~ (/functional expressions/).
 
 * A simplistic functional language, funx
 #+CINDEX: funx
@@ -44,7 +75,7 @@ This section describes a simple functional programming language, ~funx~, evident
 * An extension for NXP-style inferencing, funxp
 #+CINDEX: funxp
 
-Promises and delay/force. A mention of thread and parallelism.
+Promises and delay/force. A mention of thread and parallelism (QLISP, Kugel non-halting computations v. thinking).
 
 NXP-style rules. Rule: Hypo LHS &optional RHS.
 
@@ -175,4 +206,10 @@ From funx.bib
   :INDEX:    cp
   :END:
 
+* Footnotes
 
+[fn:3]  In this context, progress in AI research was exemplified by  comprehensive descriptions of computer programs as landmark systems. @@texinfo:@xref{Feigenbaum1963,,5},@@ for such descriptions of the 1960s and 1950s systems. The import of the analogy between cognitive processes, in the human mind, and the workings of a computer program, was also felt in philosophy with the dramatic revival in the 1970s of /The Language of Thought/ hypothesis. The watershed was publication of Jerry Fodor's The Language of Thought (1975), triggering discussions and debates which continue to figure prominently within philosophy and cognitive science today. From a philosophical perspective, research programs such as "naturalizing intentionality" and "naturalizing consciousness" are still active although under a variety of cognitive assumptions, mirrorring the outpouring of results in neurosciences and computer science in the last decades.
+
+[fn:2] The philosophical perspective so stated does not focus on /how/ the physical symbol system itself is actually realized. It obviously suggests that the human mind is such as system but also that, implicitly, physical symbol systems may be realised in Turing/Von Neumann computer architectures, and computer programs more specifically. And thus in the 1960s and 1970s it became an established practice to research theories about memory, reasoning or beliefs on computer programs as an experimental substrate, drawing conclusions deemed legitimate for cognition in the human mind. Contrast this to current Computational Neurosciences and to Connectionism's neural networks architectures, old and new.
+
+[fn:1] Development of an expert system, /Daniel Sagalowicz/, Expert System, Vol. 1, Issue 2, Oct. 1984. 
