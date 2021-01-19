@@ -52,6 +52,12 @@ While the seminal ideas for the NXP Architecture stemmed from a very early inter
 
 ** Production Systems and Rule-based Systems.
 
+
+#+CAPTION: Model Human Processor in /The Psychology of Human-computer Interaction/, by Card, Newell, Moran (1983)
+#+attr_texinfo: :width 200px :center t
+[[./MODEL-HUMAN-PROCESSOR-w200.jpg]]
+
+
 Productions and rules systems.
 
 Medical consultation as a task environment.
@@ -77,7 +83,9 @@ This section describes a simple functional programming language, ~funx~, evident
 
 Promises and delay/force. A mention of thread and parallelism (QLISP, Kugel non-halting computations v. thinking).
 
-NXP-style rules. Rule: Hypo LHS &optional RHS.
+Data-driven vs. call: Hewitt mentioned in Sacerdoti as pattern-directed function invocation.
+
+NXP-style rules. Rule: Hypo LHS &optional RHS &optional :context.
 
 Glossary of terms: hypo(thesis), cond(itions), LHS/RHS, actions, sign, goal/subgoal, backward/forward chaining, knowcess, gating...
 

@@ -2,6 +2,7 @@
 ;; To create a file, visit it with C-x C-f and enter text in its buffer.
 
 ;; (push "C:/Users/jmc/Documents/code/funx" load-path)
+(require 'ox-texinfo)
 (normal-top-level-add-subdirs-to-load-path)
 (require 'secd-exec)
 (require 'secd-comp-kb)
@@ -122,6 +123,7 @@
 t
 
 ;; Testing context links
+(setq secd--kb-option-context t)
 (setq session
       (nxp-session
        '((rule H1 ((leq (mul '2 a) '100)) ((set b '20))
@@ -133,7 +135,7 @@ t
 	       :context (S2 S3)
 	       )
 	 (rule G1 ((leq x '10) (leq y '10))
-	       :context (S4)
+	       :context (S4 S2)
 	       )
 	 (rule G2 ((leq x '5) (leq y '5))
 	       :context (S4 S5)

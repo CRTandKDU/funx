@@ -1,7 +1,15 @@
 #+TITLE: README revisions file
-#+SUBTITLE: NXP Runtime
+#+SUBTITLE: FUNXP (See also info file)
 #+AUTHOR: jmc
 
+* DONE Context links, definition and implementation <2021-01-19 mar.>
+Context links in the NXP architecture(s) are the long line descendants of the /signs/ in the original NClose system (1983-4). In the current system, each rule may associate a list of signs to its hypothesis, with the ~:context~ property in the ~rule~ sexp. Signs can be any symbol, and are not necessarily variables appearing in conditions or in actions.
+
+At compile-time signs are collected and grouped by hypothesis. Two hypotheses are contextually linked if they share at least one context sign. (Note that these links could be further refined by accounting for the number of common signs and/or by the value or structure of these signs.)
+
+The contextual edges then define an adjacency matrix for all hypotheses with the ~:context~ propery in their rules. The transitive closure of this matrix defines the number of /walks/ along contextual links between pair of hypotheses.
+
+At run-time, on the proper option ~secd--kb-context-hypos~ set to true, the final evaluation of an hypothesis posts all walkable hypotheses in the transitive closure for later evaluation.
 * DONE Tree representation. Global control list. Prompts. <2021-01-11 lun.>
 Installed a new globale in the environment compiled from knowledge bases to properly handle question with Emacs Lisp ~completing-read~.
 

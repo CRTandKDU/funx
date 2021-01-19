@@ -30,15 +30,14 @@
 (defconst secd--kb-context-signs	'*CONTEXT-SIGNS*)
 (defconst secd--kb-context-hypos	'*CONTEXT-HYPOS*)
 
-
-;; WHAT-IF decorations
-
 ;; Heuristics options
 ;; If true, rule values post their hypo for evaluation only if `*T*' (gating on)
 (defvar secd--kb-option-forward-chaining-gate t)
 ;; If true, when signs need evaluation backward immediately on rules the RHS
 ;; of which `set's the signs. (Note: backward on hypos is automatic.)
 (defvar secd--kb-option-backward-chaining-rhs nil)
+;; If true, propagates from hypothesis to context-related hypotheses
+(defvar secd--kb-option-context nil)
 
 ;; KB compiler components
 (require 'secd-comp-kb-sexp)
@@ -122,6 +121,57 @@
     )
   )
 
+;;; Context evocation hook
+(defun secd-comp--kb-context-hook (var val state)
+  "Traverse context links from hypothesis (transitive closure) post evaluation. Note that since it is triggered post evaluation the hook is modulated by forward chaining *T*-evaluated rules or not options."
+  (let ((tclosure (cdr (assoc secd--kb-context-hypos (secd--e state)))))
+    (if (assoc var tclosure)
+	(let* ((row (cdr (assoc var tclosure)))
+	       (n   (length row))
+	       (nctx 0)
+	       (var-index (--find-index (equal (car it) var) tclosure))
+	       (tlcl (secd-comp--kb-toplevel-clist state)))
+
+	  (if secd-exec-verbose
+	      (save-current-buffer
+		(set-buffer (get-buffer-create "*SECD*"))
+		(goto-char (point-max))
+		(let ((cstr (format "#%02X%02X%02X" 128 255 0)))
+		  (insert
+		   (propertize
+		    (format "CTXT-HOOK: On %s (%s):\nTLCL: %s\n" var val tlcl)
+		    'face `(foreground-color . ,cstr))
+		   )
+		  )
+		)
+	    )
+
+	  (dotimes
+	      (i n (when (> nctx 0)
+		     (secd--cps-set-bot 'SEQ tlcl)
+		     (secd--cps-set-bot nctx tlcl)))
+
+	    (if (null (equal i var-index))
+		(when (> (aref row i) 0)
+		  (secd--cps-set-bot 'LDP tlcl)
+		  (secd--cps-set-bot (car (nth i tclosure)) tlcl)
+		  (setq nctx (1+ nctx)))))
+
+	  (if secd-exec-verbose
+	      (save-current-buffer
+		(set-buffer (get-buffer-create "*SECD*"))
+		(goto-char (point-max))
+		(let ((cstr (format "#%02X%02X%02X" 128 255 0)))
+		  (insert
+		   (propertize
+		    (format "CTXT-HOOK: On %s (%s):\nTLCL: %s\n" var val tlcl)
+		    'face `(foreground-color . ,cstr))
+		   )
+		  )
+		)
+	    )
+      ))))    
+  
 
 ;;; Forward-chaining hook: signs to rules, conditionally rules to hypos
 (defun secd-comp--kb-forward-hook (var val state)
@@ -183,10 +233,10 @@
 			     )
 			   tlcl)
 			 )
-		  (when (listp (cdr (assoc hypo (secd--e state))))
-		    (secd--cps-set-bot 'LDP tlcl)
-		    (secd--cps-set-bot hypo tlcl)
-		    )
+		  ;; Warning: testing unevaluated hypos as lists!
+		  ;; (when (listp (cdr (assoc hypo (secd--e state))))
+		  (secd--cps-set-bot 'LDP tlcl)
+		  (secd--cps-set-bot hypo tlcl)
 		  )
 		)
 	    )
@@ -249,15 +299,19 @@
 
 ;; To be further refined to work on a list of hypos
 (defun secd-comp--kb-knowcess (e goals &optional s var val)
-  "A high-level function to start evaluation of hypothesis `goals'."
+  "A high-level function to start evaluation of hypothesis `goals'. Installs the forward-chaining hook."
   (let ((clist (cons 'STOP nil)))
     (dolist (goal goals clist)
       (setq clist (cons 'LDP (cons goal (cons 'AP0 clist))))
       )
+    ;; Optional hooks
     (add-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)
+    (if secd--kb-option-context
+	(add-hook 'secd-env-update-hook 'secd-comp--kb-context-hook))
+    ;; Setup control list and run
     (let ((state (list s e clist
 		       (cons (cons secd--kb-toplevel-control-list clist) nil))))
-      (if (and var val)
+      (if (and var val) ;; TODO: Update for list of var/val volunteers
 	  (secd-env--update e var val state))
       (secd-cycle (secd--s state) (secd--e state) (secd--c state) (secd--d state))
       )
