@@ -19,7 +19,7 @@
 
 (defun secd-env--rupdate (env clist val &optional state)
   "Replaces `clist' in first found promise in `env' with `val', to implement the UPD mnemonic. Returns update or nil if not found."
-  (let ((promise (rassoc clist env)))
+  (let ((promise (rassoc (cons 'PROMISE clist) env)))
     (cond
      (promise
       (setcdr promise val)

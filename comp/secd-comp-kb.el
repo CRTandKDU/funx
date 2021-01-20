@@ -46,14 +46,15 @@
 (require 'secd-comp-kb-env)
 
 ;;; Decompiling control lists to LHS and RHS source
+;;; jmc 2021-01-20 Handle 'PROMISE
 (defun secd-comp-lhs (rule env)
-  (let* ((ccode (cdr (assoc rule env)))
+  (let* ((ccode (cddr (assoc rule env)))
 	 (ccode-lhs (--take-while (null (eq it 'ALL)) ccode))
 	 (ccode-conds (reverse (--remove (eq it 'LDP) ccode-lhs))))
     ccode-conds))
 
 (defun secd-comp-rhs (rule env)
-  (let* ((ccode (cdr (assoc rule env)))
+  (let* ((ccode (cddr (assoc rule env)))
 	 (ccode-rhs (--drop-while (null (eq it 'SEL)) ccode))
 	 (ccode-actions
 	  (and ccode-rhs
@@ -274,12 +275,12 @@
 		 tlcl
 		 )
 	       )
-	(when (listp (cdr (assoc (car c-r) (secd--e state))))
-	  (secd--cps-set-bot 'LDP tlcl)
-	  (secd--cps-set-bot (cdr c-r) tlcl)
-	  (secd--cps-set-bot 'LDP tlcl)
-	  (secd--cps-set-bot (car c-r) tlcl)
-	  )
+	;; (when (listp (cdr (assoc (car c-r) (secd--e state))))
+	(secd--cps-set-bot 'LDP tlcl)
+	(secd--cps-set-bot (cdr c-r) tlcl)
+	(secd--cps-set-bot 'LDP tlcl)
+	(secd--cps-set-bot (car c-r) tlcl)
+	  ;; )
 	)
       )
     (if secd-exec-verbose

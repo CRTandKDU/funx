@@ -95,13 +95,13 @@
       (secd-cycle
        nil
        '((a . 12) (b . 5)
-	 (CRT_and_KDU . (ASK CRT_and_KDU LDC "agree" EQ UPD))
-	 (C11 . (LDP CRT_and_KDU AP0 UPD))
-	 (C12 . (ASK C12 UPD))
-	 (R1  . (LDP C12 LDP C11 ALL 2 UPD))
-	 (R2  . (LDC 5 LDC 6 EQ UPD))
+	 (CRT_and_KDU . (PROMISE ASK CRT_and_KDU LDC "agree" EQ UPD))
+	 (C11 . (PROMISE LDP CRT_and_KDU AP0 UPD))
+	 (C12 . (PROMISE ASK C12 UPD))
+	 (R1  . (PROMISE LDP C12 LDP C11 ALL 2 UPD))
+	 (R2  . (PROMISE LDC 5 LDC 6 EQ UPD))
 	 (R3  . *F*)
-	 (H   . (LDP R1 LDP R3 LDP R2 ANY 3 UPD))
+	 (H   . (PROMISE LDP R1 LDP R3 LDP R2 ANY 3 UPD))
 	 )
        '(
 	 LDP H
@@ -111,6 +111,8 @@
        nil
        )
       )
+
+(setq secd-exec-verbose nil)
 
 What is the value of CRT_and_KDU?
 (setq b5

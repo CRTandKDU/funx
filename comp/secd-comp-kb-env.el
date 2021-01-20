@@ -18,7 +18,9 @@ Returns environment and list of terminals found in conditions."
 		  )
 	      (push (cons cn (cons c nil)) source-list)
 	      (setq rclist (cons 'LDP (cons cn rclist)))
-	      (setq cclist (push (cons cn (car ccompiled)) cclist))
+	      (setq cclist
+		    (push (cons cn (cons 'PROMISE (car ccompiled)))
+			  cclist))
 	      ;; (setq rvars  (append rvars (cadr ccompiled)))
 	      ;; Prepare list of signs -> condition forward decorations
 	      ;; with the exception of constant promises `*T*' and `*F*'
@@ -40,7 +42,10 @@ Returns environment and list of terminals found in conditions."
 			)
 		    (push (cons axn (cons ax nil)) source-list)
 		    (setq axlist (cons 'LDP (cons axn axlist)))
-		    (setq aclist (push (cons axn (car axcompiled)) aclist))
+		    (setq aclist
+			  (push (cons axn
+				      (cons 'PROMISE (car axcompiled)))
+				aclist))
 		    ;; (setq rvars  (append rvars (cadr axcompiled)))
 		    (dolist (var (cadr axcompiled) rvars)
 		      (push (cons var (cons axn rn)) rvars))
@@ -71,8 +76,8 @@ Returns environment and list of terminals found in conditions."
 		    (cons 'LDC (cons '*F* (cons 'JOIN nil))))
 		    (cons 'UPD nil)))
 		(cons 'UPD nil))))))
-
-	  (push (cons rn rclist) env)
+	  ;; jmc 2021-01-20 Handle 'PROMISE kw in env
+	  (push (cons rn (cons 'PROMISE rclist)) env)
 
 	  ;; Use rule environment to associate decorations
 	  ;; Source control lists for conditions and actions
@@ -198,12 +203,13 @@ Returns environment and list of terminals found in conditions."
 		    (push r ctrls)
 		    (push 'LDP ctrls)
 		    )
-		  (push (cons sign ctrls) env)
+		  ;; jmc 2021-01-20 Patch to put 'PROMISE kw in environment
+		  (push (cons sign (cons 'PROMISE ctrls)) env)
 		  )
-	      (push (cons sign (cons 'ASK (cons sign (cons 'UPD nil)))) env))
+	      (push (cons sign (cons 'PROMISE (cons 'ASK (cons sign (cons 'UPD nil))))) env))
 	    )
 	;; No: standard ASK <SIGN> UPD control list
-	(push (cons sign (cons 'ASK (cons sign (cons 'UPD nil)))) env)
+	(push (cons sign (cons 'PROMISE (cons 'ASK (cons sign (cons 'UPD nil))))) env)
 	)
       )
 
@@ -220,7 +226,7 @@ Returns environment and list of terminals found in conditions."
 	(dolist (rule (cdr h) rlist)
 	  (setq rlist (cons 'LDP (cons rule rlist)))
 	  )
-	(push (cons (car h) (append rlist suffix)) env)
+	(push (cons (car h) (cons 'PROMISE (append rlist suffix))) env)
 	)
       )
     ;; Pass #4

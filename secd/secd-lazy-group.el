@@ -32,11 +32,14 @@ simply loaded as with LD.
   (let ((cprime (secd-env--locate e (car (cdr c))))
 	)
     (list
-     (if (atom cprime)
-	 (cons cprime s)
-       ;; (cons 'PROMISE (cons (cons cprime e) s))
-       (cons (cons 'PROMISE (cons cprime e)) s) 
-       )
+     ;; jmc 2021-01-20 Patch for list-typed values distinct from promises
+     ;; (if (atom cprime)
+     ;; 	 (cons cprime s)
+     ;;   (cons (cons 'PROMISE (cons cprime e)) s) 
+     ;;   )
+     (if (and (listp cprime) (equal (car cprime) 'PROMISE))
+	 (cons (cons 'PROMISE (cons (cdr cprime) e)) s)
+       (cons cprime s))
      e
      (cdr (cdr c))
      d
@@ -125,6 +128,7 @@ it is updated in-place.
   (let ((clist (car (cdr (car (car d)))))
 	(env   (car (cdr d)))
 	)
+    ;; jmc 2021-01-20 Handle 'PROMISE
     (if (null (secd-env--rupdate env clist (car s) (list s e c d)))
 	(secd-env--rupdate-promise
 	 (-first (lambda (binding)

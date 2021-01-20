@@ -39,8 +39,17 @@ Adds variables to alist of names in `n', altering it.
 	      (if (eq (car e) 'cons)
 		  (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'CONS c)))
 		;; Special processing for `set'.
+		;; jmc 2021-01-20 (set VAR CST) -> (set VAR SEXP)
 		(if (eq (car e) 'set)
-		    (secd-comp--comp-lazy (car (cdr (cdr e))) (add-to-list n (cons secd--kb-RHS-set-variable (car (cdr e)))) (cons 'LDC (cons (car (cdr e)) (cons 'SET c))))
+		    (let ((expression (car (cdr (cdr e)))))
+		      (add-to-list
+		       n
+		       (cons secd--kb-RHS-set-variable (car (cdr e)))) 
+		      (secd-comp--comp-lazy
+		       expression
+		       n
+		       ;; (cons 'LDC (cons (car (cdr e)) (cons 'SET c))))
+		       (cons 'LDC (cons (car (cdr e)) (cons 'SET c)))))
 		  (if (eq (car e) 'eq)
 		      (secd-comp--comp-lazy (car (cdr (cdr e))) n (secd-comp--comp-lazy (car (cdr e)) n (cons 'EQ c)))
 		    (if (eq (car e) 'in)

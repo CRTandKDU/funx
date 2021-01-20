@@ -1,0 +1,27 @@
+;;; -*- mode: emacs-lisp; -*-
+
+(setq session
+      (nxp-session
+       '((rule
+	  DEDUCTION
+	  ((eq (car (cdr GIVEN)) 'IS-A)
+	   (eq (car (cdr (cdr GIVEN))) 'MAN))
+	  ((set
+	    CASE
+	    (cons (car GIVEN) (cons 'IS-A (cons 'MORTAL 'nil)))))
+	  )
+	 )))
+
+(setq session
+      (nxp-session
+       '((rule
+	  DEDUCTION
+	  ((eq (car (cdr GIVEN)) 'IS-A)
+	   (eq (car (cdr (cdr GIVEN))) 'MAN))
+	  ((set
+	    CASE '10))))))
+
+
+
+
+

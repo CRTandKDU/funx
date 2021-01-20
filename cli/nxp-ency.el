@@ -6,7 +6,9 @@
 
 (defun nxp-ency--promise-pp (p)
   (let ((col1 (car p))
-	(col2 (if (listp (cdr p)) '*UNKNOWN* (cdr p)))
+	(col2 (if (and (listp (cdr p)) (equal 'PROMISE (cadr p)))
+		  '*UNKNOWN*
+		(cdr p)))
 	)
     (cond
      ;; True

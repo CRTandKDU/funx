@@ -19,7 +19,6 @@
 This manual is for FUNXP, a functional perspective on the NXP Architecture (version {{{version}}}).
 
 * Introduction
-
 Most of the ideas expressed in the historical series of computer programs, termed /NXP Architecture/ in this paper, were originally designed at the apex of one of the recurring cycle in the 30-year returns of the Artificial Intelligence (AI) debate, @@texinfo:@xref{JMC2018,,1}.@@ 
 
 ** A Dominant View, Symbolic Artificial Intelligence
@@ -51,14 +50,49 @@ With symbols, structures come naturally as list of symbols and cognitive process
 While the seminal ideas for the NXP Architecture stemmed from a very early interest in what would be now termed /learning concepts/ (see [[How we got here]]), they were readily influenced and refined by the dominant view at the time, all the more so that they matured in the cultural environment of Carnegie-Mellon University (CMU), namely of its Computer Science and Robotics Institute departments, from 1982 to 1984.
 
 ** Production Systems and Rule-based Systems.
+#+CINDEX: rule-based system
+#+CINDEX: production system
+With the symbolic AI view now firmly entrenched, both in computer science and in the emerging philosophy of the mind, the idea of rule-based systems, in which /knowledge/ is conventionally represented as /rules/ operating on symbols (following the Physical Symbol System hypothesis) became an active applied research program.
 
-
-#+CAPTION: Model Human Processor in /The Psychology of Human-computer Interaction/, by Card, Newell, Moran (1983)
+#+CAPTION: Model Human Processor in /The Psychology of Human-computer Interaction/, by Card, Newell, Moran (1983). The brain-as-a-computer metaphor in the philosophy of the mind, all quantified!
 #+attr_texinfo: :width 200px :center t
 [[./MODEL-HUMAN-PROCESSOR-w200.jpg]]
 
+Although rule-based computation was originally used for formal and systems purposes , researchers in Artificial Intelligence (AI) found that the same methodology was also useful for modelling a wide variety of sophisticated tasks.
 
-Productions and rules systems.
+#+BEGIN_QUOTE
+The production system was one of those happy events, though in minor key, that historians of science often talk about: a rather well-prepared formalism, sitting in wait for a scientific mission. Production systems have a long and diverse history. Their use in symbolic logic starts with Post, @@texinfo:@xref{Post1943,,7},@@ from whom the name is taken. They also show up as Markov algorithms, @@texinfo:@xref{Markov1957,,8}.@@ Their use in linguistics, where they are also called rewrite rules, dates from Chomsky, @@texinfo:@xref{Chomsky57,,10}.@@ As with many other notions in computer science, they really entered into wide currency when they became operationalized in programming languages, first in string manipulation systems and in compiler translation languages, @@texinfo:@xref{Floyd1961,,9}.@@ Thus they were at hand when the data on human problem solving finally took a form (Problem Behavior Graphs) that pointed to their usefulness, @@texinfo:@xref{Newell1972,,3}.@@
+#+END_QUOTE
+
+As commented on by Lenat[fn:4], there were many design constraints present in the classical formal rule based systems. Many of these details were preserved in the AI production rule based programs (e.g., forcing all state information into a single string of tokens). But there were also many changes. The whole notion of "what a rule system really is" changed from an effective problem statement to a tendency to solve problems in a particular way. One typical corollary of this change of view was that instead of no external inputs whatsoever, there was now a presumption of some "environment" which supplied new entries into the token sequence.
+
+#+CINDEX: rule-based-system
+#+CINDEX: working memory
+#+CINDEX: inference engine
+#+CINDEX: recognize-act-cycle
+So over the 1970s symbolic AI research mostly worked with rule systems (RS), a collection of condition-action rules, together with associated data structures (DS; also called memories, or /working memory/) which the rules may inspect and alter. There must also be a policy for /interpretation/: detecting and firing relevant rules (also known as /recognize-act-cycle/, later called /inference engine/). "Intelligence is ten million rules," [[https://www.wired.com/2016/03/doug-lenat-artificial-intelligence-common-sense-engine/][pronounced Lenat in 1988]], such were the times.
+
+*** Neo-classical Rule System Architecture
+#+CINDEX: LHS
+#+CINDEX: RHS
+#+CINDEX: working memory
+#+CINDEX: conditions
+#+CINDEX: actions
+In ten loose principles:
+
+#+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
+- Principle of Simple Memories :: One or two uniform data structures define sufficient memories for a rule system to read from and write into. The format for entries In these structures is both uncomplicated and unchanging.
+- Principle of Simple DS Accesses :: The primitive read and write operations are as simple and low-level as possible; typically they are simply a membership or equality test type of read, and an insert-new-element or set-value type of write. More complicated, algorithmic operations on the memories are not available to the rules.
+- Principle of Isolated DS Elements :: Elements of the uniform DS cannot point to (parts of) other elements. This follows from the preceding principle: If we aren't allowed to chase pointers, there may as well not be any.
+- Principle of Continuous Attention :: In addition to the one or two simple data structures, there may be an external environment which continuously inserts stimuli into the DS. The interleaving of stimuli and internally generated symbols is managed quite trivially: (a) The stimuli are simply inserted into the DS as new or changed elements; (b) Each rule is so small and quick that no "interruption" mechanism is necessary. The interpreter may ignore any suddenly-added stimulus until the current rule finishes executing. The RS may be viewed as "continuously" attending to the environment.
+- Principle of Opaque Rules :: Rules need not have a format inspectable by other rules, but rather can be coded in whatever way is convenient for the programmer and the rule interpreter; i.e., the set of rules is not treated as one of the RSs data structures. E.g., the condition parts of rules may be barred from fully analyzing the set of productions, and the action parts of rules may not be allowed to operate on existing rules.
+- Principle of Simple Rules :: Rules consist of a left- and a right-hand side which are quite elementary. The left hand side (lhs, situation characterization, IF-part, condition) is typically a pattern-match composed with a primitive DS read access, and the right hand side (rhs, consequence, THEN-part, action) is also simply a primitive DS write access. There is no need for sophisticated bundles of DS accesses on either side of a rule. Thus several extra rules should be preferred to a single rule with several actions.
+- Principle of Encoding by Coupled Rules :: A collection of interrelated rules is used to accomplish each subtask; i.e., wherever a subroutine would be used in a procedural programming language. For example, programming an iteration may require many rules "coupled" by writing and reading special (Le., otherwise meaningless) loop control notes in the data structure. 
+-  Principle of Knowledge as Rules :: All knowledge of substance should be, can : be, and is represented as rules. This includes all non-trivial domain dependent information. The role of the DS is just to hold simple descriptive information, intermediate control state messages, recent stimuli from the environment, etc.
+- Principle of Simple Interpretation :: The topmost control flow in the RS is via a simple rule interpreter. After a rule fires, it is essential that any rule in the system may potentially be the next one to fire (i.e., it is forbidden to locate a set of relevant rules and fire them off in sequence). When the rhs of a rule is executed, it can (and frequently will) drastically alter the situation that determined which rules were relevant.
+- Principle of Closure :: The representations allowed by (1-9) are sufficient and appropriate for organizing all the kinds of knowledge needed for tasks for which a given RS is designed.
+
+Notice the common theme: the adequacy of simplicity in all dimensions. 
 
 Medical consultation as a task environment.
 
@@ -78,9 +112,8 @@ This section describes a simple functional programming language, ~funx~, evident
 
 ** Simple subset of LISP. SECD Machine. Compiling funx to SECD assembly.
 
-* An extension for NXP-style inferencing, funxp
+* Extending for NXP-style inferencing, funxp
 #+CINDEX: funxp
-
 Promises and delay/force. A mention of thread and parallelism (QLISP, Kugel non-halting computations v. thinking).
 
 Data-driven vs. call: Hewitt mentioned in Sacerdoti as pattern-directed function invocation.
@@ -215,6 +248,8 @@ From funx.bib
   :END:
 
 * Footnotes
+
+[fn:4] Designing a Rule System That Searches for Scientific Discoveries, /Douglas B. Lenat/ and /Gregory Harris/, CMU CS, Apr. 1977.
 
 [fn:3]  In this context, progress in AI research was exemplified by  comprehensive descriptions of computer programs as landmark systems. @@texinfo:@xref{Feigenbaum1963,,5},@@ for such descriptions of the 1960s and 1950s systems. The import of the analogy between cognitive processes, in the human mind, and the workings of a computer program, was also felt in philosophy with the dramatic revival in the 1970s of /The Language of Thought/ hypothesis. The watershed was publication of Jerry Fodor's The Language of Thought (1975), triggering discussions and debates which continue to figure prominently within philosophy and cognitive science today. From a philosophical perspective, research programs such as "naturalizing intentionality" and "naturalizing consciousness" are still active although under a variety of cognitive assumptions, mirrorring the outpouring of results in neurosciences and computer science in the last decades.
 
