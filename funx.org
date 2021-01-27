@@ -19,7 +19,7 @@
 This manual is for FUNXP, a functional perspective on the NXP Architecture (version {{{version}}}).
 
 * Introduction
-Most of the ideas expressed in the historical series of computer programs, termed /NXP Architecture/ in this paper, were originally designed at the apex of one of the recurring cycle in the 30-year returns of the Artificial Intelligence (AI) debate, @@texinfo:@xref{JMC2018,,1}.@@ 
+Most of the ideas expressed in the historical series of computer programs, termed /NXP Architecture/ in this paper, were originally designed at the apex of one of the recurring return in the 30-year cycle in the Artificial Intelligence (AI) debate, @@texinfo:@xref{JMC2018,,1}.@@ 
 
 ** A Dominant View, Symbolic Artificial Intelligence
 #+CINDEX: Symbolic AI
@@ -32,10 +32,11 @@ Artificial Intelligence is the subfield of computer science concerned with symbo
 #+CINDEX: Expert System
 These computer systems incorporating symbolic knowledge became known as /Expert Systems/ and were all the rage, as industrial applications of AI, from the early eighties to the mid-nineties.
 
-This somewhat restricted, to contemporary eyes, view of AI as a "subfield of computer science" geared towards augmenting traditional programs with symbolic knowledge was, however, perfectly in line with the precepts of the symbolic thread of AI research, established at the /Dartmouth Summer Research Project on Artificial Intelligence/ in 1956. Out of the variety of conceptual tenets of research on "thinking machines" in the 1950s, diversely known as /cybernetics/, /automata theory/ or /complex information processing/, stemmed out the original characteristics of the symbolic approach to AI: the importance of (mathematical) logic in high-level cognitive processes, and the prevalence of symbols in all aspects of cognition.
+#+CINDEX: Dartmouth
+This somewhat restricted, to contemporary eyes, view of AI as a "subfield of computer science" geared towards augmenting traditional programs with symbolic knowledge was, however, perfectly in line with the precepts of the symbolic thread of AI research, established at the /Dartmouth Summer Research Project on Artificial Intelligence/ in 1956. Out of the variety of research theses on "thinking machines" in the 1950s, diversely known as /cybernetics/, /automata theory/ or /complex information processing/, stemmed out the original characteristics of the symbolic approach to AI: the importance of (mathematical) logic in high-level cognitive processes, and the prevalence of symbols in all aspects of cognition.
 
 #+CINDEX: Physical Symbol System Hypothesis
-The defining assumption, /the physical symbol system hypothesis/, is the philosophical perspective on AI assessed by Allen Newell and Herbert A. Simon:
+The defining assumption, /the physical symbol system hypothesis/, was the philosophical perspective on AI assessed by Allen Newell and Herbert A. Simon:
 
 #+BEGIN_QUOTE
 A physical symbol system has the necessary and sufficient means for general intelligent action, @@texinfo:@xref{Newell1972,,3}.@@
@@ -44,21 +45,23 @@ A physical symbol system has the necessary and sufficient means for general inte
 #+CINDEX: goal
 #+CINDEX: working memory
 #+CINDEX: computer/brain analogy
-With symbols, structures come naturally as list of symbols and cognitive processes are understood as controlled by signal and symbol structures in /working memory/, i.e. arbitrary list structures in an extensive database-like system, called /goals/, @@texinfo:@xref{PDIS1978,,4}.@@ On the one hand, note the implicit analogy with the Turing machine model of a computer[fn:2], where perceptions are turned into symbols in memory, feeding a processor which elects further actions, operating changes in the environment. And, on the other hand, delineating further this analogy, the notions of symbols and lists from which LISP, and all its functional programming languages descendance in computer science, was derived, by the same contributors to the seminal Dartmouth workshop[fn:3].
+#+CINDEX: Dartmouth
+With symbols, structures come naturally as list of symbols, and cognitive processes are understood as controlled by signal and symbol structures in /working memory/, i.e. arbitrary list structures in an extensive database-like system, sometimes called /goals/, @@texinfo:@xref{PDIS1978,,4}.@@ On the one hand, note the implicit analogy with the Turing machine model of a computer[fn:2], where perceptions are turned into symbols in memory, feeding a processor which elects further actions, operating changes in the environment. And, on the other hand, delineating further this analogy, the notions of symbol and list from which LISP, and all its functional programming languages descendants in computer science, was derived, and moreover by the same contributors to the seminal Dartmouth workshop[fn:3].
 
 #+CINDEX: CMU
 While the seminal ideas for the NXP Architecture stemmed from a very early interest in what would be now termed /learning concepts/ (see [[How we got here]]), they were readily influenced and refined by the dominant view at the time, all the more so that they matured in the cultural environment of Carnegie-Mellon University (CMU), namely of its Computer Science and Robotics Institute departments, from 1982 to 1984.
 
 ** Production Systems and Rule-based Systems.
 #+CINDEX: rule-based system
+#+CINDEX: rule system
 #+CINDEX: production system
-With the symbolic AI view now firmly entrenched, both in computer science and in the emerging philosophy of the mind, the idea of rule-based systems, in which /knowledge/ is conventionally represented as /rules/ operating on symbols (following the Physical Symbol System hypothesis) became an active applied research program.
+With the symbolic AI view then firmly entrenched, both in computer science and in the emerging philosophy of the mind, the idea of rule-based systems, in which /knowledge/ is conventionally represented as /rules/ operating on symbols (following the Physical Symbol System hypothesis) became an active applied research program.
 
 #+CAPTION: Model Human Processor in /The Psychology of Human-computer Interaction/, by Card, Newell, Moran (1983). The brain-as-a-computer metaphor in the philosophy of the mind, all quantified!
 #+attr_texinfo: :width 200px :center t
 [[./MODEL-HUMAN-PROCESSOR-w200.jpg]]
 
-Although rule-based computation was originally used for formal and systems purposes , researchers in Artificial Intelligence (AI) found that the same methodology was also useful for modelling a wide variety of sophisticated tasks.
+Although rule-based computation was originally used for formal and systems purposes , researchers in Artificial Intelligence (AI) found that the same methodology was also useful for modeling a wide variety of sophisticated tasks.
 
 #+BEGIN_QUOTE
 The production system was one of those happy events, though in minor key, that historians of science often talk about: a rather well-prepared formalism, sitting in wait for a scientific mission. Production systems have a long and diverse history. Their use in symbolic logic starts with Post, @@texinfo:@xref{Post1943,,7},@@ from whom the name is taken. They also show up as Markov algorithms, @@texinfo:@xref{Markov1957,,8}.@@ Their use in linguistics, where they are also called rewrite rules, dates from Chomsky, @@texinfo:@xref{Chomsky57,,10}.@@ As with many other notions in computer science, they really entered into wide currency when they became operationalized in programming languages, first in string manipulation systems and in compiler translation languages, @@texinfo:@xref{Floyd1961,,9}.@@ Thus they were at hand when the data on human problem solving finally took a form (Problem Behavior Graphs) that pointed to their usefulness, @@texinfo:@xref{Newell1972,,3}.@@
@@ -70,15 +73,16 @@ As commented on by Lenat[fn:4], there were many design constraints present in th
 #+CINDEX: working memory
 #+CINDEX: inference engine
 #+CINDEX: recognize-act-cycle
-So over the 1970s symbolic AI research mostly worked with rule systems (RS), a collection of condition-action rules, together with associated data structures (DS; also called memories, or /working memory/) which the rules may inspect and alter. There must also be a policy for /interpretation/: detecting and firing relevant rules (also known as /recognize-act-cycle/, later called /inference engine/). "Intelligence is ten million rules," [[https://www.wired.com/2016/03/doug-lenat-artificial-intelligence-common-sense-engine/][pronounced Lenat in 1988]], such were the times.
+So over the 1970s symbolic AI research mostly worked with rule systems (RS), a collection of condition-action rules, together with associated data structures (DS; also called memories, or /working memory/) which the rules may inspect and alter. There must also be a policy for /interpretation/: detecting and firing relevant rules (also known as /recognize-act-cycle/, later called /inference engine/). "Intelligence is ten million rules," [[https://www.wired.com/2016/03/doug-lenat-artificial-intelligence-common-sense-engine/][Lenat pronounced in 1988]], such were the times.
 
 *** Neo-classical Rule System Architecture
+#+CINDEX: rule system
 #+CINDEX: LHS
 #+CINDEX: RHS
 #+CINDEX: working memory
 #+CINDEX: conditions
 #+CINDEX: actions
-In ten loose principles:
+In ten loose principles according to Lenat and Harris:
 
 #+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
 - Principle of Simple Memories :: One or two uniform data structures define sufficient memories for a rule system to read from and write into. The format for entries In these structures is both uncomplicated and unchanging.
@@ -96,17 +100,317 @@ Notice the common theme: the adequacy of simplicity in all dimensions.
 
 Medical consultation as a task environment.
 
+*** Rules are put to many uses in inference
+In contrast, defending that thinking may be more than computing[fn:5], Peter Kugel refers to Peirce's definitions of:
+
+#+CINDEX: rule system
+#+CINDEX: rule
+#+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
+- Rule :: a general principle that is applied to specific examples. The analogy to a program representing an principle that computers apply to certain inputs still stands.
+- Case :: what the rule is applied to. This would be the input in the computer program metaphor, or the working memory in the rule system.
+- Result :: what is produced by the rule application. This would be the output in the computer program metaphor, or the effects of RHS actions on the working memory in a rule system.
+
+#+CINDEX: deduction
+#+CINDEX: induction
+#+CINDEX: abduction
+#+CINDEX: machine learning
+The overall analogy suggests that deduction might be modeled as evaluating a rule against case, which was often done at that time. While in logic, axiomatic theories are often thought as recursively enumerable (i.e. partially computable) theorems, here it is suggested that induction works from case and result to rule. And indeed, in the heydays of symbolic AI, Machine Learning research went this way, @@texinfo:@xref{Michalski1984,,29}, @xref{Michalski1986,,30},@@ years before the massive connectionist architecture of today's ML took up the prize.
+
+|            | DEDUCTION                      |
+|------------+--------------------------------|
+| Given:     | Rule: All men are mortal       |
+| Given:     | Case: (SOCRATES IS-A MAN)      |
+|------------+--------------------------------|
+| Concludes: | Result: (SOCRATES IS-A MORTAL) |
+
+
+|            | INDUCTION                      |
+|------------+--------------------------------|
+| Given:     | Case: (SOCRATES IS-A MAN)      |
+| Given:     | Result: (SOCRATES IS-A MORTAL) |
+|------------+--------------------------------|
+| Concludes: | Rule: All men are mortal       |
+
+
+|            | ABDUCTION                      |
+|------------+--------------------------------|
+| Given:     | Rule: All men are mortal       |
+| Given:     | Result: (SOCRATES IS-A MORTAL) |
+|------------+--------------------------------|
+| Concludes: | Case: (SOCRATES IS-A MAN)      |
+
+#+CINDEX: forward-chaining
+#+CINDEX: backward-chaining
+Peirce's types of inference are related, but not identical to, notions of /forward-chaining/ and /backward-chaining/ in rule systems, which are later explored in the FUNXP architecture.
+
+#+CINDEX: CMU
+#+CINDEX: DEC
+#+CINDEX: VAX
+#+CINDEX: OPS 5
+In the CMU culture, at the time, the "neo-classical" view defined by Lenat was prevalent. Its incarnation in the series of production systems languages, OPS, culminated in OPS 5 (and later OPS 83). OPS 5 was made instantly famous by the then well-known significant success of a first industrial application: R1/XCON, an expert system to configure VAX Systems at DEC[fn:6].
+
+#+CAPTION: The OPS series of production systems languages. Source: Wikipedia, CC0, https://en.wikipedia.org/w/index.php?curid=44903117
+#+attr_texinfo: :width 400px :center t
+[[./OPS_series.png]]
+
+#+CINDEX: RETE
+#+CINDEX: recognize-act-cycle
+In OPS-based expert systems, creation/update/deletion operations on the working memory were propagated into a graph, compiled from the rules. These changes triggered LHSes, concurrently selecting rules which could be fired at each step. The recognize-act-cycle parameters would drive picking up the rule(s) to fire, executing their RHSes and cycling back to rule selection[fn:7].
+
+The numerous active developments, at CMU, about and around OPS 5 added to the design mix of the NXP Architecture. They helped contrasting and focusing on the proper interaction of backward chaining and forward chaining, that guide the logical process of rule evaluation.
+
+*** Rules with and without symbols
+#+CINDEX: neurosciences
+#+CINDEX: cognitive control
+Interestingly, the formidable development of neurosciences and computational neurosciences in the last decades throws a new contemporary light on the venerable rule system thread of symbolic AI. Based on mathematical-logic and computer-science inspired metaphors, the rule system ended up as a model of a fundamental human cognitive faculty: the capacity for cognitive control, the ability to behave in accord with rules, goals or intentions (all problematic notions to the philosophy of mind, by the way) -- even when this runs counter to reflexive or other compelling competing responses.
+
+#+CINDEX: SOAR
+A hallmark of this cognitive control is its remarkable flexibility. Novel tasks can be performed with very little additional experience (a problematic issue, in contrast, for the current -- 2021 -- crop of massive Deep Learning connectionist architectures). This was unfalteringly explored over several decades by, among others, Allen Newell, @@texinfo:@xref{Newell1972,,3},@@ then @@texinfo:@xref{Newell1990,,31}.@@
+
+Today's neurosciences tell us that this ability appears to depend on the prefrontal cortex (PFC). This capacity, however, emerges only slowly over a protracted period through late adolescence. The rule system abstractly models flexible cognitive control at the psychological level, in terms of symbol processing computations that all support arbitrary variable bindings. A symbol may stand for anything, as computations only rely on the syntactic properties of such symbols[fn:3]. It remains unclear, however, whether or how this model relates to the increasingly growing body of knowledge about the neural mechanisms underlying cognitive control and namely the functioning of the PFC.
+
+#+CINDEX: connectionism
+#+CINDEX: connectionism (proper treatment)
+At the biological level, many models were developed of cognitive control relying on the maintenance of rule-like representations in the PFC. But questions about how these representations develop and why this development should be so long are still unanswered, @@texinfo:@xref{Rougier2005,,2}.@@ Leveraging today's successes in massive connectionism, as is apparent in Deep Learning, neural networks models of the PFC can be trained to show development of rule-like task representations, which support generalization of task performance to novel environments. A perfect, modern instance of the proper treatment of connectionism, the approach pioneered more than thirty years ago that sought to set up "check and balances" strategies against an all-encompassing symbolic AI, @@texinfo:@xref{Smolensky1988,,32}.@@
+
+** Clinical Consultation as a Task Environment
+The third historical ingredient in the context for the original design in the NXP Architectures were some seminal applications of symbolic AI to Medicine, and more specifically to clinical consultation.
+
+*** Old and Long History of Medical Applications of AI
+#+CINDEX: AIM
+In 1956, Dr François Paycha presented a paper at the /Premier Congrès International De Cybernétique/, in Namur, on "Cybernétique de la consultation", @@texinfo:@xref{Paycha1963,,11}.@@
+
+#+CINDEX: sign
+#+CINDEX: syndrome
+#+CINDEX: symptom
+#+CINDEX: clinical picture
+Inspired by the Weaver-Shannon information theory and Norbert Wiener's Cybernetics, "Consultation Cybernetics" is a full-fledged theory of heuristics in medical diagnosis. Useful abstractions in the logical process of reaching a positive diagnosis are precisely defined in an inclusive sequence of sets of signs/symptoms, syndrome, clinical pictures, and finally diseases, joined by typed links, which may be directed or not. The "working memory" was then represented as a graph:
+
+#+CAPTION: Medical Consultation: a view from cybernetician Dr François Paycha, in 1956.
+#+Attr_texinfo: :width 400px :center t
+[[./PAYCHA.jpg]]
+
+Paycha suggests that "diagnosis machines" are needed to confront the increasingly growing volume of medical knowledge, already escaping the MD's comprehension. And diagnosis being only the first in a series of steps leading to prescription, and a healthy patient, the need is amplified by the increasing volume of therapeutics information.
+
+The graph is traversed by the consultation exploratory process in three consecutive phases, termed /semiological/, /differential/, and /positive/ diagnosis, respectively. Based on a form of ternary logic, /true/, /false/, and /unknown/, the first two phases range from signs/symptoms up to candidate diseases through syndromes and their related clinical pictures. Then a directed ternary-logic evaluation of the candidates is performed in the last phase, reaching one, or possibly several, positive diagnoses.
+
+#+CINDEX: goal
+#+CINDEX: forward-chaining
+#+CINDEX: backward-chaining
+The theory articulates a data-driven phase, reminiscent of or heralding forward-chaining in rule systems, which Paycha insists is almost reflexive in the MD's mind -- thus also evocative of so-called spontaneous computations models studied twenty years later in computer science, @@texinfo:@xref{Rieger77,,6},@@ -- with a form of deductive backward-chaining goal and subgoal evaluation.
+
+All the basic building blocks of AI in Medicine (AIM) are in place.
+
+*** There Were Many Inspiring Accomplishments in AIM
+Started in 1972 at Stanford University, MYCIN is a pioneering computer-based consultation system designed to assist physicians in the diagnosis of and therapy selection for patients with bacterial infections. In addition to the consultation system itself, MYCIN contains an explanation system which can answer simple English questions in order to justify its advice or educate the user. The system's knowledge is encoded in the form of some 350 production rules which embody the clinical decision criteria of infectious disease experts. Much of MYCIN's power derives from the modular, highly stylized nature of these decision rules, enabling the system to dissect its own reasoning and allowing easy modification of the knowledge base, @@texinfo:@xref{Buchanan1984,,14}.@@
+
+#+CAPTION: The MYCIN Experiments at Stanford's SUMEX-AIM.
+#+attr_texinfo: :width 300px :center t
+[[./MYCIN.jpg]]
+
+#+CINDEX: MYCIN
+#+CINDEX: EMYCIN
+#+CINDEX: ONCOCIN
+#+CINDEX: expert system shell
+Stanford's MYCIN and its descendants, such as EMYCIN[fn:9], a domain independent version of MYCIN for use in other domain and applications, and ONCOCIN[fn:8], an oncology protocol management system designed to assist physicians in the treatment of cancer patients, had a long-lasting influence on the whole program of AI research and precipitated the commercial the early eighties charge towards industrial and commercial applications of expert systems.
+
+#+CINDEX: MYCIN
+#+CINDEX: OPS
+#+CINDEX: expert system shell
+#+CINDEX: knowledge engineering
+Predominantly based on backward-chaining, in contrast to the design of CMU's OPS series of production system languages, MYCIN nonetheless fixed the major features and definitions of expert systems, and /expert system shells/ as domain-independent /knowledge engineering/ software tools.
+
+In 1983, Ed Shortliffe reflected on the impact of MYCIN on AI:
+
+#+BEGIN_QUOTE 
+You mentioned earlier that MYCIN is often cited as sort of the fundamental expert system -- which may be overstating the case for MYCIN. DENDRAL is certainly the earliest really well-accepted expert system, although it has some different elements . It's not interactive for large groups of people in quite the same way that MYCIN is intended to be . But ideas that grew out of MYCIN and
+DENDRAL and other medical efforts such as the CASNET project at Rutgers, the INTERNIST project at the University of Pittsburgh, work at MIT on a program called PIP (the Present Illness Program), and subsequent work at MIT on explanation and more recently causal reasoning and multi-level causal descriptions, have contributed greatly to the state of the art in expert systems and, in turn, to the demonstration of these ideas.
+#+END_QUOTE
+
+#+CINDEX: rule interpreter
+#+CINDEX: inference engine
+#+CINDEX: rule compiler
+#+CINDEX: certainty factors
+#+CINDEX: interactivity
+#+CINDEX: explanation
+MYCIN made popular constructs like /rule interpreters/ (shells) and /rule compilers/ (in this case to decision trees) and /certainty factors/; main control structure as goal-directed backward chaining of rules[fn:10]; interactivity by asking questions to the user, modularity of rules which could be edited individually; explanation capabilities. (Note that early expert systems faced the same critic, which are today addressed to ML Deep Learning neural nets, of demanding /explanation/ for the conclusions it reached in order to be accepted as a legitimate tool by a community of practitioners.)
+
+#+CAPTION: The Expert System Architecture industry standard in the late eighties.
+#+attr_texinfo: :width 300px :center t
+[[./EXPERT-SYSTEM.jpg]]
+
+
+Its influence was certainly important on the NXP Architecture as its first demonstration knowledge bases, for research purposes, were all from the medical consultation task environment @@texinfo:@xref{Rappaport-1984-15190,,12}.@@ Closer to the CMU campus, INTERNIST-I was a broad-based computer-assisted diagnostic tool developed in the early 1970s at the University of Pittsburgh as an educational experiment[fn:11].
+
+In hindsight, the NXP Architecture design strongly benefitted from the accomplishments of this opening chapter of AIM, @@texinfo:@xref{Clancey1984,,13}.@@ These were retrospectively described in 2015 by Pr. Casimir Kulikowski, whose doctoral dissertation, in 1970, described a pattern recognition model which has been successfully used to simulate a doctor's diagnostic process:
+
+#+BEGIN_QUOTE 
+During the first half of the 1970’s, several groups working on computational models for clinical decision-making and problem-solving had developed the MYCIN rule-based system for infectious disease therapy assistance at Stanford, the CASNET Causal Associational NETwork model for consultation in glaucoma, at Rutgers, the DIALOG (later renamed INTERNIST) system for differential diagnosis in internal medicine at Pittsburgh, and the PIP (Present Illness Program)
+for diagnosis-driven acquisition of clinical data at MIT and Tufts. These had been inspired by AI approaches that departed from the earlier general problem solving search paradigm characteristic of AI since its inception and still holding sway into the 1970’s, and focused on capturing domain- and problem-specific strategies for solving complex sequences of expert biomedical interpretations and actions. These included the rule-based and hypothesis-list approaches used in the DENDRAL Project, which influenced MYCIN, as well as
+experimental, instructional, interview-based, and cognitive approaches to the analysis of clinical problem solving, and the causal-taxonomic representation of underlying processes of disease.  While earlier computer models for medical decision-making were predominantly statistical or algorithmic, the new AI approaches developed structured representations of specific clinical domain knowledge over which a general inference engine could reason with a variety of heuristics, and provide advice or suggestions to the consulting user.
+#+END_QUOTE
+
+Closing the loop with the early cybernetics endeavours in Medicine of Dr Paycha, the state of the art of AI systems for medical consultation was summarized in computer programs such as NEOMYCIN. Revisiting the "MYCIN expertiments" over close to twenty years, and reconfiguring the system for education purposes -- the ultimate use INTERNIST-I was also put to at about the same time -- the following diagram was published:
+
+#+CAPTION: Strategies in MYCIN-inspired medical consultation computer programs.
+#+attr_texinfo: :width 200px :center t
+[[./MYCIN-STRATEGY.jpg]]
+
+Note the similarities with Dr Paycha's investigations of 1956, allowing for changes in terminology and some refinements on the pedagogical aims of the classification.
+
 * How we got here
+The functional perspective motivates revisiting -- once more -- the design of the NXP Architecture. This section elaborates on what is expected of functionalism (as in the philosophy of mind) or of functional languages when it comes to the nature and implementation of the NXP Architecture.
 
-A quick word on previous implementations. Interpreter v. compilers.
+** Archeology and vestigial software artefacts
+The seminal ideas, presented in context in the [[* Introduction]] slowly matured over time. Several computer programs, designed as scientific experiments on a computer model of the mind, in typical Newell-Simon style, testify to the long track in the design space.
 
-Emacs-Lisp.
+#+CINDEX: differetential diagnosis
+#+CINDEX: inference engine
+#+CINDEX: clustering
+#+CINDEX: NEXPERT
+#+CINDEX: AIM
+#+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
+- PHILIPS :: Associative memory; exploration of clustering in Machine Learning (1979-80).
+- NClose :: An AIM inference engine with a focus on differential diagnosis in medical consultation (1982-3). Also Rappaport, A., /Closed Search: an hypothesis evaluator/, Unpublished manuscript, Robotics Institute, Carnegie-Mellon University, (1982).
+- KAA :: Derived from PHILIPS, ML by clustering on the inference paths of the NClose performances (1982-3).
+- SCS :: A knowledge management tool for the KAS/PROSPECTOR rule model, written in OPS 5 (1982-3). Also Mulsant, B., Servan-Schreiber, D. /A Gentle Introduction to Artificial Intelligence in Medicine/. Unpublished manuscript, Robotics Institute, Carnegie-Mellon University, (1982).
+- PROSYL :: Nclose-inspired algorithm for many-objects many-patterns matching à la RETE (1983).
+- AMBER :: Generalizing previous programs: discovery and clustering of sequential observations for prediction (1984).
+- NEXPERT, later NEXPERT OBJECT :: Industry-standard expert system development environment on microcomputers, workstations and mainframes, with pioneering GUI (1985-)
+
+Recent, and mostly unpublished, research work explored further implementations and design ideas about the NXP Architecture:
+
+#+CINDEX: CPS
+#+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
+- Theoretical models :: Expressing heuristics in continuation passing style (CPS) [[https://arxiv.org/abs/cs/0211035][Monadic Style Control Constructs for Inference Systems]] (2002), [[https://arxiv.org/abs/cs/0402035][Memory As A Monadic Control Construct In Problem-Solving]] (2004).
+- NClosEmacs :: A Nclose-inspired rule/hypothesis evaluator written in Emacs-Lisp with a Machine Learning (ML) extension exploring /bagging/ and /boosting/ (2008-10).
+- LLVM-based implementation :: Based on CLANG, CouchDB and a minimal GUI client in GTK+, a NXP Architecture based on CPS constructs (2010).
+- Micro-Service implementation :: Written in Javascript and based on Node, Moleculer, the progressive microservice framework, a demonstration prototype with a React GUI (2018) for the Web.
+
+** Meanwhile functionalism thrives in the philosophy of mind
+#+CINDEX: functionalism
+#+CINDEX: mental states
+In the philosophy of mind, functionalism is generally considered one of the major proposals that have been offered as solutions to the mind/body problem[fn:12].  Functionalism says that mental states are constituted by their causal relations to one another and to sensory inputs and behavioral outputs.  
+Functionalism is one of the major theoretical developments of Twentieth Century analytic philosophy, and provides the conceptual underpinnings of much work in cognitive science.
+
+Ned Block lists three sources for functionalism:
+
+#+BEGIN_QUOTE
+  - Putnam and Fodor saw mental states in terms of an empirical computational theory of the mind[fn:3]. (A critical assumption in the symbolic v. connectionism recurring debate, where both sides appeal to a form of computation.)
+  - Smart's "topic neutral" analyses led Armstrong and Lewis to a functionalist analysis of mental concepts. (In which /causality/ is emphasised[fn:13].)
+  - Wittgenstein's idea of /meaning as use/ led to a version of functionalism as a theory of meaning, further developed by Sellars and later Harman.
+#+END_QUOTE
+
+Leveraging the mind-as-computer metaphor (see [[Rules with and without symbols]]), Block introduces the function relevant to mind by way of the Turing machine. What is a state of a Turing machine? Its nature is entirely relational: the state is completely defined by its relation with other states in the transition table. And so:
+
+  * According to functionalism, the nature of a mental state is just like the nature of an automaton state: constituted by its relations to other states and to inputs and outputs;
+  * Hence mental states can be totally characterized in terms that involve only logico-mathematical language and terms for input signals and behavioral outputs. (A syntactic view of characterizing mental processes.)
+  * Mental states, howver, do have /other/ (e.g. physical) properties. These other properties are said to be the /realizations/ of the functional properties. So, although functionalism characterizes the mental in non-mental terms, it does so only by quantifying over realizations of mental states (which would not have delighted behaviorists).
+  * Of course then, one functional state can be realized in different ways. (This, we saw, is a principle in the symbolic AI approach which abstracts the underlying substrate for mental processes.)
+  * Conversely, one physical state can realize different functional states in different machines, including the brain.
+
+#+CINDEX: physicalism
+#+CINDEX: cognitive science
+#+CINDEX: functionalism (conceptual)
+#+CINDEX: functionalism (psychofunctionalism)
+Functionalism then permeates cognitive science and AI[fn:14] since inception. It hints at the the falsity of physicalism:  if a creature without a brain can think, thinking can't be a brain state[fn:5].
+
+The issue of realization is not without difficulty, however. Should we consider it in empirical psychology and functionalism aims at capturing mental concepts (as ordinarily understood); should we consider it in common sense psychology, and functionalism aims rather at fixing the extension of mental terms. (Reminiscent of distinctly--and non equivalently--defining a function in the mathematical sense, by extension, or by intension.) These variants of functionalism in turn spell different problems in relating mental states to causation, or to /qualia/ (phenomenal states like the look of /red/)[fn:15].
+
+** And functional programming languages in computer science
+#+CINDEX: LISP
+#+CINDEX: Dartmouth
+As mentioned before, the roots of the symbolic AI and functional programming languages are historically intertwined, dating back to the Dartmouth workshop of 1956. And so at different historical eras, AI was sometimes equated with LISP programs and LISP-Machines, LISP being the original and archetypal functional programming language. In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions. (In this respect, it shares architectural principles with the versions of functionalism in the philosophy of mind of the [[Meanwhile functionalism thrives in the philosophy of mind][previous section]].) 
+
+
+It is a declarative programming paradigm in which function definitions are trees of expressions that each return a value, rather than a sequence of imperative statements which change the state of the program. In this respect, it naturally blends with [[Production Systems and Rule-based Systems.][rule systems]].
+
+
+As an exploration path for this research project, we planned to revisit this blending of symbolic processe perspectives, viewed as mental processes and viewed as computer programs expressed in functional languages, leading to an original (re)implementation of the NXP Architecture.
+
+*** Evaluation, Compilation and Abstract Machines
+*** Strict v. Lazy Evaluation
+*** I/O and GUI
+
+
+Choosing Emacs-Lisp.
 
 ~funxp~ is both a programming language and an interactive programming environment for expert systems. (Ref IPE1984.) It embeds NCLOSE, an earlier inference engine, in a simple -- even simplistic -- functional programming language called ~funx~ (/functional expressions/).
 
+The usual way of presenting an evaluation model for a functional
+language is to define an abstract machine, which executes an
+instruction stream. The abstract machine is given an operational
+semantics using a state transition system, and compilation rules are
+given for converting a functional program into abstract machine code.
+
+Eager v. lazy.
+
 * A simplistic functional language, funx
 #+CINDEX: funx
-This section describes a simple functional programming language, ~funx~, evidently based on LISP with a minimal set of built-in functions. 
+This section describes a simple functional programming language, ~funx~, evidently based on LISP with a minimal set of built-in functions.
+
+From Peyton Jones:
+  - How are function values, data values and unevaluated expressions represented (Section 3.1)?
+  - How is function application performed (Section 3.2)?
+
+Closures, thunks, promises. The heap contains two kinds of ob jects:
+head normal forms (or values), and as-yet unevaluated suspensions (or
+thunks). Head normal forms can be further classified into two kinds:
+function values and data values. A value may contain thunks inside it;
+for example, a list CONS cell might have an unevaluated head and/or
+tail. A value which contains no thunks inside it is called a normal
+form. For reasons which will become apparent we use the term closure
+to refer to both values and thunks.
+
+A function value is a suspended computation (promise to perform the computation when the value is applied to some arguments). The most compact way to represent a function value is as a block of static code (shared by all dynamic instances of the value), together with the values of its free variables: a /closure/.
+
+Representing closure: 
+a) Block of heap-allocated storage with 1
+pointer to code followed by pointers to variables. The environment
+pointer points to the closure and variables are accessed by calls
+relative to this pointer. (Directly or by chains of pointers, with an
+impact on GC.)  
+b) The Three Instruction Machine (TIM) takes another
+interesting position. Instead of representing a closure by a single
+pointer, it represents a closure by a pair of a code pointer and a
+pointer to a heap-allocated frame (Fairbairn & Wray [1987]). The
+frame, which is a vector of code-pointer/frame-pointer pairs, gives
+the values of the free variables of the closure, and may be shared
+between many closures.
+
+In a non-strict language, values are passed to functions or stored in data structures in unevaluated form, and only evaluated when their value is actually required. In fact a discrete scale : strict (eager) -> lenient (Traub) -> non-strict, depending on whether all or some values are unevaluated.
+
+Like function values, these unevaluated forms capture a suspended
+computation, and can be represented by a closure in the same way as a
+function value. Following the terminology of Bloss, Hudak & Young
+[1988], we call this particular sort of closure a thunk, a term which
+goes back to the early Algol implementations of call-by-name (Ingerman
+[1961]). When the value of the thunk is required, the thunk is forced: naive reduction, cell model (flag) or self-updating model. (With issues on optimisation and GC.)
+
+Compiling function applications
+
+Compilers from the Lisp tradition usually compile function application
+as follows: evaluate the function, evaluate the argument, and apply
+the function value to the argument. When a known function is being
+applied (as is often the case, especially in Lisp), the \evaluate the
+function" part becomes trivial. This model for function application,
+which we call the evalapply model, is invariably used by compilers for
+strict languages (eg Lisp, Hope, SML and the SECD machine (Henderson
+[1980]; Landin [1965])). It is also used in some implementations of
+non-strict languages, except that of course only the function is
+evaluated before the application (eg the ABC machine (Koopman [1990]),
+and the <n,G>-machine (Augustsson & Johnsson [1989])).
+
+In contrast, compilers based on lazy graph reduction treat function
+application as follows: push the argument on an evaluation stack, and
+tail-call (or enter) the function. There is no \return" when the
+evaluation of the function is complete. We call this the push-enter
+model.
+
+
+It it has a formal operational semantics, expressed as a state
+transition system, as well as the usual denotational semantics
+
 
 ** Rehash of Henderson's book and other references of the 60s and 70s. Sexps.
 
@@ -248,6 +552,36 @@ From funx.bib
   :END:
 
 * Footnotes
+
+[fn:15] Troubles with functionalism. /Ned Block/, Minnesota Studies in the Philosophy of Science, 9:261-325, (1978).
+
+[fn:14] Not to mention neurosciences. See e.g. Toward discovery science of human brain function, /Bharat B. Biswal, et al./, Proceedings of the National Academy of Sciences Mar 2010, 107 (10) 4734-4739; (DOI: 10.1073/pnas.0911855107).
+
+[fn:13] The causal approach was also characteristic of D.M. Armstrong's careful conceptual analysis of mental states and processes, such as perception and the secondary qualities, sensation, consciousness, belief, desire, emotion, voluntary action, in his A Materialist Theory of the Mind (1968).
+
+[fn:12] Solutions to the mind/body problem usually try to answer questions such as: What is the ultimate nature of the mental? At the most general level, what makes a mental state mental? Or more specifically, What do thoughts have in common in virtue of which they are thoughts? That is, what makes a thought a thought? What makes a pain a pain? /Cartesian Dualism/ said the ultimate nature of the mental was to be found in a special mental substance. /Behaviorism/ identified mental states with behavioral dispositions; /physicalism/ in its most influential version identifies mental states with brain states. /Block, Ned/, What is Functionalism? The Encyclopedia of Philosophy Supplement, (1996).
+
+[fn:11] Internist-I, an Experimental Computer-Based Diagnostic Consultant for General Internal Medicine, /Miller, Randolph A., Harry E. Pople Jr, and Jack D. Myers./ New England Journal of Medicine 307.8 (1982): 468-476. 
+
+[fn:10] The order of the rules in the list attached to a goal is assumed to be
+arbitrary, and all the rules are applied unless one of them succeeds and
+concludes the value of the parameter with certainty (in which case the
+remaining rules are superfluous).
+
+[fn:9] EMYCIN : A Knowledge Engineer ’ s Tool for Constructing
+Rule-Based Expert Systems, /William, Van Melle, E. Shortliffe,
+Bruce. and G. Buchanan/, Pergamon-lnfotech state of the art report on
+machine intelligence, pp. 249-263. Maidenhead, Berkshire, U.K.:
+Infotech Ltd., 1981.
+
+[fn:8] ONCOCIN: an expert system for oncology protocol management, /Edward H. Shortliffe, A. Carlisle Scott, Miriam B. Bischoff, A. Bruce Campbell, William Van Melle, and Charlotte D. Jacobs./ In Proceedings of the 7th international joint conference on Artificial intelligence - Volume 2 (IJCAI'81). Morgan Kaufmann Publishers Inc., San Francisco, CA, USA, 876–881, 1981
+
+[fn:7] Rete: A Fast Algorithm for the Many Pattern/Many Object Pattern
+Match Problem, /Charles L. Forgy/, Artificial Intelligence 19, pp. 17-37, 1982.
+
+[fn:6]  R1: An Expert in the Computer Systems Domain, /John McDermott/, Proceedings of the First AAAI Conference on Artificial Intelligence. AAAI'80. Stanford, California: AAAI Press: 269–271, 1980. (The paper won the AAAI Classic Paper Award in 1999.)
+
+[fn:5] Thinking May Be More Than Computing, /Peter Kugel/, Cognition, 22 (1986) pp. 137-198. 
 
 [fn:4] Designing a Rule System That Searches for Scientific Discoveries, /Douglas B. Lenat/ and /Gregory Harris/, CMU CS, Apr. 1977.
 
