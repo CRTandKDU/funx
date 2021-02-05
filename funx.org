@@ -16,6 +16,8 @@
 
 #+TEXINFO_PRINTED_TITLE: FUNXP
 
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+
 This manual is for FUNXP, a functional perspective on the NXP Architecture (version {{{version}}}).
 
 * Introduction
@@ -199,9 +201,34 @@ The graph is traversed by the consultation exploratory process in three consecut
 #+CINDEX: backward-chaining
 The theory articulates a data-driven phase, reminiscent of or heralding forward-chaining in rule systems, which Paycha insists is almost reflexive in the MD's mind -- thus also evocative of so-called spontaneous computations models studied twenty years later in computer science, @@texinfo:@xref{Rieger77,,6},@@ -- with a form of deductive backward-chaining goal and subgoal evaluation.
 
-All the basic building blocks of AI in Medicine (AIM) are in place.
+All the basic building blocks of AI in Medicine (AIM) were in place.
 
-*** There Were Many Inspiring Accomplishments in AIM
+*** There Were Many, Many Inspiring Accomplishments in AIM
+The early ground-breaking AIM systems were developed by inpired pioneers at Stanford, Pittsburgh University, Rutgers, MIT and a few other innovative centers of AI research in the seventies. These were designed by collaborative teams where computer scientists, MDs and hospitals all worked together, against a background of more traditional approaches to the use of computer in clinical medicine, @@texinfo:@xref{Szolovits1982,,33},@@:
+
+- Flowchart :: or /clinical algorithm/ which encodes, in principle, the sequences of actions a good clinician would perform for any one of some population of patients.
+- Data Bases :: (in two separate words, at the time) enabling, when data is properly captured, the /matching/ of cases to a large body of previous cases.
+- Application of Decision Theory :: a mathematical theory of decision making under uncertainty, rooted in operations research.
+
+which were all thought as lacking the flexibility required for full-fledged /usable/ clinical systems.
+
+This crop of first generation programs proved over time to be inspiring accomplishments for later research:
+
+#+CINDEX: CASNET
+#+CINDEX: EXPERT
+- CASNET :: developed at Rutgers University by Kulikowski, in its major instanciation as a diagnostic and therapeutic program for glaucoma and related diseases of the eye. EXPERT, a somewhat simpler descendant was more widely applied mostly in the analysis of thyroid disorders and rheumatology. It identified the fundamental issue of /causality/ as essential in the diagnostic and used /causal-associational networks/ as the core knowledge representation.
+#+CINDEX: MYCIN
+- MYCIN :: or as described by their developers Buchanan and Shortliffe, the series of MYCIN Experiments, at Stanford University, originally applied in the diagnosis and treatment of bacterial infections of the blood. Rules famously represent knowledge in MYCIN, often associated with so called /certainty factors/.
+#+CINDEX: Digitalis Therapy Advisor
+- Digitalis Therapy Advisor :: developed at MIT by Szolovits /et al./, where knowledge is captured in Minsky's /frames/ model he suggested for memory structures.
+#+CINDEX: INTERNIST
+#+CINDEX: CADUCEUS
+- INTERNIST :: developed at the University of Pittsburgh by Pople, an ambitious program for diagnosis in general internal medicine. Special emphasis on the distinction between problem formulation and problem solving, a characteristic of this system, was further refined in CADUCEUS, a follow-on system in the mid-80s.
+#+CINDEX: PIP (Present Illness Program)
+#+CINDEX: ABEL
+- PIP :: designed, at MIT, to emulate clinicians in the evaluation of patients with renal disease. It merged facts about the patient with knowledge from a database to develop a hypothesis about what was afflicting the patient. More complex cases were addressed by ABEL (by Patil), a program for the diagnosis, and eventual treatment, of acid/base and electrolyte disturbances.
+
+#+CINDEX: MYCIN
 Started in 1972 at Stanford University, MYCIN is a pioneering computer-based consultation system designed to assist physicians in the diagnosis of and therapy selection for patients with bacterial infections. In addition to the consultation system itself, MYCIN contains an explanation system which can answer simple English questions in order to justify its advice or educate the user. The system's knowledge is encoded in the form of some 350 production rules which embody the clinical decision criteria of infectious disease experts. Much of MYCIN's power derives from the modular, highly stylized nature of these decision rules, enabling the system to dissect its own reasoning and allowing easy modification of the knowledge base, @@texinfo:@xref{Buchanan1984,,14}.@@
 
 #+CAPTION: The MYCIN Experiments at Stanford's SUMEX-AIM.
@@ -242,7 +269,7 @@ MYCIN made popular constructs like /rule interpreters/ (shells) and /rule compil
 
 Its influence was certainly important on the NXP Architecture as its first demonstration knowledge bases, for research purposes, were all from the medical consultation task environment @@texinfo:@xref{Rappaport-1984-15190,,12}.@@ Closer to the CMU campus, INTERNIST-I was a broad-based computer-assisted diagnostic tool developed in the early 1970s at the University of Pittsburgh as an educational experiment[fn:11].
 
-In hindsight, the NXP Architecture design strongly benefitted from the accomplishments of this opening chapter of AIM, @@texinfo:@xref{Clancey1984,,13}.@@ These were retrospectively described in 2015 by Pr. Casimir Kulikowski, whose doctoral dissertation, in 1970, described a pattern recognition model which has been successfully used to simulate a doctor's diagnostic process:
+In hindsight, the NXP Architecture design strongly benefitted from the accomplishments of this opening chapter of AIM, @@texinfo:@xref{Szolovits1982,,33},@@[fn:24] @@texinfo:@xref{Clancey1984,,13}.@@ These stepping stones were retrospectively described in 2015 by Pr. Casimir Kulikowski, whose doctoral dissertation, in 1970, described a pattern recognition model which has been successfully used to simulate a doctor's diagnostic process:
 
 #+BEGIN_QUOTE 
 During the first half of the 1970’s, several groups working on computational models for clinical decision-making and problem-solving had developed the MYCIN rule-based system for infectious disease therapy assistance at Stanford, the CASNET Causal Associational NETwork model for consultation in glaucoma, at Rutgers, the DIALOG (later renamed INTERNIST) system for differential diagnosis in internal medicine at Pittsburgh, and the PIP (Present Illness Program)
@@ -250,7 +277,11 @@ for diagnosis-driven acquisition of clinical data at MIT and Tufts. These had be
 experimental, instructional, interview-based, and cognitive approaches to the analysis of clinical problem solving, and the causal-taxonomic representation of underlying processes of disease.  While earlier computer models for medical decision-making were predominantly statistical or algorithmic, the new AI approaches developed structured representations of specific clinical domain knowledge over which a general inference engine could reason with a variety of heuristics, and provide advice or suggestions to the consulting user.
 #+END_QUOTE
 
-Closing the loop with the early cybernetics endeavours in Medicine of Dr Paycha, the state of the art of AI systems for medical consultation was summarized in computer programs such as NEOMYCIN. Revisiting the "MYCIN expertiments" over close to twenty years, and reconfiguring the system for education purposes -- the ultimate use INTERNIST-I was also put to at about the same time -- the following diagram was published:
+#+CAPTION: Strategies in CASNET glaucoma consulation program, developed at Rutgers (1971-8) based on /causal association networks/.
+#+attr_texinfo: :width 200px :center t
+[[./CASNET.jpg]]
+
+Closing the loop with the early cybernetics endeavours in Medicine of Dr Paycha, the state of the art of AI systems for medical consultation was summarized in computer programs such as NEOMYCIN. Revisiting the "MYCIN experiments" over close to twenty years, and reconfiguring the system for education purposes -- the ultimate use INTERNIST-I was also put to at about the same time -- the following diagram was published:
 
 #+CAPTION: Strategies in MYCIN-inspired medical consultation computer programs.
 #+attr_texinfo: :width 200px :center t
@@ -261,8 +292,8 @@ Note the similarities with Dr Paycha's investigations of 1956, allowing for chan
 * How we got here
 The functional perspective motivates revisiting -- once more -- the design of the NXP Architecture. This section elaborates on what is expected of functionalism (as in the philosophy of mind) or of functional languages when it comes to the nature and implementation of the NXP Architecture.
 
-** Archeology and vestigial software artefacts
-The seminal ideas, presented in context in the [[* Introduction]] slowly matured over time. Several computer programs, designed as scientific experiments on a computer model of the mind, in typical Newell-Simon style, testify to the long track in the design space.
+** NXP Archeology and vestigial software artefacts
+The seminal ideas, presented in context in the [[* Introduction]] slowly matured over time. Several computer programs, designed as scientific experiments on a computer model of the mind, in typical Newell-Simon style, testify to the long trek in the design space that brought us here and now.
 
 #+CINDEX: differetential diagnosis
 #+CINDEX: inference engine
@@ -320,10 +351,10 @@ The issue of realization is not without difficulty, however. Should we consider 
 ** And functional programming languages in computer science
 #+CINDEX: LISP
 #+CINDEX: Dartmouth
-As mentioned before, the roots of the symbolic AI and functional programming languages are historically intertwined, dating back to the Dartmouth workshop of 1956. And so at different historical eras, AI was sometimes equated with LISP programs and LISP-Machines, LISP being the original and archetypal functional programming language. In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions. (In this respect, it shares architectural principles with the versions of functionalism in the philosophy of mind of the [[Meanwhile functionalism thrives in the philosophy of mind][previous section]].) 
+As mentioned before, the roots of the symbolic AI and functional programming languages are historically intertwined, dating back to the Dartmouth workshop of 1956. And so, at different times in its history, AI was just equated with LISP programs and LISP-Machines, LISP being the original and archetype functional programming language. In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions. (In this respect, it shares some principles with versions of functionalism in the philosophy of mind glossed over in [[Meanwhile functionalism thrives in the philosophy of mind][previous section]].) 
 
 
-It is a declarative programming paradigm in which function definitions are trees of expressions that each return a value, rather than a sequence of imperative statements which change the state of the program. In this respect, it naturally blends with [[Production Systems and Rule-based Systems.][rule systems]].
+It is a declarative programming paradigm in which function definitions are trees of expressions that each return a value, rather than a sequence of imperative statements which change the state of the program. In this respect, it naturally blends with declarative knowledge, [[Production Systems and Rule-based Systems.][rule systems]].
 
 
 As an exploration path for this research project, we planned to revisit this blending of symbolic processe perspectives, viewed as mental processes and viewed as computer programs expressed in functional languages, leading to an original (re)implementation of the NXP Architecture.
@@ -461,94 +492,311 @@ The power of lazy evaluation also allows the processing of potentially infinite 
 The next section of this manual will detail a SECD abstract machine, derived from Lispkit, with a strict compiler for the ~funx~ functional programming language. Henderson's transformations we be used however to design the ~funxp~ NXP-related extensions to the language as they require lazy compilation.
 
 *** I/O and GUI
+Two chapters in Henderson's book explain how input-output for the Lispkit LISP variant is implemented on typical hardware. Depending on the underlying implementation hardware, mapping of the abstract machine may vary and primitives for the input and output of sexps are correspondingly required.
 
+#+CINDEX: Emacs-Lisp (implementation language)
+The choice of Emacs-Lisp as an implementation programming language (and execution model) frees us from these developments for the moment. Sexps are naturally parsed and printed out by the Emacs-Lisp machinery, and the abstract ~funx~ machine is mapped almost directly to the underlying Emacs interpreter. A follow on to this project would be to port the abstract machine to another environment (such as Javascript wit Node.js), involving a new mapping of the abstract machine to the concrete one.
 
-Choosing Emacs-Lisp.
+Consequently well-formed sexps for the ~funx~ language will be expressed here in (a subset of) Emacs-Lisp symbolic expressions.
 
-~funxp~ is both a programming language and an interactive programming environment for expert systems. (Ref IPE1984.) It embeds NCLOSE, an earlier inference engine, in a simple -- even simplistic -- functional programming language called ~funx~ (/functional expressions/).
-
-The usual way of presenting an evaluation model for a functional
-language is to define an abstract machine, which executes an
-instruction stream. The abstract machine is given an operational
-semantics using a state transition system, and compilation rules are
-given for converting a functional program into abstract machine code.
-
-Eager v. lazy.
+#+CINDEX: GUI (text-based)
+Similarly, Emacs being the overall environment for this abstract machine its graphical user interfaces, and user experience, would primarily be text-based. The result ~funxp~ is both a programming language and an interactive programming environment,  @@texinfo:@xref{IPE1984,,18},@@ for expert systems. It embeds NCLOSE, an earlier inference engine, in a simple--even simplistic--functional programming language called ~funx~ (/functional expressions/).
 
 * A simplistic functional language, funx
 #+CINDEX: funx
-This section describes a simple functional programming language, ~funx~, evidently based on LISP with a minimal set of built-in functions.
+#+CINDEX: funxp
+This section is devoted to the exploration of the semantics of a simplified functional programming language, called ~funx~, in which we later plan to embed a rule system, resulting in ~funxp~, an implementation of the NXP Architecture with a functional perspective.
 
-From Peyton Jones:
-
-In Cardelli's FAM: A closure is a data object representing a function;
-it contains the text of the function and the value of its free
-variables. The text of a function is in itself a rather complex
-structure; it contains a sequence of instructions in some suitable
-machine language, and a set of literals which may be strings or other
-text cells.
-
-Closures, thunks, promises. The heap contains two kinds of ob jects:
-head normal forms (or values), and as-yet unevaluated suspensions (or
-thunks). Head normal forms can be further classified into two kinds:
-function values and data values. A value may contain thunks inside it;
-for example, a list CONS cell might have an unevaluated head and/or
-tail. A value which contains no thunks inside it is called a normal
-form. For reasons which will become apparent we use the term closure
-to refer to both values and thunks.
-
-A function value is a suspended computation (promise to perform the computation when the value is applied to some arguments). The most compact way to represent a function value is as a block of static code (shared by all dynamic instances of the value), together with the values of its free variables: a /closure/.
-
-Representing closure: 
-a) Block of heap-allocated storage with 1
-pointer to code followed by pointers to variables. The environment
-pointer points to the closure and variables are accessed by calls
-relative to this pointer. (Directly or by chains of pointers, with an
-impact on GC.)  
-b) The Three Instruction Machine (TIM) takes another
-interesting position. Instead of representing a closure by a single
-pointer, it represents a closure by a pair of a code pointer and a
-pointer to a heap-allocated frame (Fairbairn & Wray [1987]). The
-frame, which is a vector of code-pointer/frame-pointer pairs, gives
-the values of the free variables of the closure, and may be shared
-between many closures.
-
-In a non-strict language, values are passed to functions or stored in data structures in unevaluated form, and only evaluated when their value is actually required. In fact a discrete scale : strict (eager) -> lenient (Traub) -> non-strict, depending on whether all or some values are unevaluated.
-
-Like function values, these unevaluated forms capture a suspended
-computation, and can be represented by a closure in the same way as a
-function value. Following the terminology of Bloss, Hudak & Young
-[1988], we call this particular sort of closure a thunk, a term which
-goes back to the early Algol implementations of call-by-name (Ingerman
-[1961]). When the value of the thunk is required, the thunk is forced: naive reduction, cell model (flag) or self-updating model. (With issues on optimisation and GC.)
-
-Compiling function applications
-
-Compilers from the Lisp tradition usually compile function application
-as follows: evaluate the function, evaluate the argument, and apply
-the function value to the argument. When a known function is being
-applied (as is often the case, especially in Lisp), the \evaluate the
-function" part becomes trivial. This model for function application,
-which we call the evalapply model, is invariably used by compilers for
-strict languages (eg Lisp, Hope, SML and the SECD machine (Henderson
-[1980]; Landin [1965])). It is also used in some implementations of
-non-strict languages, except that of course only the function is
-evaluated before the application (eg the ABC machine (Koopman [1990]),
-and the <n,G>-machine (Augustsson & Johnsson [1989])).
-
-In contrast, compilers based on lazy graph reduction treat function
-application as follows: push the argument on an evaluation stack, and
-tail-call (or enter) the function. There is no \return" when the
-evaluation of the function is complete. We call this the push-enter
-model.
-
-
-It it has a formal operational semantics, expressed as a state
-transition system, as well as the usual denotational semantics
+Moreover, we are interested in developing a compiler for ~funx~ and ~funxp~. Hence after presenting the language itself, we describe the SECD-based abstract machine for the language and its implementation in Emacs-Lisp.
 
 ** FUNX a functional language, pure and simplistic
-** FUNX SECD Abstract Machine
+#+CINDEX: funx
+Concrete ~funx~ programs are (Emacs-Lisp) sexps as per our design choices of implementation language and environment. The following sexps, where ~s~ is any sexp,  ~x~ are atoms and ~e~ well-formed expressions,  are /all/ the well-formed expressions in ~funx~:
 
+#+CINDEX: funx (well-formed expressions)
+#+CINDEX: funx (concrete syntex)
+#+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
+#+CINDEX: variable
+- ~x~ :: a variable.
+#+CINDEX: constant
+#+CINDEX: quote
+- ~(quote s)~ :: a constant sexp.
+#+CINDEX: arithmetic (add, sub, mul, div, rem)
+- ~(add e1 e2)~, ~(sub e1 e2)~, ~(mul e1 e2)~, ~(div e1 e2)~, ~(rem e1 e2)~ :: arithmetic expressions (whose arguments are usually quoted when constant--a difference with Emacs-Lisp).
+#+CINDEX: comparison (eq, leq)
+#+CINDEX: eq (concrete syntax)
+#+CINDEX: leq (concrete syntax)
+- ~(eq e1 e2)~, ~(leq e1 e2)~ :: equality and comparison tests, returns a ~funx~ boolean, special atoms ~*T*~ and ~*F*~.
+#+CINDEX: cell (atom, car, cdr, cons)
+#+CINDEX: car (concrete syntax)
+#+CINDEX: cdr (concrete syntax)
+#+CINDEX: cons (concrete syntax)
+- ~(car e)~, ~(cdr e)~, ~(cons e1 e2)~ :: cell structure operations.
+#+CINDEX: atom (concrete syntax)
+- ~(atom e)~ :: tests for atomicity, returns a ~funx~ boolean, special atoms ~*T*~ and ~*F*~.
+#+CINDEX: conditional
+#+CINDEX: if (concrete syntax)
+- ~(if e1 e2 e3)~ :: conditional form, where ~e1~ should evaluate to a ~funx~ boolean, special atoms ~*T*~ and ~*F*~.
+#+CINDEX: function (definition)
+#+CINDEX: lambda (concrete syntax)
+- ~(lambda (x1 ... xN) e)~ :: function definition, returns a function value.
+#+CINDEX: function (application)
+- ~(e e1 e2 ... eN)~ :: function application, applies function ~e~ to arguments' values ~eI~.
+#+CINDEX: let (concrete syntax)
+#+CINDEX: block (recursive)
+- ~(let ((x1 e1) ... (xN eN)) e)~ :: recursive block, evaluates sexp ~e~ in the environment bindings ~(x1 e1) ... (xN eN)~.
+
+These are the ~funx~ built-in functions supported by the abstract machine described in the next section. We will also see how this limited set of functions is nonetheless powerful enough to express its own compilers, eager and lazy. (It is also sufficient to express its own interpreter, should we want to skip the abstract machine step altogether.)
+
+As an example of a program expressed in ~funx~, we state the perennial factorial example and show below a possible sexp to compute ~3!~.
+
+#+CINDEX: factorial (example)
+#+NAME: fact
+#+CAPTION: The perennial factorial example, example ~ex1.lsp~.
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(let
+    ((fac
+      (lambda (n)
+	(if (eq n (quote 1)) (quote 1) (mul n (fac (sub (quote 1) n))))))
+     )
+  (fac (quote 3))
+  )
+#+END_SRC
+
+Variables are bound in ~lambda~ and ~let~ expressions. When their definitions are called their associated argument (in lambda-sexps) or local block definition (in let-sexps) are eagerly evaluated and new bindings are pushed into the environment. On exit of the function call or of the block, the variables, and their bindings in the environment are deleted. (Note that ~let~ in ~funxp~ is called ~letrec~ in Henderson's book.)
+
+#+CINDEX: environment (as stack)
+Note that using the environment both as an association list and as a stack simplifies the management of variables with identical names. The value retrieved is always the one bound in the most local binding, which is the first found when searching the environment.
+
+Constants are always quoted--a point of departure from the Emacs-Lisp convention of not quoting numbers. Operators are defined as prefix as is common in LISP so that ~2 + 2~ is expressed as ~(add (quote 2) (quote 2))~.
+
+Denotational semantics for Lispkit-Lisp and ~funx~ into the set category can be readily developped, leading to provably correct interpreters[fn:23]. The classic difficulty is the sementics of the ~let~ recursive block operator. (The non-recursive ~let~, as in Henderson's Lispkit, is simply reduced to an equivalent ~lambda~ expression, ~(let (x e) e-body)~ being ~(lambda (x) e-body)~ applied to argument ~e~, and presents no difficulty.) The specificity of recursive block is that each variable is evaluated in an environment that binds all the variables in the ~let~ block, so that this /augmented/ environment is a form of fixed point in the operation of binding variables.
+
+** FUNX SECD Abstract Machine
+#+CINDEX: SECD
+In this section we borrow freely from Henderson's book for the description of the SECD machine, @@texinfo:@xref{Henderson1980a,,22}.@@ The SECD machine, invented in its original form by Landin, derives its name from the designation of its four principal components, or registers.
+
+- stack :: used to hold values of expressions during computation.
+- environment :: used to hold bindngs of variables to values during computation.
+- control list :: used to hold the abstract machine program being executed.
+- dump :: used as a general stack to hold values of other registers, particularly when calling functions
+
+#+CINDEX: state (of SECD machine)
+#+CINDEX: control list
+#+CINDEX: continuation
+All registers hold sexps that usually are lists of sexps. The entire state of the SECD machine is given by giving the content of its four registers. The program of a SECD machine is also a sexp, a list of /control-sexps/ usually atomic, which are read sequentially. Each individual control transforms the state of the SECD machine, so that each is an instruction for a machine transition, written as:
+
+~s e c d -> s' e' c' d'~
+
+The control list constitutes the program of the abstract machine and tells it how to move from state to state, following the sequence of machine transistions each individual control in the list denotes[fn:25]. (Control lists are also called continuations in this info file.)
+
+For instance, and with a bit of heads-on over the next section, let us look at the control list for simple arithmetics:
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(mul (quote 2) (quote 3))
+#+END_SRC
+
+The expected control list for the above ~funx~ sexp would be:
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(LDC 2 LDC 3 MUL STOP)
+#+END_SRC
+
+It introduces three controls:
+
+- LDC :: Pushes the following constant sexp on the stack.
+- MUL :: Pops values from the stack twice, multiplies them and pushes back the result on the stack.
+- STOP :: Stops the abstract machine, leaving the state untouched.
+
+And the natural execution of this program with initally nulled stack, environment and dump registers would look like the following sequence of transitions:
+
+| Sequence | s     | e   | c                      | d   |
+|----------+-------+-----+------------------------+-----|
+|        0 | nil   | nil | (LDC 2 LDC 3 MUL STOP) | nil |
+|        1 | (2)   | nil | (LDC 3 MUL STOP)       | nil |
+|        2 | (3 2) | nil | (MUL STOP)             | nil |
+|        3 | (6)   | nil | (STOP)                 | nil |
+
+with the result nicely sitting on top of the stack when the machine finally stops.
+
+*** Operational semantics
+#+CINDEX: semantics (operational)
+#+CINDEX: mnemonics (control)
+The operational semantics of the abstract machine is then defined by each control and its associated machine transition. The mnemonics for the controls in the abstract machine are as follows:
+
+
+#+CINDEX: LD
+- LD :: push variable's value on the stack
+#+CINDEX: LDC
+- LDC :: push constant on the stack
+#+CINDEX: LDF
+- LDF :: push function-plus-environment closure on the stack
+
+#+CINDEX: ADD
+- ADD :: apply arithmetic operator to top two stack values, push result back
+#+CINDEX: SUB
+- SUB :: apply arithmetic operator to top two stack values, push result back
+#+CINDEX: MUL
+- MUL :: apply arithmetic operator to top two stack values, push result back
+#+CINDEX: DIV
+- DIV :: apply arithmetic operator to top two stack values, push result back
+#+CINDEX: REM
+- REM :: apply arithmetic operator to top two stack values, push result back
+
+#+CINDEX: CAR
+- CAR :: replace top of stack by its head
+#+CINDEX: CDR
+- CDR :: replace top of stack by its tail
+#+CINDEX: CONS
+- CONS :: pop top two stack values, push back /cons/ of values
+#+CINDEX: ATOM
+- ATOM :: test for atomicity, replace top of stack by boolean ~*T*~, ~*F*~
+#+CINDEX: EQ
+- EQ :: test for equality of popped top two stack values, push back boolean 
+result
+#+CINDEX: LEQ
+- LEQ :: test for lower-than popped top two stack values, push back boolean 
+#+CINDEX: SEL
+- SEL :: select control for ~if~ sexps, followed by two arguments in the control list: sexp if top of stack is ~*T*~, and sexp if top of stack is ~*F*~
+#+CINDEX: JOIN
+- JOIN :: terminates a sexp in SEL control, and proceeds to the next control after SEL in list
+
+#+CINDEX: AP
+- AP :: apply function on top of stack, push result back
+#+CINDEX: RTN
+- RTN :: terminates a function definition in LDF argument, push the top of the stack as the result of the function application
+#+CINDEX: DUM
+- DUM :: opens a recursive ~let~ block
+#+CINDEX: RAP
+- RAP :: recursive apply, evaluate sexp in a recursive ~let~ block
+
+In order to facilitate the presentation we grouped the controls in several categories:
+
+**** ld-group
+The load group of controls usually push a value on the stack.
+
+#+FINDEX: LDC (transition)
+#+FINDEX: LD (transition)
+#+FINDEX: LDF (transition)
+| s | e | c                | d | -> | s'                  | e' | c' | d' |
+|---+---+------------------+---+----+---------------------+----+----+----|
+| s | e | (LDC sexp . c)   | d | -> | (sexp . s)          | e  | c  | d  |
+| s | e | (LD x . c )      | d | -> | ((~locate~ x e) . s | e  | c  | d  |
+| s | e | (LDF f-sexp . c) | d | -> | ((f-sexp e) . s)    | e  | c  | d  |
+
+#+FINDEX: locate (variable in environment)
+#+FINDEX: LDF (closure)
+#+CINDEX: closure (LDF)
+In the transition table above, ~locate~ is a environment utility function which given a variable name and an environment returns the value bound to the variable in the environment, or ~nil~ if no such binding is found. Note that ~sexp~ denotes any sexp, and ~f-sexp~ denotes a function sexp (i.e. a list which head is a list of named arguments, and tail is the control list for the body of the function), so that the ~LDF~ control pushes a closure (function + environment) on the stack.
+
+**** arith-group
+#+CINDEX: arithmetic
+The machine transitions for the arithmetic group all have the same form:
+
+#+FINDEX: ADD (transition)
+#+FINDEX: SUB (transition)
+#+FINDEX: MUL (transition)
+#+FINDEX: DIV (transition)
+#+FINDEX: REM (transition)
+| s         | e | c          | d | -> | s'             | e' | c' | d' |
+|-----------+---+------------+---+----+----------------+----+----+----|
+| (a b . s) | e | (<OP> . c) | d | -> | (<a OP b> . s) | e  | c  | d  |
+
+**** ops-group
+#+FINDEX: CAR (transition)
+#+FINDEX: CDR (transition)
+#+FINDEX: CONS (transition)
+#+FINDEX: ATOM (transition)
+#+FINDEX: LEQ (transition)
+#+FINDEX: EQ (transition)
+#+FINDEX: SEL (transition)
+#+FINDEX: JOIN (transition)
+This group contains the basic operations on values in ~funx~.
+
+| s              | e | c               | d     | -> | s'            | e' | c'       | d'    |
+|----------------+---+-----------------+-------+----+---------------+----+----------+-------|
+| ;; Lists       |   |                 |       |    |               |    |          |       |
+| ((a . b) s)    | e | (CAR . c)       | d     | -> | (a . s)       | e  | c        | d     |
+| ((a . b) s)    | e | (CDR . c)       | d     | -> | (b . s)       | e  | c        | d     |
+| (a b s)        | e | (CONS . c)      | d     | -> | ((a . b) s)   | e  | c        | d     |
+|----------------+---+-----------------+-------+----+---------------+----+----------+-------|
+| ;; Tests       |   |                 |       |    |               |    |          |       |
+| (a s)          | e | (ATOM . c)      | d     | -> | ([*T*,*F*] s) | e  | c        | d     |
+| (a b s)        | e | (EQ . c)        | d     | -> | ([*T*,*F*] s) | e  | c        | d     |
+| (a b s)        | e | (LEQ . c)       | d     | -> | ([*T*,*F*] s) | e  | c        | d     |
+|----------------+---+-----------------+-------+----+---------------+----+----------+-------|
+| ;; IF control  |   |                 |       |    |               |    |          |       |
+| ([*T*,*F*]  s) | e | (SEL cT cF . c) | d     | -> | s             | e  | [cT, cF] | (c d) |
+| s              | e | (JOIN)          | (c d) | -> | s             | e  | c        | d     |
+
+Notes: ~funx~ provides only simple primitive tests: atomicity, equality (implemented here as LISP's ~EQUAL~) and comparison of numbers. The conditional control is implemented by pushing the continuation on the dump register and entering the appropriate control list branch; the ~JOIN~ control always terminates each branch, and reinstalls the continuation from the dump register. (There are other ways to implement the conditional control, of course.)
+
+**** fun-group
+This group implements the function application and lambda-function definitions.
+
+#+FINDEX: AP (transition)
+#+FINDEX: RTN (transition)
+#+FINDEX: DUM (transition)
+#+FINDEX: RAP (transition)
+| s               | e  | c       | d         | -> | s'          | e'                              | c'        | d'        |
+|-----------------+----+---------+-----------+----+-------------+---------------------------------+-----------+-----------|
+| ;; Application  |    |         |           |    |             |                                 |           |           |
+| (f-sexp vals s) | e  | (AP c)  | d         | -> | nil         | ((args-f-sexp . vals) e-f-sexp) | cl-f-sexp | (s e c d) |
+| (ret-val)       | e' | (RTN)   | (s e c d) | -> | (ret-val s) | e                               | c         | d         |
+|-----------------+----+---------+-----------+----+-------------+---------------------------------+-----------+-----------|
+| ;; LET blocks   |    |         |           |    |             |                                 |           |           |
+| s               | e  | (DUM c) | d         | -> | s           | (OMEGA e)                       | c         | d         |
+| (f-sexp vals s) | (OMEGA e) | (RAP c) | d         | -> | nil         | ~rplaca~((args-f-sexp . vals) e-f-sexp) | cl-f-sexp | (s e c d) | 
+
+#+CINDEX: push-enter
+Notes: the ~AP~ control works in association with the ~LDF~ which loads a closure on the stack. It pushes the state to the dump register and enters the control list in the closure, within an environment resulting from pushing the association list of function arguments and values from the stack to the environment stored in the closure. The ~RTN~ control, which always terminates a control list in a closure, reinstates the machine state from the dump register and pushes the result (top of the stack) of the function application to the recovered stack.
+
+- args-f-sexp :: extracts the argument names from the closure sexp
+- vals :: popped values from the stack, on for each function argument in order
+- e-f-sexp :: extracts the environment from the closure sexp
+- cl-f-sexp :: extracts the control list from the closure sexp
+- OMEGA :: a litteral constant used as placeholder for the ~car~ of the environment which is altered by,
+- rplaca :: replaces OMEGA in its argument by a pointer the association list of function arguments and values from the stack, and returns a pointer to itself (this implements the recursive nature of the ~let~ block)
+
+The ~DUM~ control opens a ~let~ recursive block which expects a ~LDF <closure> RAP~ to terminate it, where the environment in the closure will be altered in-place by pushing the variable definitions in the ~let~ statement.
+
+As an example, the factorial function in ~funx~ from above:
+
+#+CINDEX: factorial (example)
+#+CAPTION: The perennial factorial example, example ~ex1.lsp~.
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(let
+    ((fac
+      (lambda (n)
+	(if (eq n (quote 1)) (quote 1) (mul n (fac (sub (quote 1) n))))))
+     )
+  (fac (quote 3))
+  )
+#+END_SRC
+
+
+#+CINDEX: factorial (compiled)
+#+NAME: fact-secd
+#+CAPTION: The perennial factorial example compiled, 3! in ~ex1.fasl~.
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(DUM LDF ((n) LDC 1 LD n EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD fac AP LD n MUL JOIN) RTN) LDF ((fac) LDC 3 LD fac AP RTN) RAP STOP)
+#+END_SRC
+
+*** Running the funx SECD Abstract Machine
+#+CINDEX: SECD Machine (running)
+The executive for the SECD Abstract Machine is found in the ~secd-exec.el~ file. It is a simple automata that moves the state of the machine to the next one according to the values of its registers ~s, e, c,~ and ~d~. At each step the transition is looked up into the representation of last section's transition tables, and the transformation of state indicated is performed until the special control ~STOP~ is found.
+
+#+ATTR_TEXINFO: :options secd-cycle stack environment control dump
+#+BEGIN_defun
+  Steps through the control list /control/, with initial stack, environment and dump as provided and stops at ~STOP~ control, returning the state of the stopped machine as the list ~(s e c d)~.
+#+END_defun
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(secd-cycle nil nil '(LDC 2 LDC 3 MUL STOP) nil)
+    => ((6) nil (STOP) nil)
+#+END_SRC
+
+*** A funx strict compiler
 * Extending for NXP-style inferencing, funxp
 #+CINDEX: funxp
 Promises and delay/force. A mention of thread and parallelism (QLISP, Kugel non-halting computations v. thinking).
@@ -559,9 +807,20 @@ NXP-style rules. Rule: Hypo LHS &optional RHS &optional :context.
 
 Glossary of terms: hypo(thesis), cond(itions), LHS/RHS, actions, sign, goal/subgoal, backward/forward chaining, knowcess, gating...
 
+Nelly Aiello 3 control strategies for rule systems.
+
 * Compiling funxp to SECD assembly
+#+BEGIN_QUOTE
+What seemed to be missing was the desire to compile.
+
+--- Don De Lillo, /The Players/
+#+END_QUOTE
 
 Knowledge base, or rule sets, are compiled to funxp environments.
+
+An environment is the state of the working memory + hidden information used by the engine (plus top level control list in d). Why not put everything in d?
+
+Richard Fikes, Deductive Retrieval Mechanisms for State Description Models, 1975, SRI Technical Report (Note) 106. For other ideas to represent working memory. Also BRAND X semantic nets.
 
 Decorations and globales.
 
@@ -685,6 +944,12 @@ From funx.bib
   :END:
 
 * Footnotes
+
+[fn:25] For more formal elaborations of the SECD machine see: Call-by-Name, Call-by-Value and the Lambda Calculus, /Gordon Plotkin/ (Theoretical Computer Science , Vol. 1, pp. 125-159, 1975); The Tail-Recursive SECD Machine, /John D. Ramsdell/, Journal of Automated Reasoning volume 23, p. 43–62 (1999); A Rational Deconstruction of Landin's SECD Machine, /Olivier Danvy/, In: Grelck C., Huch F., Michaelson G.J., Trinder P. (eds) Implementation and Application of Functional Languages. IFL 2004. Lecture Notes in Computer Science, vol 3474. Springer, Berlin, Heidelberg. https://doi.org/10.1007/11431664_4 (2005); The SECD Microprocessor: A Verification Case Study, /Brian T. Graham/, The Springer International Series in Engineering and Computer Science (1992).
+
+[fn:24] During the summer 1983, the authors visited Dr Peter Szolovits group at MIT and also met there with Dr. Ramesh Patil. 
+
+[fn:23] See also: A_LispKit Lisp Programming Language, a Modified Denotational Semantics Approach. /Jerinic, Ljubomir./ (1993); An experiment in practical semantics, /Maurice Naftalin/, ESOP 1986: ESOP 86 pp 144-159 (1986); A Compiler For Lispkit Targetted At Henderson's SECD Machine, /Simpson, T.; Birtwistle, G.; Hermann, M.; Graham, B./, Technical Report, University of Calgary (1989).
 
 [fn:22] Parallel graph reduction with the (v , G)-machine. /Lennart Augustsson and Thomas Johnsson./ In Proceedings of the fourth international conference on Functional programming languages and computer architecture (FPCA 1989) DOI:https://doi.org/10.1145/99370.99386 
 
