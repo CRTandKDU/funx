@@ -71,4 +71,4 @@
 	(if (eq elist nil) nil
 	  (cons (car (car elist)) (secd-comp--vars (cdr elist))))))
      )
-  (secd-comp--comp '(add (quote 4) (mul (quote 2) (quote 3))) nil nil))
+  (secd-comp--comp '(mul (quote 2) (quote 3)) nil nil))

@@ -143,6 +143,29 @@ t
 	 )
        ))
 
+(setq secd--kb-option-context t)
+(setq secd--kb-option-context-compare
+      (lambda (c1 c2) (equal (car c1) (car c2))))
+(setq session
+      (nxp-session
+       '((rule H1 ((leq (mul '2 a) '100)) ((set b '20))
+	       :context ((S1 . 0.5) (S2 . 0.7))
+	       )
+	 (rule H2 ((leq '100 b))
+	       )
+	 (rule H1 ((leq a '50)) ((set c '30))
+	       :context ((S2 . 0.4) (S3 . 0.2))
+	       )
+	 (rule G1 ((leq x '10) (leq y '10))
+	       :context ((S4 . 0.6) (S2 . 0.7))
+	       )
+	 (rule G2 ((leq x '5) (leq y '5))
+	       :context ((S4 . 3) (S5 . 0.3))
+	       )
+	 )
+       ))
+
+
 (setq alist (cdr (assoc '*CONTEXT-SIGNS* (cdr (assoc 'ENVIRONMENT session)))))
 (mat-nclose (mat-adjacency alist))
 [[1 2 0] [2 1 0] [0 0 0]]
@@ -158,3 +181,7 @@ alist
  '(DUM LDC 4 LDF ((x) LD x LD 2 MUL LD y ADD RTN) LDF ((foo y) LDC 3 LD foo AP RTN) RAP STOP)
  nil
  )
+
+(insert (format "%s" SATFAULT))
+((rule TANKS_OUT_PRESSURE_LOW ((leq pressure_out_P3 '20))) (rule TANKS_OUT_PRESSURE_LOW ((leq pressure_out_P4 '20))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P1 '370)))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P2 '370)))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P3 '370)))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P4 '370)))) (rule TANKS_EQUAL ((eq pressure_P2 pressure_P4))) (rule TANKS_EQUAL ((eq pressure_P1 pressure_P3))) (rule ALERT ((leq pressure_P1 '20))) (rule ALERT ((leq pressure_P2 '20))) (rule ALERT ((not (leq pressure_P1 '370)))) (rule ALERT ((not (leq pressure_P2 '370)))) (rule ALERT ((leq pressure_out_P3 '20))) (rule ALERT ((leq pressure_out_P4 '20))) (rule ALERT ((not (leq pressure_out_P3 '370)))) (rule ALERT ((not (leq pressure_out_P4 '370)))) (rule ALARM_TANK_WAS_P1_OR_P2 ((leq pressure_P1 '20))) (rule ALARM_TANK_WAS_P1_OR_P2 ((leq pressure_P2 '20))) (rule ALARM_TANK_WAS_P1_OR_P2 ((not (leq pressure_P1 '370)))) (rule ALARM_TANK_WAS_P1_OR_P2 ((not (leq pressure_P2 '370)))) (rule TANK_P1_OR_P2_WAS_HIGH ((not (leq pressure_P1 '370)))) (rule TANK_P1_OR_P2_WAS_HIGH ((not (leq pressure_P1 '370)))) (rule ACTION_12 ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) ALARM_TANK_WAS_P1_OR_P2 TANK_P1_OR_P2_WAS_HIGH) ((set pressure_P1 '200) (set pressure_P2 '205) (set pressure_P3 '300) (set pressure_P4 '200) (set pressure_out_P3 '200) (set pressure_out_P4 '205) (set pressure_P5 '200))) (rule ACTION_14 ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) ALARM_TANK_WAS_P1_OR_P2 (not TANK_P1_OR_P2_WAS_HIGH)) ((set pressure_P1 '200) (set pressure_P2 '205) (set pressure_P3 '300) (set pressure_P4 '200) (set pressure_out_P3 '200) (set pressure_out_P4 '205))) (rule ACTION_19 ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) ALARM_TANK_WAS_P1_OR_P2 (not (eq pressure_out_P3 pressure_out_P4))) ((set pressure_out_P3 '200) (set pressure_out_P4 '200))) (rule ACTION_4 ((eq CRT_and_KDU 'AGREE) (eq task 'FLUID-TRANSFER) ALERT) ((set pressure_P1 '200) (set pressure_P2 '205) (set pressure_P3 '300) (set pressure_P4 '200) (set pressure_out_P3 '200) (set pressure_out_P4 '205))) (rule DECREASE_DUE_TO_THERMAL_CONDITIONS ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) (not ALARM_TANK_WAS_P1_OR_P2) (eq pressure_out_P3 pressure_out_P4))) (rule EXC_P_RISE_V10 (ACTION_12 (eq pressure_P2 pressure_P5))) (rule EXC_P_RISE_V3 (ACTION_12 (eq pressure_P1 pressure_P5))) (rule EXC_P_RISE_V16 (ACTION_4 TANKS_EQUAL ALARM_TANK_WAS_HIGH)) (rule THERMAL_TRANSIENT_CONDITION (ACTION_19 (not TANKS_OUT_PRESSURE_LOW) (eq pressure_out_P3 pressure_out_P4))) (rule POSSIBLE_LEAK (ACTION_19 TANKS_OUT_PRESSURE_LOW (eq pressure_out_P3 pressure_out_P4))) (rule POSSIBLE_LEAK (ACTION_14 TANKS_EQUAL)) (rule POSSIBLE_LEAK (ACTION_4 TANKS_EQUAL (not ALARM_TANK_WAS_HIGH))) (rule MDM_ANALOG_INPUT_PARAMETER_LOSS ((eq CRT_and_KDU 'DISAGREE) ALERT)) (rule XDRC_FAILURE_OR_BIAS (ACTION_14 (not TANKS_EQUAL))) (rule XDRC_FAILURE_OR_BIAS (ACTION_4 (not TANKS_EQUAL))) (rule XDRC_FAILURE_OR_BIAS (ACTION_19 (not (eq pressure_out_P3 pressure_out_P4)))) (rule XDRC_FAILURE_OR_BIAS (ACTION_12 (not (eq pressure_P2 pressure_P5)) (not (eq pressure_P1 pressure_P5)))))
+

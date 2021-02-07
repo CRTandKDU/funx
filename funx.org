@@ -53,7 +53,7 @@ With symbols, structures come naturally as list of symbols, and cognitive proces
 #+CINDEX: CMU
 While the seminal ideas for the NXP Architecture stemmed from a very early interest in what would be now termed /learning concepts/ (see [[How we got here]]), they were readily influenced and refined by the dominant view at the time, all the more so that they matured in the cultural environment of Carnegie-Mellon University (CMU), namely of its Computer Science and Robotics Institute departments, from 1982 to 1984.
 
-** Production Systems and Rule-based Systems.
+** Production Systems and Rule-based Systems
 #+CINDEX: rule-based system
 #+CINDEX: rule system
 #+CINDEX: production system
@@ -354,7 +354,7 @@ The issue of realization is not without difficulty, however. Should we consider 
 As mentioned before, the roots of the symbolic AI and functional programming languages are historically intertwined, dating back to the Dartmouth workshop of 1956. And so, at different times in its history, AI was just equated with LISP programs and LISP-Machines, LISP being the original and archetype functional programming language. In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions. (In this respect, it shares some principles with versions of functionalism in the philosophy of mind glossed over in [[Meanwhile functionalism thrives in the philosophy of mind][previous section]].) 
 
 
-It is a declarative programming paradigm in which function definitions are trees of expressions that each return a value, rather than a sequence of imperative statements which change the state of the program. In this respect, it naturally blends with declarative knowledge, [[Production Systems and Rule-based Systems.][rule systems]].
+It is a declarative programming paradigm in which function definitions are trees of expressions that each return a value, rather than a sequence of imperative statements which change the state of the program. In this respect, it naturally blends with declarative knowledge, [[Production Systems and Rule-based Systems][rule systems]].
 
 
 As an exploration path for this research project, we planned to revisit this blending of symbolic processe perspectives, viewed as mental processes and viewed as computer programs expressed in functional languages, leading to an original (re)implementation of the NXP Architecture.
@@ -487,7 +487,7 @@ Henderson gives a precise definition of lazy evaluation, based on the ~delay~ an
 
 #+CINDEX: evaluation (lazy)
 #+CINDEX: parallelism
-The power of lazy evaluation also allows the processing of potentially infinite structures and the proper interpretation of mutually recursive equations defined in ~let~ blocks. It also apply to the proper execution of a functional program viewed as a network of communicating processes, @@texinfo:@xref{Keller1979,,26}.@@ This turns functional languages into particularly natural forms of expressions for certain types of parallelism (and in particular, /data driven/, which is particularly useful in [[Production Systems and Rule-based Systems.][rule systems]])
+The power of lazy evaluation also allows the processing of potentially infinite structures and the proper interpretation of mutually recursive equations defined in ~let~ blocks. It also apply to the proper execution of a functional program viewed as a network of communicating processes, @@texinfo:@xref{Keller1979,,26}.@@ This turns functional languages into particularly natural forms of expressions for certain types of parallelism (and in particular, /data driven/, which is particularly useful in [[Production Systems and Rule-based Systems][rule systems]].
 
 The next section of this manual will detail a SECD abstract machine, derived from Lispkit, with a strict compiler for the ~funx~ functional programming language. Henderson's transformations we be used however to design the ~funxp~ NXP-related extensions to the language as they require lazy compilation.
 
@@ -652,10 +652,9 @@ The operational semantics of the abstract machine is then defined by each contro
 #+CINDEX: ATOM
 - ATOM :: test for atomicity, replace top of stack by boolean ~*T*~, ~*F*~
 #+CINDEX: EQ
-- EQ :: test for equality of popped top two stack values, push back boolean 
-result
+- EQ :: test for equality of popped top two stack values, push boolean result
 #+CINDEX: LEQ
-- LEQ :: test for lower-than popped top two stack values, push back boolean 
+- LEQ :: test for lower-than popped top two stack values, push boolean result
 #+CINDEX: SEL
 - SEL :: select control for ~if~ sexps, followed by two arguments in the control list: sexp if top of stack is ~*T*~, and sexp if top of stack is ~*F*~
 #+CINDEX: JOIN
@@ -678,11 +677,23 @@ The load group of controls usually push a value on the stack.
 #+FINDEX: LDC (transition)
 #+FINDEX: LD (transition)
 #+FINDEX: LDF (transition)
-| s | e | c                | d | -> | s'                  | e' | c' | d' |
-|---+---+------------------+---+----+---------------------+----+----+----|
-| s | e | (LDC sexp . c)   | d | -> | (sexp . s)          | e  | c  | d  |
-| s | e | (LD x . c )      | d | -> | ((~locate~ x e) . s | e  | c  | d  |
-| s | e | (LDF f-sexp . c) | d | -> | ((f-sexp e) . s)    | e  | c  | d  |
+| s                   | e | c                | d |
+|---------------------+---+------------------+---|
+|                     |   |                  |   |
+| s                   | e | (LDC sexp . c)   | d |
+| (sexp . s)          | e | c                | d |
+|                     |   |                  |   |
+|---------------------+---+------------------+---|
+|                     |   |                  |   |
+| s                   | e | (LD x . c )      | d |
+| ((~locate~ x e) . s | e | c                | d |
+|                     |   |                  |   |
+|---------------------+---+------------------+---|
+|                     |   |                  |   |
+| s                   | e | (LDF f-sexp . c) | d |
+| ((f-sexp e) . s)    | e | c                | d |
+|                     |   |                  |   |
+|---------------------+---+------------------+---|
 
 #+FINDEX: locate (variable in environment)
 #+FINDEX: LDF (closure)
@@ -698,9 +709,13 @@ The machine transitions for the arithmetic group all have the same form:
 #+FINDEX: MUL (transition)
 #+FINDEX: DIV (transition)
 #+FINDEX: REM (transition)
-| s         | e | c          | d | -> | s'             | e' | c' | d' |
-|-----------+---+------------+---+----+----------------+----+----+----|
-| (a b . s) | e | (<OP> . c) | d | -> | (<a OP b> . s) | e  | c  | d  |
+| s              | e | c          | d |
+|----------------+---+------------+---|
+|                |   |            |   |
+| (a b . s)      | e | (<OP> . c) | d |
+| (<a OP b> . s) | e | c          | d |
+|                |   |            |   |
+|----------------+---+------------+---|
 
 **** ops-group
 #+FINDEX: CAR (transition)
@@ -713,21 +728,41 @@ The machine transitions for the arithmetic group all have the same form:
 #+FINDEX: JOIN (transition)
 This group contains the basic operations on values in ~funx~.
 
-| s              | e | c               | d     | -> | s'            | e' | c'       | d'    |
-|----------------+---+-----------------+-------+----+---------------+----+----------+-------|
-| ;; Lists       |   |                 |       |    |               |    |          |       |
-| ((a . b) s)    | e | (CAR . c)       | d     | -> | (a . s)       | e  | c        | d     |
-| ((a . b) s)    | e | (CDR . c)       | d     | -> | (b . s)       | e  | c        | d     |
-| (a b s)        | e | (CONS . c)      | d     | -> | ((a . b) s)   | e  | c        | d     |
-|----------------+---+-----------------+-------+----+---------------+----+----------+-------|
-| ;; Tests       |   |                 |       |    |               |    |          |       |
-| (a s)          | e | (ATOM . c)      | d     | -> | ([*T*,*F*] s) | e  | c        | d     |
-| (a b s)        | e | (EQ . c)        | d     | -> | ([*T*,*F*] s) | e  | c        | d     |
-| (a b s)        | e | (LEQ . c)       | d     | -> | ([*T*,*F*] s) | e  | c        | d     |
-|----------------+---+-----------------+-------+----+---------------+----+----------+-------|
-| ;; IF control  |   |                 |       |    |               |    |          |       |
-| ([*T*,*F*]  s) | e | (SEL cT cF . c) | d     | -> | s             | e  | [cT, cF] | (c d) |
-| s              | e | (JOIN)          | (c d) | -> | s             | e  | c        | d     |
+| s              | e | c               | d     |
+|----------------+---+-----------------+-------|
+| ;; Lists       |   |                 |       |
+|                |   |                 |       |
+| ((a . b) s)    | e | (CAR . c)       | d     |
+| (a . s)        | e | c               | d     |
+|                |   |                 |       |
+| ((a . b) s)    | e | (CDR . c)       | d     |
+| (b . s)        | e | c               | d     |
+|                |   |                 |       |
+| (a b s)        | e | (CONS . c)      | d     |
+| ((a . b) s)    | e | c               | d     |
+|                |   |                 |       |
+|----------------+---+-----------------+-------|
+| ;; Tests       |   |                 |       |
+|                |   |                 |       |
+| (a s)          | e | (ATOM . c)      | d     |
+| ([*T*,*F*] s)  | e | c               | d     |
+|                |   |                 |       |
+| (a b s)        | e | (EQ . c)        | d     |
+| ([*T*,*F*] s)  | e | c               | d     |
+|                |   |                 |       |
+| (a b s)        | e | (LEQ . c)       | d     |
+| ([*T*,*F*] s)  | e | c               | d     |
+|                |   |                 |       |
+|----------------+---+-----------------+-------|
+| ;; IF control  |   |                 |       |
+|                |   |                 |       |
+| ([*T*,*F*]  s) | e | (SEL cT cF . c) | d     |
+| s              | e | [cT, cF]        | (c d) |
+|                |   |                 |       |
+| s              | e | (JOIN)          | (c d) |
+| s              | e | c               | d     |
+|                |   |                 |       |
+|----------------+---+-----------------+-------|
 
 Notes: ~funx~ provides only simple primitive tests: atomicity, equality (implemented here as LISP's ~EQUAL~) and comparison of numbers. The conditional control is implemented by pushing the continuation on the dump register and entering the appropriate control list branch; the ~JOIN~ control always terminates each branch, and reinstalls the continuation from the dump register. (There are other ways to implement the conditional control, of course.)
 
@@ -738,15 +773,25 @@ This group implements the function application and lambda-function definitions.
 #+FINDEX: RTN (transition)
 #+FINDEX: DUM (transition)
 #+FINDEX: RAP (transition)
-| s               | e  | c       | d         | -> | s'          | e'                              | c'        | d'        |
-|-----------------+----+---------+-----------+----+-------------+---------------------------------+-----------+-----------|
-| ;; Application  |    |         |           |    |             |                                 |           |           |
-| (f-sexp vals s) | e  | (AP c)  | d         | -> | nil         | ((args-f-sexp . vals) e-f-sexp) | cl-f-sexp | (s e c d) |
-| (ret-val)       | e' | (RTN)   | (s e c d) | -> | (ret-val s) | e                               | c         | d         |
-|-----------------+----+---------+-----------+----+-------------+---------------------------------+-----------+-----------|
-| ;; LET blocks   |    |         |           |    |             |                                 |           |           |
-| s               | e  | (DUM c) | d         | -> | s           | (OMEGA e)                       | c         | d         |
-| (f-sexp vals s) | (OMEGA e) | (RAP c) | d         | -> | nil         | ~rplaca~((args-f-sexp . vals) e-f-sexp) | cl-f-sexp | (s e c d) | 
+| s               | e                               | c         | d         |
+|-----------------+---------------------------------+-----------+-----------|
+| ;; Application  |                                 |           |           |
+|                 |                                 |           |           |
+| (f-sexp vals s) | e                               | (AP c)    | d         |
+| nil             | ((args-f-sexp . vals) e-f-sexp) | cl-f-sexp | (s e c d) |
+|                 |                                 |           |           |
+| (ret-val)       | e'                              | (RTN)     | (s e c d) |
+| (ret-val s)     | e                               | c         | d         |
+|                 |                                 |           |           |
+|-----------------+---------------------------------+-----------+-----------|
+| ;; ~let~ block  |                                 |           |           |
+|                 |                                 |           |           |
+| s               | e                               | (DUM c)   | d         |
+| s               | (OMEGA e)                       | c         | d         |
+|                 |                                 |           |           |
+| (f-sexp vals s) | (OMEGA e)                       | (RAP c)   | d         |
+| nil             | ~rplaca~                        | cl-f-sexp | (s e c d) |
+|                 | ((args-f-sexp . vals) e-f-sexp) |           |           |
 
 #+CINDEX: push-enter
 Notes: the ~AP~ control works in association with the ~LDF~ which loads a closure on the stack. It pushes the state to the dump register and enters the control list in the closure, within an environment resulting from pushing the association list of function arguments and values from the stack to the environment stored in the closure. The ~RTN~ control, which always terminates a control list in a closure, reinstates the machine state from the dump register and pushes the result (top of the stack) of the function application to the recovered stack.
@@ -779,7 +824,16 @@ As an example, the factorial function in ~funx~ from above:
 #+NAME: fact-secd
 #+CAPTION: The perennial factorial example compiled, 3! in ~ex1.fasl~.
 #+BEGIN_SRC emacs-lisp :results silent :exports code
-(DUM LDF ((n) LDC 1 LD n EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD fac AP LD n MUL JOIN) RTN) LDF ((fac) LDC 3 LD fac AP RTN) RAP STOP)
+(DUM 
+ LDF ((n) LDC 1 
+          LD n 
+          EQ 
+          SEL (LDC 1 JOIN) 
+              (LD n LDC 1 SUB LD fac AP LD n MUL JOIN) 
+          RTN) 
+ LDF ((fac) LDC 3 LD fac AP RTN) 
+ RAP 
+ STOP)
 #+END_SRC
 
 *** Running the funx SECD Abstract Machine
@@ -797,8 +851,276 @@ The executive for the SECD Abstract Machine is found in the ~secd-exec.el~ file.
 #+END_SRC
 
 *** A funx strict compiler
+#+CINDEX: funx (strict compiler)
+#+CINDEX: call-by-value
+The strict compiler translates ~funx~ sexps to SECD Abstract Machine control lists. It is strict, or eager, in the sense that in function applications, arguments are evaluated first, in left-to-right-order, and pushed on the stack; the function code is pushed on the stack and the application control, ~AP~ or ~RAP~ is executed. This is also known as /call-by-value/.
+
+#+CINDEX: call-by-name
+Of course, other strategies are possible. For instance, rather than evaluating the arguments first, which might not be used in the body of the function thus wasting precious computing resources, the translation could substitute the evaluation code for the arguments in the body of the function. This is the /call-by-name/ convention rule. (Note that using call-by-name, functions may be defined even for arguments which computation would not terminate in call-by-value evaluation.)
+
+Following Henderson's book, the strict compiler implements the following translation of sexps:
+
+| ~funx~ sexp                     | SECD Control List                               |
+|---------------------------------+-------------------------------------------------|
+| T v                             | LD v                                            |
+| T (quote s)                     | LDC s                                           |
+| T (add s1 s2)                   | T s2 T s1 ADD                                   |
+| T (leq s1 s2)                   | T s2 T s1 LEQ                                   |
+| T (atom s)                      | T s ATOM                                        |
+| T (car s)                       | T s CAR                                         |
+| T (cdr s)                       | T s CDR                                         |
+| T (cons s1 s2)                  | T s2 T s1 CONS                                  |
+| T (if s1 s2 s3)                 | T s1 SEL (T s2 JOIN) (T s3 JOIN)                |
+| T (lambda (v1 ... vn) s)        | LDF ((v1 ... vn) T s RTN)                       |
+| T (let ((v1 s1) ... (vn sn)) s) | DUM T sn ... T s1 LDF ((v1 ... vn) T s RTN) RAP |
+| T (s s1 ... sn)                 | T sn ... T s1 T s AP                            |
+
+
+where ~v~, ~s1 ... sn~ are variable names, the value of which will be found in the environment register of the SECD machine; and ~s~, ~s1 ... sn~ are well-formed ~funxp~ sexps. (The other arithmetic sexps are translated like ~add~.)
+
+Note that there are minor differences with the translation in Henderson's book, related to the implementation of the environment and to the single ~let~ sexp, which does note distinguishes between recursive and non-recursive blocks.
+
+In Emacs-Lisp the strict compiler is invoked by:
+
+#+ATTR_TEXINFO: :options secd-comp--comp expression names controls
+#+BEGIN_defun
+    /expression/ is the ~funx~ sexp to translate; /names/ is a register of variable names defined in /expression/: this is unused in the strict compiler, but will be used in the NXP lazy variant of the compiler; /controls/ is the recursively built list of controls.
+#+END_defun
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(secd-comp--comp '(mul (quote 2) (quote 3)) nil '(STOP))
+    => (LD 3 LD 2 MUL STOP)
+#+END_SRC
+
+**** Another perennial example, compiling the compiler
+As a footnote to this section, we could not skip the "compile the compiler" exercize! The simple ~funx~ functional language is expressive enough to implement the translation to SECD Abstract Machine control lists. The previous example is found in the ~examples/comp3.lsp~ file, which once compiled with the Emacs-Lisp ~secd-comp--comp~ function above produces the following control list, with the ~funxp~ sexp ~'(mul (quote 2) (quote 3))~ to be compiled loaded (as a constant, ~LDC~) on the stack.
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+  (DUM LDF ((elist) LD nil LD elist EQ SEL (LD nil JOIN) (LD elist
+  CDR LD secd-comp--vars AP LD elist CAR CAR CONS JOIN) RTN)
+  LDF ((elist n c) LD nil LD elist EQ SEL (LD c JOIN) (LD c LD n LD
+  elist CAR CDR CAR LD secd-comp--comp AP LD n LD elist CDR LD
+  secd-comp--list AP JOIN) RTN) LDF ((e n c) LD e ATOM SEL (LD c LD
+  e CONS LDC LD CONS JOIN) (LDC car LD e CAR EQ SEL (LD c LDC CAR
+  CONS LD n LD e CDR CAR LD secd-comp--comp AP JOIN) (LDC cdr LD e
+  CAR EQ SEL (LD c LDC CDR CONS LD n LD e CDR CAR LD
+  secd-comp--comp AP JOIN) (LDC atom LD e CAR EQ SEL (LD c LDC ATOM
+  CONS LD n LD e CDR CAR LD secd-comp--comp AP JOIN) (LDC quote LD
+  e CAR EQ SEL (LD c LD e CDR CAR CONS LDC LDC CONS JOIN) (LDC cons
+  LD e CAR EQ SEL (LD c LDC CONS CONS LD n LD e CDR CAR LD
+  secd-comp--comp AP LD n LD e CDR CDR CAR LD secd-comp--comp AP
+  JOIN) (LDC eq LD e CAR EQ SEL (LD c LDC EQ CONS LD n LD e CDR CAR
+  LD secd-comp--comp AP LD n LD e CDR CDR CAR LD secd-comp--comp AP
+  JOIN) (LDC leq LD e CAR EQ SEL (LD c LDC LEQ CONS LD n LD e CDR
+  CAR LD secd-comp--comp AP LD n LD e CDR CDR CAR LD
+  secd-comp--comp AP JOIN) (LDC add LD e CAR EQ SEL (LD c LDC ADD
+  CONS LD n LD e CDR CAR LD secd-comp--comp AP LD n LD e CDR CDR
+  CAR LD secd-comp--comp AP JOIN) (LDC sub LD e CAR EQ SEL (LD c
+  LDC SUB CONS LD n LD e CDR CAR LD secd-comp--comp AP LD n LD e
+  CDR CDR CAR LD secd-comp--comp AP JOIN) (LDC mul LD e CAR EQ
+  SEL (LD c LDC MUL CONS LD n LD e CDR CAR LD secd-comp--comp AP LD
+  n LD e CDR CDR CAR LD secd-comp--comp AP JOIN) (LDC div LD e CAR
+  EQ SEL (LD c LDC DIV CONS LD n LD e CDR CAR LD secd-comp--comp AP
+  LD n LD e CDR CDR CAR LD secd-comp--comp AP JOIN) (LDC rem LD e
+  CAR EQ SEL (LD c LDC REM CONS LD n LD e CDR CAR LD
+  secd-comp--comp AP LD n LD e CDR CDR CAR LD secd-comp--comp AP
+  JOIN) (LDC if LD e CAR EQ SEL (LDC (JOIN) LD n LD e CDR CDR CDR
+  CAR LD secd-comp--comp AP LDC (JOIN) LD n LD e CDR CDR CAR LD
+  secd-comp--comp AP LDF ((cont-t cont-f) LD c LD cont-f CONS LD
+  cont-t CONS LDC SEL CONS LD n LD e CDR CAR LD secd-comp--comp AP
+  RTN) AP JOIN) (LDC lambda LD e CAR EQ SEL (LD c LDC (RTN) LD n LD
+  e CDR CDR CAR LD secd-comp--comp AP LD e CDR CAR CONS CONS LDC
+  LDF CONS JOIN) (LDC let LD e CAR EQ SEL (LD c LDC RAP CONS
+  LDC (RTN) LD n LD e CDR CDR CAR LD secd-comp--comp AP LD e CDR
+  CAR LD secd-comp--vars AP CONS CONS LDC LDF CONS LD n LD e CDR
+  CAR LD secd-comp--list AP LDC DUM CONS JOIN) (LD c LDC AP CONS LD
+  n LD e CAR LD secd-comp--comp AP LD n LD e CDR LD secd-comp--args
+  AP JOIN) JOIN) JOIN) JOIN) JOIN) JOIN) JOIN) JOIN) JOIN) JOIN)
+  JOIN) JOIN) JOIN) JOIN) JOIN) JOIN) RTN) LDF ((secd-comp--comp
+  secd-comp--list secd-comp--vars) LD nil LD nil LDC (mul '2 '3) LD
+  secd-comp--comp AP RTN) RAP STOP)
+#+END_SRC
+
+Running the SECD machine on this control list then produces the expected:
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+    => (LD 3 LD 2 MUL STOP)
+#+END_SRC
+
+which run again through the SECD machine will finally output ~6~!
+
 * Extending for NXP-style inferencing, funxp
 #+CINDEX: funxp
+#+CINDEX: delay-force
+In order to build the NXP Architecture on top of the ~funx~ functional programming language, we will first extend the features of the language with Henderson's /delay-force/ mechanism for delayed evaluations of sexps.
+
+#+CINDEX: promises
+#+CINDEX: delayed evaluations
+While delayed evaluations expose some of the parallel nature of functional programming languages, where sexps are viewed as separate threads in a network of communicating processes, we will not explore this further in the current implementations[fn:26].
+
+Similarly, while delayed evaluations make it possible to write functional programs which process infinite structures, e.g. infinite lists, this is a feature we will not explore in the following sections.
+
+#+CINDEX: agenda
+#+CINDEX: heuristics
+The NXP Architecture uses delayed evaluations for all evaluations of facts, conditions, rules and hypotheses defined in NXP knowledge bases. The proper order of execution of these delayed evaluations, based on one or more heuristics, constitutes the control structure of an interactive session, also called the /agenda/. In the current implementation, the agenda is simply represented by the global control list of the underlying SECD Machine.
+
+In order to emphasize delayed evaluations, we call the functional language ~funx~ augmented with delayed evaluations: ~funxp~.
+
+** Promises are delayed evaluations
+#+CINDEX: promises
+#+CINDEX: delayed evaluations
+#+CINDEX: lazy evaluation
+Delayed evaluations lead to lazy evaluation of sexps, compared to typical call-by-value eager evaluations @@texinfo:@xref{Henderson1976,,21}.@@ It is usually introduced explicitly in augmenting the well-formed expression with explicit delaying and forcing evaluation, so that ~(delay e)~ and ~(force e)~ are well-formed sexps when ~e~ is a well-formed sexp, and ~(force (delay e))~ has the same value as ~e~.
+
+#+CINDEX: delay
+#+CINDEX: promise
+The value of ~(delay e)~ is a closure-like structure, we call a /promise/. It incorporates a representation of the expression--its compiled control list in the compiler output--and the environment in which to be evaluated.
+
+Note that one interpretation of the delay/force could readily be implemented in ~funx~ without extension. Making an expression ~e~ into a function with no parameter ~(lambda () e)~ has indeed the effect of postponing the evaluation until it is actually called with no argument, ~((lambda () e))~. This intepretation however would cause the function to be evaluated twice if called twice as opposed to once only, as in ~(let ((val (lambda () e))) (cons (val) (val)))~.
+
+An alternative interpretation would be that the value of the delayes function is represented by a closure containing ~e~ which, when forced, is replaced by the value resulting from the evaluation of ~e~. The next forcing would return this previous evaluation result rather than trigger a new evaluation[fn:27]. The ~funx~ control set is thus expanded to make the latter intepretation precise:
+
+| ~funxp~ feature | Control lists |
+|-----------------+---------------|
+| T (delay s)     | LDE T s UPD   |
+| T (force s)     | T s AP0      |
+| T NXP-s         | LDP NXP-s     |
+
+where ~NXP-s~ designates an NXP special sexp (fact, condition, rule, action or hypothesis), and introducing new controls:
+
+#+CINDEX: LDE
+- LDE :: load the following promise on stack
+#+CINDEX: LDP
+- LDP :: load the named promise from the environment
+#+CINDEX: AP0
+- AP0 :: evaluate the promise on top of the stack, stores the result of the evaluation in the promise, or if already evaluated, use that value
+#+CINDEX: UPD
+- UPD :: terminates a promise definition (in LDE argument)
+
+*** lazy-group
+Transitions for the new controls are as follows: 
+
+#+FINDEX: LDE (transition)
+#+FINDEX: LDP (transition)
+#+FINDEX: UPD (transition)
+#+FINDEX: AP0 (transition)
+| s                   | e  | c            | d                             |
+|---------------------+----+--------------+-------------------------------|
+|                     |    |              |                               |
+| s                   | e  | (LDE c . c)  | d                             |
+| ((PROMISE c e) . s) | e  | c            | d                             |
+|                     |    |              |                               |
+|---------------------+----+--------------+-------------------------------|
+|                     |    |              |                               |
+| s                   | e  | (LDP x . c ) | d                             |
+| ((~locate~ x e) . s | e  | c            | d                             |
+|                     |    |              |                               |
+|---------------------+----+--------------+-------------------------------|
+|                     |    |              |                               |
+| ((v e) . s)         | e  | (AP0 . c)    | d                             |
+| (v . s)             | e  | c            | d                             |
+|                     |    |              |                               |
+|---------------------+----+--------------+-------------------------------|
+|                     |    |              |                               |
+| ((PROMISE c e) . s) | e' | (AP0 . c')   | d                             |
+| nil                 | e  | c            | (((PROMISE c e) . s) e' c' d) |
+|                     |    |              |                               |
+|---------------------+----+--------------+-------------------------------|
+|                     |    |              |                               |
+| (v)                 | e  | (UPD)        | (((PROMISE c e) . s) e' c' d) |
+| (v . s)             | e' | c'           | d                             |
+|                     |    |              | and (PROMISE c e) => (v e)    |
+|                     |    |              |                               |
+|---------------------+----+--------------+-------------------------------|
+
+#+CINDEX: promise
+Note that the promise is distinct from a standard closure, having the reserverd keyword ~PROMISE~ when delayed. The ~AP0~ control first checks for this keyword and evaluates the closure as usual if delayed, or returns the result of the previous evaluation if present. (Hence the two lines in the previous table.)
+
+The ~UPD~ control has an additional side-effect which is to update the promise with the result of the evaluation for further reference. Here we rely on the notion than only one update is necessary to alter the promise in place. (Implementations should probably never copy promises and systematically use pointers to premises to alleviate the consistency checks.) Updates affect all the subsequent accesses to the promise.
+
+*** Lazy evaluation
+#+CINDEX: lazy evaluation
+#+CINDEX: lazy compiler
+#+CINDEX: non-strict compiler
+With this feature added in ~funxp~ the precise definition of a lazy evaluator (or compiler for that matter) is obtained by considering a strict evaluator (or compiler) and making the following changes throughout the entire program:
+
+  - delay all arguments to user-defined function sexps.
+  - delay both arguments to ~cons~, @@texinfo:@xref{FriedmanWise1976,,25}.@@ 
+  - delay all definitions in ~let~ recursive blocks.
+  - repeatedly force all arguments to primitives other than ~cons~ (e.g. ~car~ ...)
+  - repeatedly force the test in ~if~ sexps.
+  - repeatedly force the function in applications.
+
+These can be written as simple program /transformations/ performed just before evaluation or compilation of ~funxp~ sexps.
+
+** Rules and Knowledge Bases
+#+CINDEX: interactivity
+#+CINDEX: agenda
+We are now ready to introduce the NXP Architecture specific functional expressions to complete the specification of ~funxp~. All the new well-formed sexps are related to the core novel issues brought forward in rule systems: the issue of /interactivity/ with the user, and more generally with external sources of data required by the inference process on the one hand, and the issue of the control structure(s) in problem-soving--a notoriously complex question [fn:28].
+
+This section focuses on the new constructs introduced by the NXP Architecture rule system. It also provides some motivations for their introduction and intended use in problem representation and problem-solving performance. The next section explains the ~funxp~ compiler which translate these constructs into executable control lists on the SECD Abstract Machine.
+
+#+CINDEX: rule (sexp)
+#+CINDEX: LHS (sexp)
+#+CINDEX: RHS (sexp)
+#+CINDEX: hypothesis (sexp)
+#+CINDEX: condition (sexp)
+#+CINDEX: action (sexp)
+#+CINDEX: context (sexp)
+The general rule sexp in ~funxp~ is as follows:
+
+#+ATTR_TEXINFO: :options rule hypo lhs &optional rhs context
+#+BEGIN_defun
+  A rule sexp where /hypo/ is an hypothesis, or goal; /lhs/, for /left-hand side/ (LHS) is a list of conditions; optional /rhs/, for /right-hand side/ (RHS) is a list of actions; and optional /context/ is a list of sexp property.
+#+END_defun
+
+where:
+
+- hypothesis :: also called a goal, or a hypo, is a symbol which conventionally evaluates to true (~*T*~) when all the conditions in the left-hand side are matched and to false (~*F*~) if any one (or more) of the conditions in the left-hand side does not match.
+- lhs :: a list of conditions.
+- condition :: a sexp which is a ~funxp~ expression that evaluates to true (~*T*~) or false (~*F*~) exclusively.
+- rhs :: a list of actions.
+- action :: a sexp exclusively of the form ~(set s sexp)~ where ~s~ is a symbol and ~sexp~ a well-formed ~funxp~ expression that calculates the value assigned to ~s~.
+- context :: is a property written as ~:context sexp~ where ~sexp~ a well-formed ~funxp~ expression, usually a list of symbols.
+
+#+CINDEX: hypothesis (true)
+The motivation for this compact form is to express that a rule says that when all its condions in the LHS are true (matched by values of data in working memory), the rule /fires/, becomes true,  and the hypothesis becomes true.
+
+#+CINDEX: knowledge base (sexp)
+A knowledge base is a list of rule sexps.
+
+#+CINDEX: hypothesis (false)
+Note that within a knowledge base, a given hypothesis may appear in several rules. By convention, during evaluation if all of these rules evaluate to false (and consequently none is fired) the hypothesis becomes false.
+
+#+CINDEX: hypothesis (neither true, nor false)
+Hence a hypo turns out true if at least one of its rules in the knowledge base is true (and fired); it turns out false if all of its rules in the knowledge base are evaluated to false (hence none fired); and remains /unknown/ if only some of its rules have been evaluated, and to false.
+
+
+*** Interactive user interfaces
+#+CINDEX: rule system
+#+CINDEX: working memory
+In rule systems, see  [[Production Systems and Rule-based Systems]], rules are matched against data which resides in /working memory/. In the current implementation we opt for mapping the working memory into the environment register of the SECD Abstract Machine, and designates each datum simply by a symbol in ~funxp~.
+
+#+CINDEX: ASK
+#+CINDEX: Question (rule system)
+Values for these data may be computed, evaluated, or deduced by the rule system as the problem-solving progresses. Values might also be required, or collected from data sources external to the rule system itself, including from the user. The I/O channel between the rule system and its peripheral systems involves, in its generality, issues of sync/async control in communications. The current implementation simplifies the latter by considering only one data source, the user, and consequently one extension to the set of well-formed ~funxp~ sexps, the /question/. We will see that the management of the question is quite generic and may be easily adapted to other data source, e.g. relational databases or Web Services queries.
+
+The newly introduced well-formed sexp is: ~(question s)~ where ~s~ is a symbol, which naturally translates to "What is the value of s?" (Later, we show how to customise text prompts for the text-based user interface in Emacs.)
+
+#+CINDEX: session
+#+CINDEX: protocol
+This new sexp also introduces the new convention that evaluation stops at a question, waiting for an answer from the user to resume the evaluation at some later point in time. This makes the evaluation by the rule system interactive, as several questions might be asked in the process of running the system. The full cycle of interaction with the rule system, until it terminates, is called a /session/. Sessions are reminiscent of the famous /protocols/ studied by Newell and Simon as a method for eliciting knowledge from human experts.
+
+In the current implementation, the user being the single data source, any symbol, the required value of which is not present in working memory nor can be computed or evaluated by the rule system, is deemed collectable from external data sources, i.e. the user, and a corresponding question is output and evaluation stops.
+
+Note that since more than one data collection for different rules could be going on simultaneously from an evaluation perspective, there could logically be several pending questions at any given output. In the current implementation, as mentioned early, we did not address issues of parallelism which could gracefully handle the synchronization of inference threads within the framework of the ~funxp~ delayed evaluations. Instead we will introduce NXP-specific control structures to captures the proper sequencing of interaction with the user--an important criterion of usability of expert systems, @@texinfo:@xref{Szolovits1982,,33}.@@
+
+Note also that this mechanism may easily be extended to other data sources by introducing similar well-formed expressions, possibly arranged in a stack where failure to find the value of the required symbol in the top of the stack data source cause popping it out and trying the next one, addressing the question to the user at a last resort.
+
+*** Goal-driven evaluation
+*** Event-driven evaluation
+*** Heuristics design space
+
 Promises and delay/force. A mention of thread and parallelism (QLISP, Kugel non-halting computations v. thinking).
 
 Data-driven vs. call: Hewitt mentioned in Sacerdoti as pattern-directed function invocation.
@@ -807,14 +1129,14 @@ NXP-style rules. Rule: Hypo LHS &optional RHS &optional :context.
 
 Glossary of terms: hypo(thesis), cond(itions), LHS/RHS, actions, sign, goal/subgoal, backward/forward chaining, knowcess, gating...
 
-Nelly Aiello 3 control strategies for rule systems.
-
-* Compiling funxp to SECD assembly
+* Compiling funxp
 #+BEGIN_QUOTE
 What seemed to be missing was the desire to compile.
 
 --- Don De Lillo, /The Players/
 #+END_QUOTE
+
+cps-group, io-group
 
 Knowledge base, or rule sets, are compiled to funxp environments.
 
@@ -945,11 +1267,18 @@ From funx.bib
 
 * Footnotes
 
+[fn:28] See e.g. A Comparative Study Of Control Strategies For Expert Systems:
+AGE Implementation Of Three Variations Of PUFF, /Nelleke Aiello/,  AAAI-83 Proceedings, (1983). And @@texinfo:@xref{Newell1972,,3}.@@ 
+
+[fn:27] Merits of both interpretations are compared e.g. in The spineless tagless G-machine, /Simon L Peyton Jones, Jon Salkild/, Proceedings of the fourth international conference on Functional programming languages and computer architecture, pp. 184-201, (1989). 
+
+[fn:26] We refer to the following for multiprocessing aspects of implementation: @@texinfo:@xref{Traub1991,,24},@@ @@texinfo:@xref{Keller1979,,26}.@@ See also: QLISP: A Language For The Interactive Development Of Complex Systems, /E. Sacerdoti, R. Fikes, R. Reboh, D. Sagalowicz, R. J. Waldinger, B. M. Wilber/, Artificial Intelligence Center, SRI, Technical Note 120, March 1976.
+
 [fn:25] For more formal elaborations of the SECD machine see: Call-by-Name, Call-by-Value and the Lambda Calculus, /Gordon Plotkin/ (Theoretical Computer Science , Vol. 1, pp. 125-159, 1975); The Tail-Recursive SECD Machine, /John D. Ramsdell/, Journal of Automated Reasoning volume 23, p. 43–62 (1999); A Rational Deconstruction of Landin's SECD Machine, /Olivier Danvy/, In: Grelck C., Huch F., Michaelson G.J., Trinder P. (eds) Implementation and Application of Functional Languages. IFL 2004. Lecture Notes in Computer Science, vol 3474. Springer, Berlin, Heidelberg. https://doi.org/10.1007/11431664_4 (2005); The SECD Microprocessor: A Verification Case Study, /Brian T. Graham/, The Springer International Series in Engineering and Computer Science (1992).
 
 [fn:24] During the summer 1983, the authors visited Dr Peter Szolovits group at MIT and also met there with Dr. Ramesh Patil. 
 
-[fn:23] See also: A_LispKit Lisp Programming Language, a Modified Denotational Semantics Approach. /Jerinic, Ljubomir./ (1993); An experiment in practical semantics, /Maurice Naftalin/, ESOP 1986: ESOP 86 pp 144-159 (1986); A Compiler For Lispkit Targetted At Henderson's SECD Machine, /Simpson, T.; Birtwistle, G.; Hermann, M.; Graham, B./, Technical Report, University of Calgary (1989).
+[fn:23] See also: A LispKit Lisp Programming Language, a Modified Denotational Semantics Approach. /Jerinic, Ljubomir./ (1993); An experiment in practical semantics, /Maurice Naftalin/, ESOP 1986: ESOP 86 pp 144-159 (1986); A Compiler For Lispkit Targetted At Henderson's SECD Machine, /Simpson, T.; Birtwistle, G.; Hermann, M.; Graham, B./, Technical Report, University of Calgary (1989).
 
 [fn:22] Parallel graph reduction with the (v , G)-machine. /Lennart Augustsson and Thomas Johnsson./ In Proceedings of the fourth international conference on Functional programming languages and computer architecture (FPCA 1989) DOI:https://doi.org/10.1145/99370.99386 
 

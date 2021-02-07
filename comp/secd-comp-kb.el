@@ -38,6 +38,8 @@
 (defvar secd--kb-option-backward-chaining-rhs nil)
 ;; If true, propagates from hypothesis to context-related hypotheses
 (defvar secd--kb-option-context nil)
+;; Comparison function for context annotations, nil defaults to `equal'
+(defvar secd--kb-option-context-compare nil)
 
 ;; KB compiler components
 (require 'secd-comp-kb-sexp)

@@ -1,5 +1,8 @@
 ;;; Algebraic implementation of context links
 ;;; Signs-intermediated link between hypos are represented as matrices (Emacs Lisp vectors).
+;;; 2021-02-07 Updated for custom comparison between context elements
+;;;            in `mat-adjacency'
+
 (defun mat-mul (A B)
   ;; A and B vectors (square n x n matrices)
   (let* ((n (length A))
@@ -48,6 +51,7 @@
 	(aset adj i row)))))
 
 (defun secd-comp-kb-context (alist &optional iterations)
+  (setq -compare-fn secd--kb-option-context-compare)
   (let ((env nil)
 	(mat (mat-nclose (mat-adjacency alist) iterations)))
     (dotimes (i (length alist) env)
