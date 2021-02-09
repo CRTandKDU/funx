@@ -204,7 +204,7 @@ The theory articulates a data-driven phase, reminiscent of or heralding forward-
 All the basic building blocks of AI in Medicine (AIM) were in place.
 
 *** There Were Many, Many Inspiring Accomplishments in AIM
-The early ground-breaking AIM systems were developed by inpired pioneers at Stanford, Pittsburgh University, Rutgers, MIT and a few other innovative centers of AI research in the seventies. These were designed by collaborative teams where computer scientists, MDs and hospitals all worked together, against a background of more traditional approaches to the use of computer in clinical medicine, @@texinfo:@xref{Szolovits1982,,33},@@:
+The early ground-breaking AIM systems were developed by inspired pioneers at Stanford, Pittsburgh University, Rutgers, MIT and a few other innovative centers of AI research in the seventies. These were designed by collaborative teams where computer scientists, MDs and hospitals all worked together, against a background of more traditional approaches to the use of computer in clinical medicine, @@texinfo:@xref{Szolovits1982,,33},@@:
 
 - Flowchart :: or /clinical algorithm/ which encodes, in principle, the sequences of actions a good clinician would perform for any one of some population of patients.
 - Data Bases :: (in two separate words, at the time) enabling, when data is properly captured, the /matching/ of cases to a large body of previous cases.
@@ -269,7 +269,7 @@ MYCIN made popular constructs like /rule interpreters/ (shells) and /rule compil
 
 Its influence was certainly important on the NXP Architecture as its first demonstration knowledge bases, for research purposes, were all from the medical consultation task environment @@texinfo:@xref{Rappaport-1984-15190,,12}.@@ Closer to the CMU campus, INTERNIST-I was a broad-based computer-assisted diagnostic tool developed in the early 1970s at the University of Pittsburgh as an educational experiment[fn:11].
 
-In hindsight, the NXP Architecture design strongly benefitted from the accomplishments of this opening chapter of AIM, @@texinfo:@xref{Szolovits1982,,33},@@[fn:24] @@texinfo:@xref{Clancey1984,,13}.@@ These stepping stones were retrospectively described in 2015 by Pr. Casimir Kulikowski, whose doctoral dissertation, in 1970, described a pattern recognition model which has been successfully used to simulate a doctor's diagnostic process:
+In hindsight, the NXP Architecture design strongly benefited from the accomplishments of this opening chapter of AIM, @@texinfo:@xref{Szolovits1982,,33},@@[fn:24] @@texinfo:@xref{Clancey1984,,13}.@@ These stepping stones were retrospectively described in 2015 by Pr. Casimir Kulikowski, whose doctoral dissertation, in 1970, described a pattern recognition model which has been successfully used to simulate a doctor's diagnostic process:
 
 #+BEGIN_QUOTE 
 During the first half of the 1970’s, several groups working on computational models for clinical decision-making and problem-solving had developed the MYCIN rule-based system for infectious disease therapy assistance at Stanford, the CASNET Causal Associational NETwork model for consultation in glaucoma, at Rutgers, the DIALOG (later renamed INTERNIST) system for differential diagnosis in internal medicine at Pittsburgh, and the PIP (Present Illness Program)
@@ -277,11 +277,11 @@ for diagnosis-driven acquisition of clinical data at MIT and Tufts. These had be
 experimental, instructional, interview-based, and cognitive approaches to the analysis of clinical problem solving, and the causal-taxonomic representation of underlying processes of disease.  While earlier computer models for medical decision-making were predominantly statistical or algorithmic, the new AI approaches developed structured representations of specific clinical domain knowledge over which a general inference engine could reason with a variety of heuristics, and provide advice or suggestions to the consulting user.
 #+END_QUOTE
 
-#+CAPTION: Strategies in CASNET glaucoma consulation program, developed at Rutgers (1971-8) based on /causal association networks/.
+#+CAPTION: Strategies in CASNET glaucoma consultation program, developed at Rutgers (1971-8) based on /causal association networks/.
 #+attr_texinfo: :width 200px :center t
 [[./CASNET.jpg]]
 
-Closing the loop with the early cybernetics endeavours in Medicine of Dr Paycha, the state of the art of AI systems for medical consultation was summarized in computer programs such as NEOMYCIN. Revisiting the "MYCIN experiments" over close to twenty years, and reconfiguring the system for education purposes -- the ultimate use INTERNIST-I was also put to at about the same time -- the following diagram was published:
+Closing the loop with the early cybernetics endeavors in Medicine of Dr Paycha, the state of the art of AI systems for medical consultation was summarized in computer programs such as NEOMYCIN. Revisiting the "MYCIN experiments" over close to twenty years, and reconfiguring the system for education purposes -- the ultimate use INTERNIST-I was also put to at about the same time -- the following diagram was published:
 
 #+CAPTION: Strategies in MYCIN-inspired medical consultation computer programs.
 #+attr_texinfo: :width 200px :center t
@@ -292,10 +292,10 @@ Note the similarities with Dr Paycha's investigations of 1956, allowing for chan
 * How we got here
 The functional perspective motivates revisiting -- once more -- the design of the NXP Architecture. This section elaborates on what is expected of functionalism (as in the philosophy of mind) or of functional languages when it comes to the nature and implementation of the NXP Architecture.
 
-** NXP Archeology and vestigial software artefacts
+** NXP Archeology and vestigial software artifacts
 The seminal ideas, presented in context in the [[* Introduction]] slowly matured over time. Several computer programs, designed as scientific experiments on a computer model of the mind, in typical Newell-Simon style, testify to the long trek in the design space that brought us here and now.
 
-#+CINDEX: differetential diagnosis
+#+CINDEX: differential diagnosis
 #+CINDEX: inference engine
 #+CINDEX: clustering
 #+CINDEX: NEXPERT
@@ -328,7 +328,7 @@ Ned Block lists three sources for functionalism:
 
 #+BEGIN_QUOTE
   - Putnam and Fodor saw mental states in terms of an empirical computational theory of the mind[fn:3]. (A critical assumption in the symbolic v. connectionism recurring debate, where both sides appeal to a form of computation.)
-  - Smart's "topic neutral" analyses led Armstrong and Lewis to a functionalist analysis of mental concepts. (In which /causality/ is emphasised[fn:13].)
+  - Smart's "topic neutral" analyses led Armstrong and Lewis to a functionalist analysis of mental concepts. (In which /causality/ is emphasized[fn:13].)
   - Wittgenstein's idea of /meaning as use/ led to a version of functionalism as a theory of meaning, further developed by Sellars and later Harman.
 #+END_QUOTE
 
@@ -336,7 +336,7 @@ Leveraging the mind-as-computer metaphor (see [[Rules with and without symbols]]
 
   * According to functionalism, the nature of a mental state is just like the nature of an automaton state: constituted by its relations to other states and to inputs and outputs;
   * Hence mental states can be totally characterized in terms that involve only logico-mathematical language and terms for input signals and behavioral outputs. (A syntactic view of characterizing mental processes.)
-  * Mental states, howver, do have /other/ (e.g. physical) properties. These other properties are said to be the /realizations/ of the functional properties. So, although functionalism characterizes the mental in non-mental terms, it does so only by quantifying over realizations of mental states (which would not have delighted behaviorists).
+  * Mental states, however, do have /other/ (e.g. physical) properties. These other properties are said to be the /realizations/ of the functional properties. So, although functionalism characterizes the mental in non-mental terms, it does so only by quantifying over realizations of mental states (which would not have delighted behaviorists).
   * Of course then, one functional state can be realized in different ways. (This, we saw, is a principle in the symbolic AI approach which abstracts the underlying substrate for mental processes.)
   * Conversely, one physical state can realize different functional states in different machines, including the brain.
 
@@ -357,14 +357,14 @@ As mentioned before, the roots of the symbolic AI and functional programming lan
 It is a declarative programming paradigm in which function definitions are trees of expressions that each return a value, rather than a sequence of imperative statements which change the state of the program. In this respect, it naturally blends with declarative knowledge, [[Production Systems and Rule-based Systems][rule systems]].
 
 
-As an exploration path for this research project, we planned to revisit this blending of symbolic processe perspectives, viewed as mental processes and viewed as computer programs expressed in functional languages, leading to an original (re)implementation of the NXP Architecture.
+As an exploration path for this research project, we planned to revisit this blending of symbolic processes perspectives, viewed as mental processes and viewed as computer programs expressed in functional languages, leading to an original (re)implementation of the NXP Architecture.
 
 *** Evaluation, Compilation and Abstract Machines
 A solid trend in programming language design has been the use of operational semantics to define the semantics of a programming language. In this respect, Abstract machines have been effectively used as intermediate and low-level architectures suitable for supporting serious implementations of a wide variety of programming languages, including imperative, functional, and logic programming languages. Abstract machines are distinguished from operational
 semantics by having simple and direct algorithmic implementations that can employ efficient data structures. On the other hand, abstract machines are distinguished from lower-level, machine-code implementations because typically the former uses pattern matching for manipulating data while the latter explicitly addresses the notions of structure sharing, storage allocation, and register allocation[fn:16]. 
 
 #+CINDEX: abstract machine
-#+CINCEX: Emacs-Lisp (implementation language)
+#+CINDEX: Emacs-Lisp (implementation language)
 In the above characterization of abstract machines their use as an intermediate language for compilation is an essential feature. As a result the implementation of a programming language consists of two stages. The implementation of the compiler and the implementation of the abstract machine[fn:17]. These two consecutive stages are the path we followed to build this project of NXP Architecture with a functional perspective. Both the abstract machine implementation and the original compiler implementation are in Emacs-Lisp.
 
 #+CINDEX: funx
@@ -426,7 +426,7 @@ Note that an /intepreter/ for a functional language like ~funx~ can be defined a
 
 #+CINDEX: environment
 #+CINDEX: binding
-Applying a function to its arguments is the /core binding operation/ in ~funx~ and other functional programming languages. Every expression in ~funx~ is evaluated with respect to an environment. An environment is just that, this association between arguments and values (which are simply sexps). In the situation where the functinal expression refers to variables introduced, not as arguments to the application, but locally--one also talks about variables defined outside the scope of the function--the environment needs to be augmented with the bindings for these variables prior to evaluation. This is the role of the ~let~ primitive in ~funx~ which introduces blocks with additional bindings.
+Applying a function to its arguments is the /core binding operation/ in ~funx~ and other functional programming languages. Every expression in ~funx~ is evaluated with respect to an environment. An environment is just that, this association between arguments and values (which are simply sexps). In the situation where the functional expression refers to variables introduced, not as arguments to the application, but locally--one also talks about variables defined outside the scope of the function--the environment needs to be augmented with the bindings for these variables prior to evaluation. This is the role of the ~let~ primitive in ~funx~ which introduces blocks with additional bindings.
 
 #+NAME: foo
 #+BEGIN_SRC emacs-lisp :results silent :exports code
@@ -458,7 +458,7 @@ In this implementation in Emacs-Lisp, environments are simply represented as ass
 #+CINDEX: evaluation (lazy)
 #+CINDEX: call-by-value
 #+CINDEX: call-by-need
-This closure infrastructure in the SECD machine is also critical in implementing /eager/ evaluation or /lazy/ evaluation we alluded to above. In eager, or strict, evaluation, sexps are evaluated immediately as they are mentinoned (call-by-value). In a non-strict language evaluation, values are passed to functions or stored in data structures in unevaluated form, and only evaluated when their value is actually required (call-by-need). There is a long and rich literature on strict v. non strict functional languages, eager v. lazy (sometimes even /lenient/) interpreters and compilers: @@texinfo:@xref{Steele1976,,16},@@ @@texinfo:@xref{Moses1970,,17},@@ @@texinfo:@xref{Traub1991,,24},@@ @@texinfo:@xref{FriedmanWise1976,,25}.@@
+This closure infrastructure in the SECD machine is also critical in implementing /eager/ evaluation or /lazy/ evaluation we alluded to above. In eager, or strict, evaluation, sexps are evaluated immediately as they are mentioned (call-by-value). In a non-strict language evaluation, values are passed to functions or stored in data structures in unevaluated form, and only evaluated when their value is actually required (call-by-need). There is a long and rich literature on strict v. non strict functional languages, eager v. lazy (sometimes even /lenient/) interpreters and compilers: @@texinfo:@xref{Steele1976,,16},@@ @@texinfo:@xref{Moses1970,,17},@@ @@texinfo:@xref{Traub1991,,24},@@ @@texinfo:@xref{FriedmanWise1976,,25}.@@
 
 #+CINDEX: thunk
 #+CINDEX: promise
@@ -495,7 +495,7 @@ The next section of this manual will detail a SECD abstract machine, derived fro
 Two chapters in Henderson's book explain how input-output for the Lispkit LISP variant is implemented on typical hardware. Depending on the underlying implementation hardware, mapping of the abstract machine may vary and primitives for the input and output of sexps are correspondingly required.
 
 #+CINDEX: Emacs-Lisp (implementation language)
-The choice of Emacs-Lisp as an implementation programming language (and execution model) frees us from these developments for the moment. Sexps are naturally parsed and printed out by the Emacs-Lisp machinery, and the abstract ~funx~ machine is mapped almost directly to the underlying Emacs interpreter. A follow on to this project would be to port the abstract machine to another environment (such as Javascript wit Node.js), involving a new mapping of the abstract machine to the concrete one.
+The choice of Emacs-Lisp as an implementation programming language (and execution model) frees us from these developments for the moment. Sexps are naturally parsed and printed out by the Emacs-Lisp machinery, and the abstract ~funx~ machine is mapped almost directly to the underlying Emacs interpreter. A follow on to this project would be to port the abstract machine to another environment (such as Javascript with Node.js), involving a new mapping of the abstract machine to the concrete one.
 
 Consequently well-formed sexps for the ~funx~ language will be expressed here in (a subset of) Emacs-Lisp symbolic expressions.
 
@@ -514,7 +514,7 @@ Moreover, we are interested in developing a compiler for ~funx~ and ~funxp~. Hen
 Concrete ~funx~ programs are (Emacs-Lisp) sexps as per our design choices of implementation language and environment. The following sexps, where ~s~ is any sexp,  ~x~ are atoms and ~e~ well-formed expressions,  are /all/ the well-formed expressions in ~funx~:
 
 #+CINDEX: funx (well-formed expressions)
-#+CINDEX: funx (concrete syntex)
+#+CINDEX: funx (concrete syntax)
 #+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
 #+CINDEX: variable
 - ~x~ :: a variable.
@@ -570,14 +570,14 @@ Note that using the environment both as an association list and as a stack simpl
 
 Constants are always quoted--a point of departure from the Emacs-Lisp convention of not quoting numbers. Operators are defined as prefix as is common in LISP so that ~2 + 2~ is expressed as ~(add (quote 2) (quote 2))~.
 
-Denotational semantics for Lispkit-Lisp and ~funx~ into the set category can be readily developped, leading to provably correct interpreters[fn:23]. The classic difficulty is the sementics of the ~let~ recursive block operator. (The non-recursive ~let~, as in Henderson's Lispkit, is simply reduced to an equivalent ~lambda~ expression, ~(let (x e) e-body)~ being ~(lambda (x) e-body)~ applied to argument ~e~, and presents no difficulty.) The specificity of recursive block is that each variable is evaluated in an environment that binds all the variables in the ~let~ block, so that this /augmented/ environment is a form of fixed point in the operation of binding variables.
+Denotational semantics for Lispkit-Lisp and ~funx~ into the set category can be readily developed, leading to provably correct interpreters[fn:23]. The classic difficulty is the semantics of the ~let~ recursive block operator. (The non-recursive ~let~, as in Henderson's Lispkit, is simply reduced to an equivalent ~lambda~ expression, ~(let (x e) e-body)~ being ~(lambda (x) e-body)~ applied to argument ~e~, and presents no difficulty.) The specificity of recursive block is that each variable is evaluated in an environment that binds all the variables in the ~let~ block, so that this /augmented/ environment is a form of fixed point in the operation of binding variables.
 
 ** FUNX SECD Abstract Machine
 #+CINDEX: SECD
 In this section we borrow freely from Henderson's book for the description of the SECD machine, @@texinfo:@xref{Henderson1980a,,22}.@@ The SECD machine, invented in its original form by Landin, derives its name from the designation of its four principal components, or registers.
 
 - stack :: used to hold values of expressions during computation.
-- environment :: used to hold bindngs of variables to values during computation.
+- environment :: used to hold bindings of variables to values during computation.
 - control list :: used to hold the abstract machine program being executed.
 - dump :: used as a general stack to hold values of other registers, particularly when calling functions
 
@@ -588,7 +588,7 @@ All registers hold sexps that usually are lists of sexps. The entire state of th
 
 ~s e c d -> s' e' c' d'~
 
-The control list constitutes the program of the abstract machine and tells it how to move from state to state, following the sequence of machine transistions each individual control in the list denotes[fn:25]. (Control lists are also called continuations in this info file.)
+The control list constitutes the program of the abstract machine and tells it how to move from state to state, following the sequence of machine transitions each individual control in the list denotes[fn:25]. (Control lists are also called continuations in this info file.)
 
 For instance, and with a bit of heads-on over the next section, let us look at the control list for simple arithmetics:
 
@@ -608,7 +608,7 @@ It introduces three controls:
 - MUL :: Pops values from the stack twice, multiplies them and pushes back the result on the stack.
 - STOP :: Stops the abstract machine, leaving the state untouched.
 
-And the natural execution of this program with initally nulled stack, environment and dump registers would look like the following sequence of transitions:
+And the natural execution of this program with initially nulled stack, environment and dump registers would look like the following sequence of transitions:
 
 | Sequence | s     | e   | c                      | d   |
 |----------+-------+-----+------------------------+-----|
@@ -800,7 +800,7 @@ Notes: the ~AP~ control works in association with the ~LDF~ which loads a closur
 - vals :: popped values from the stack, on for each function argument in order
 - e-f-sexp :: extracts the environment from the closure sexp
 - cl-f-sexp :: extracts the control list from the closure sexp
-- OMEGA :: a litteral constant used as placeholder for the ~car~ of the environment which is altered by,
+- OMEGA :: a literal constant used as placeholder for the ~car~ of the environment which is altered by,
 - rplaca :: replaces OMEGA in its argument by a pointer the association list of function arguments and values from the stack, and returns a pointer to itself (this implements the recursive nature of the ~let~ block)
 
 The ~DUM~ control opens a ~let~ recursive block which expects a ~LDF <closure> RAP~ to terminate it, where the environment in the closure will be altered in-place by pushing the variable definitions in the ~let~ statement.
@@ -838,7 +838,7 @@ As an example, the factorial function in ~funx~ from above:
 
 *** Running the funx SECD Abstract Machine
 #+CINDEX: SECD Machine (running)
-The executive for the SECD Abstract Machine is found in the ~secd-exec.el~ file. It is a simple automata that moves the state of the machine to the next one according to the values of its registers ~s, e, c,~ and ~d~. At each step the transition is looked up into the representation of last section's transition tables, and the transformation of state indicated is performed until the special control ~STOP~ is found.
+The executive for the SECD Abstract Machine is found in the ~secd-exec.el~ file. It is a simple automaton that moves the state of the machine to the next one according to the values of its registers ~s, e, c,~ and ~d~. At each step the transition is looked up into the representation of last section's transition tables, and the transformation of state indicated is performed until the special control ~STOP~ is found.
 
 #+ATTR_TEXINFO: :options secd-cycle stack environment control dump
 #+BEGIN_defun
@@ -882,6 +882,7 @@ Note that there are minor differences with the translation in Henderson's book, 
 
 In Emacs-Lisp the strict compiler is invoked by:
 
+@@html:-- Function <b>secd-comp--comp</b> expression names controls@@
 #+ATTR_TEXINFO: :options secd-comp--comp expression names controls
 #+BEGIN_defun
     /expression/ is the ~funx~ sexp to translate; /names/ is a register of variable names defined in /expression/: this is unused in the strict compiler, but will be used in the NXP lazy variant of the compiler; /controls/ is the recursively built list of controls.
@@ -893,7 +894,7 @@ In Emacs-Lisp the strict compiler is invoked by:
 #+END_SRC
 
 **** Another perennial example, compiling the compiler
-As a footnote to this section, we could not skip the "compile the compiler" exercize! The simple ~funx~ functional language is expressive enough to implement the translation to SECD Abstract Machine control lists. The previous example is found in the ~examples/comp3.lsp~ file, which once compiled with the Emacs-Lisp ~secd-comp--comp~ function above produces the following control list, with the ~funxp~ sexp ~'(mul (quote 2) (quote 3))~ to be compiled loaded (as a constant, ~LDC~) on the stack.
+As a footnote to this section, we could not skip the "compile the compiler" exercise! The simple ~funx~ functional language is expressive enough to implement the translation to SECD Abstract Machine control lists. The previous example is found in the ~examples/comp3.lsp~ file, which once compiled with the Emacs-Lisp ~secd-comp--comp~ function above produces the following control list, with the ~funxp~ sexp ~'(mul (quote 2) (quote 3))~ to be compiled loaded (as a constant, ~LDC~) on the stack.
 
 #+BEGIN_SRC emacs-lisp :results silent :exports code
   (DUM LDF ((elist) LD nil LD elist EQ SEL (LD nil JOIN) (LD elist
@@ -976,9 +977,9 @@ Delayed evaluations lead to lazy evaluation of sexps, compared to typical call-b
 #+CINDEX: promise
 The value of ~(delay e)~ is a closure-like structure, we call a /promise/. It incorporates a representation of the expression--its compiled control list in the compiler output--and the environment in which to be evaluated.
 
-Note that one interpretation of the delay/force could readily be implemented in ~funx~ without extension. Making an expression ~e~ into a function with no parameter ~(lambda () e)~ has indeed the effect of postponing the evaluation until it is actually called with no argument, ~((lambda () e))~. This intepretation however would cause the function to be evaluated twice if called twice as opposed to once only, as in ~(let ((val (lambda () e))) (cons (val) (val)))~.
+Note that one interpretation of the delay/force could readily be implemented in ~funx~ without extension. Making an expression ~e~ into a function with no parameter ~(lambda () e)~ has indeed the effect of postponing the evaluation until it is actually called with no argument, ~((lambda () e))~. This interpretation however would cause the function to be evaluated twice if called twice as opposed to once only, as in ~(let ((val (lambda () e))) (cons (val) (val)))~.
 
-An alternative interpretation would be that the value of the delayes function is represented by a closure containing ~e~ which, when forced, is replaced by the value resulting from the evaluation of ~e~. The next forcing would return this previous evaluation result rather than trigger a new evaluation[fn:27]. The ~funx~ control set is thus expanded to make the latter intepretation precise:
+An alternative interpretation would be that the value of the delayed function is represented by a closure containing ~e~ which, when forced, is replaced by the value resulting from the evaluation of ~e~. The next forcing would return this previous evaluation result rather than trigger a new evaluation[fn:27]. The ~funx~ control set is thus expanded to make the latter interpretation precise:
 
 | ~funxp~ feature | Control lists |
 |-----------------+---------------|
@@ -1034,7 +1035,7 @@ Transitions for the new controls are as follows:
 |---------------------+----+--------------+-------------------------------|
 
 #+CINDEX: promise
-Note that the promise is distinct from a standard closure, having the reserverd keyword ~PROMISE~ when delayed. The ~AP0~ control first checks for this keyword and evaluates the closure as usual if delayed, or returns the result of the previous evaluation if present. (Hence the two lines in the previous table.)
+Note that the promise is distinct from a standard closure, having the reserved keyword ~PROMISE~ when delayed. The ~AP0~ control first checks for this keyword and evaluates the closure as usual if delayed, or returns the result of the previous evaluation if present. (Hence the two lines in the previous table.)
 
 The ~UPD~ control has an additional side-effect which is to update the promise with the result of the evaluation for further reference. Here we rely on the notion than only one update is necessary to alter the promise in place. (Implementations should probably never copy promises and systematically use pointers to premises to alleviate the consistency checks.) Updates affect all the subsequent accesses to the promise.
 
@@ -1056,7 +1057,7 @@ These can be written as simple program /transformations/ performed just before e
 ** Rules and Knowledge Bases
 #+CINDEX: interactivity
 #+CINDEX: agenda
-We are now ready to introduce the NXP Architecture specific functional expressions to complete the specification of ~funxp~. All the new well-formed sexps are related to the core novel issues brought forward in rule systems: the issue of /interactivity/ with the user, and more generally with external sources of data required by the inference process on the one hand, and the issue of the control structure(s) in problem-soving--a notoriously complex question [fn:28].
+We are now ready to introduce the NXP Architecture specific functional expressions to complete the specification of ~funxp~. All the new well-formed sexps are related to the core novel issues brought forward in rule systems: the issue of /interactivity/ with the user, and more generally with external sources of data required by the inference process on the one hand, and the issue of the control structure(s) in problem-solving--a notoriously complex question [fn:28].
 
 This section focuses on the new constructs introduced by the NXP Architecture rule system. It also provides some motivations for their introduction and intended use in problem representation and problem-solving performance. The next section explains the ~funxp~ compiler which translate these constructs into executable control lists on the SECD Abstract Machine.
 
@@ -1069,9 +1070,10 @@ This section focuses on the new constructs introduced by the NXP Architecture ru
 #+CINDEX: context (sexp)
 The general rule sexp in ~funxp~ is as follows:
 
+@@html:-- Function <b>rule</b> hypo lhs [rhs context]@@
 #+ATTR_TEXINFO: :options rule hypo lhs &optional rhs context
 #+BEGIN_defun
-  A rule sexp where /hypo/ is an hypothesis, or goal; /lhs/, for /left-hand side/ (LHS) is a list of conditions; optional /rhs/, for /right-hand side/ (RHS) is a list of actions; and optional /context/ is a list of sexp property.
+  A rule sexp where /hypo/ is an hypothesis, or goal; /lhs/, for /left-hand side/ (LHS) is a list of conditions; optional /rhs/, for /right-hand side/ (RHS) is a list of actions; and optional /context/ is a list of properties.
 #+END_defun
 
 where:
@@ -1084,7 +1086,7 @@ where:
 - context :: is a property written as ~:context sexp~ where ~sexp~ a well-formed ~funxp~ expression, usually a list of symbols.
 
 #+CINDEX: hypothesis (true)
-The motivation for this compact form is to express that a rule says that when all its condions in the LHS are true (matched by values of data in working memory), the rule /fires/, becomes true,  and the hypothesis becomes true.
+The motivation for this compact form is to express that a rule says that when all its conditions in the LHS are true (matched by values of data in working memory), the rule /fires/, becomes true,  and the hypothesis becomes true.
 
 #+CINDEX: knowledge base (sexp)
 A knowledge base is a list of rule sexps.
@@ -1095,7 +1097,6 @@ Note that within a knowledge base, a given hypothesis may appear in several rule
 #+CINDEX: hypothesis (neither true, nor false)
 Hence a hypo turns out true if at least one of its rules in the knowledge base is true (and fired); it turns out false if all of its rules in the knowledge base are evaluated to false (hence none fired); and remains /unknown/ if only some of its rules have been evaluated, and to false.
 
-
 *** Interactive user interfaces
 #+CINDEX: rule system
 #+CINDEX: working memory
@@ -1105,29 +1106,160 @@ In rule systems, see  [[Production Systems and Rule-based Systems]], rules are m
 #+CINDEX: Question (rule system)
 Values for these data may be computed, evaluated, or deduced by the rule system as the problem-solving progresses. Values might also be required, or collected from data sources external to the rule system itself, including from the user. The I/O channel between the rule system and its peripheral systems involves, in its generality, issues of sync/async control in communications. The current implementation simplifies the latter by considering only one data source, the user, and consequently one extension to the set of well-formed ~funxp~ sexps, the /question/. We will see that the management of the question is quite generic and may be easily adapted to other data source, e.g. relational databases or Web Services queries.
 
-The newly introduced well-formed sexp is: ~(question s)~ where ~s~ is a symbol, which naturally translates to "What is the value of s?" (Later, we show how to customise text prompts for the text-based user interface in Emacs.)
+The newly introduced well-formed sexp is: ~(question s)~ where ~s~ is a symbol, which naturally translates to "What is the value of s?" (Later, we show how to customize text prompts for the text-based user interface in Emacs.)
 
 #+CINDEX: session
 #+CINDEX: protocol
 This new sexp also introduces the new convention that evaluation stops at a question, waiting for an answer from the user to resume the evaluation at some later point in time. This makes the evaluation by the rule system interactive, as several questions might be asked in the process of running the system. The full cycle of interaction with the rule system, until it terminates, is called a /session/. Sessions are reminiscent of the famous /protocols/ studied by Newell and Simon as a method for eliciting knowledge from human experts.
 
-In the current implementation, the user being the single data source, any symbol, the required value of which is not present in working memory nor can be computed or evaluated by the rule system, is deemed collectable from external data sources, i.e. the user, and a corresponding question is output and evaluation stops.
+In the current implementation, the user being the single data source, any symbol, the required value of which is not present in working memory nor can be computed or evaluated by the rule system, is deemed collectible from external data sources, i.e. the user, and a corresponding question is output and evaluation stops.
 
 Note that since more than one data collection for different rules could be going on simultaneously from an evaluation perspective, there could logically be several pending questions at any given output. In the current implementation, as mentioned early, we did not address issues of parallelism which could gracefully handle the synchronization of inference threads within the framework of the ~funxp~ delayed evaluations. Instead we will introduce NXP-specific control structures to captures the proper sequencing of interaction with the user--an important criterion of usability of expert systems, @@texinfo:@xref{Szolovits1982,,33}.@@
 
 Note also that this mechanism may easily be extended to other data sources by introducing similar well-formed expressions, possibly arranged in a stack where failure to find the value of the required symbol in the top of the stack data source cause popping it out and trying the next one, addressing the question to the user at a last resort.
 
 *** Goal-driven evaluation
+#+CINDEX: backward chaining
+#+CINDEX: goal (evaluation)
+#+CINDEX: hypothesis (evaluation)
+In goal-driven evaluation, also known as /backward chaining/, the process starts from an unevaluated hypothesis and collects all its rules in the knowledge base in no particular order. Should one the rule already be evaluated to ~*T*~--remember that rules are, like hypotheses, promises and may have been evaluated prior to the current focus--the hypothesis is evaluated to ~*T*~ without further work. If not, the collected rules are evaluated in sequence.
+
+Note that, rules being mapped to promises, if a rule in this sequence has been evaluated prior to the current focus (and necessarily to ~*F*~), it is not re-evaluated, in line with the delay-force mechanism in ~funxp~.
+
+The sequential evaluation stops at the first ~*T*~ rule value, setting the hypothesis to ~*T*~. When all the rules in the sequence end up evaluated to ~*F*~, the hypothesis is set accordingly to ~*F*~.
+
+#+CINDEX: or (evaluation)
+This sequential hypothesis evaluation is a logical ~OR~ of the values of the rules in the knowledge base, which stops at the first logical true value encountered.
+
+**** Evaluating and firing rules
+#+CINDEX: rule (evaluation)
+#+CINDEX: and (evaluation)
+In turn, rule evaluation is performed by a sequential evaluation of the conditions in its LHS, following a logical ~AND~. It stops at the first ~*F*~ value for a condition and sets the rule value to ~*F*~; when all the conditions evaluate to ~*T*~, the rule value is set to ~*T*~.
+
+#+CINDEX: rule firing (evaluation)
+When a rule is evaluated to ~*T*~ during the sequential process its RHS is immediately executed before proceeding to the next rule in sequence. The rule is said to be /fired/.
+
+#+CINDEX: action (evaluation)
+The list of actions in the RHS is evaluated in sequence. In the current implementation only one type of action is present: assignment of a value to a data.
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(set v s)
+#+END_SRC
+
+#+CINDEX: agenda
+#+CINDEX: forward-chaining
+where ~v~ is a variable name, and ~s~ a well-formed ~funxp~ sexp to compute the value assigned to ~v~. The assignment may trigger forward-chaining consequences, e.g. posting conditions in other rules on the agenda for later evaluations.
+
+Note that evaluation of a RHS sexp and an action sexp individually is always ~nil~. It is ignored by the computation thread.
+
+**** Evaluating conditions on subgoals
+#+CINDEX: condition (evaluation)
+Conditions are general ~funxp~ boolean sexps. In addition, ~funxp~ offers two boolean forms for conditions:
+
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(H)
+(not H)
+;; `not' also applies to boolean sexps
+(not s)
+#+END_SRC
+
+where ~H~ is another hypothesis (and ~s~ any other boolean sexp).
+
+#+CINDEX: backward chaining
+#+CINDEX: goal (evaluation)
+#+CINDEX: subgoal (evaluation)
+When the first two forms are encountered in condition evaluation, the current focus is pushed and the hypothesis ~H~ is evaluated. (This is similar to a procedure call in imperative programming languages, or an application in ~funxp~ as ~H~ is a promise.) In the AI established jargon this is the /chaining/, here in backward mode as it goes from goal to subgoal.
+
+Note that with this convention for chaining from conditions to hypothesis, goals are considered as data, hence also reside in working memory during a session.
+
+**** Evaluating conditions on data
+In contrast, when evaluating conditions any required data which is not an hypothesis is asked interactively from the user by default in an interactive session.
+
+#+CINDEX: heuristics
+#+FINDEX: secd--kb-option-backward-chaining-rhs
+If a variable ~v~ is required, for evaluating a condition, which is not an hypothesis but for which there are some rules in the knowledge base that may set its value in their RHS, a heuristics option in the NXP Architecture exists to trigger backward chaining from ~v~ through the RHS of these rules (rather than asking the user in that instance).
+
+@@html:-- Variable <b>secd--kb-option-backward-chaining-rhs</b>@@
+#+ATTR_TEXINFO: :options secd--kb-option-backward-chaining-rhs
+#+BEGIN_defvar
+When switched to true, search for and evaluate rules with RHS setting data required in condition evaluation before asking the user. Set to ~nil~ by default.
+#+END_defvar
+
+**** Suggesting hypotheses in interactive sessions
+#+CINDEX: suggest
+#+CINDEX: agenda
+During interactive sessions, hypotheses can be added for later evaluation by posting them to the agenda (also known as /suggesting/ in the NXP Architecture).
+
 *** Event-driven evaluation
+#+CINDEX: forward chaining
+#+CINDEX: goal (evaluation)
+#+CINDEX: hypothesis (evaluation)
+#+CINDEX: event-driven
+#+CINDEX: data-driven
+#+CINDEX: volunteer
+In event-driven, or data-driven evaluation, data values are stored in working memory, either from a rule RHS action, from an external data source or a calling external process, of by the user assigning values to some of the data (also known as /volunteering/ information in the NXP Architecture).
+
+**** Forward Chaining
+#+CINDEX: what-if
+In the /forward-chaining/ process this value-change events trigger evaluation, or reevaluation of LHS conditions of rules requiring the changed variable. Changing the value of a variable, once an interactive session is terminated, to cause reevaluation of goals is also known as /what-if/ queries in the NXP Architecture.
+
+#+CINDEX: forward chaining
+(Re)evaluated conditions, in turn, cause (re)evaluation of rules, still with the ~AND~ logical connective described above. (Re)evaluated, may then fire, and in turn cause (re)evaluation of hypotheses. If the hypothesis is itself required in a LHS condition, the forward-chaining proceeds with the new focus of attention. Forward-chaining then proceeds generally from data to subgoals, to goals, in a chain of logical deductions.
+
+**** Gating
+#+CINDEX: gating (forward-chaining)
+The NXP Architecture provides a heuristics option to control the forward-chaining deductive step from rule to hypothesis. The rationale for the control is to focus the problem-solving process on confirmed hypotheses or subgoals only, rather than expanding its focus to rules not immediately confirmed by the data at hand. This heuristics is called /gating/ in the NXP Architecture. It applies to forward-chaining and restricts the deductive step from rule to hypothesis to those ~*T*~-valued rules only.
+
+@@html:<b>secd--kb-option-forward-chaining-gate</b>@@
+#+ATTR_TEXINFO: :options secd--kb-option-forward-chaining-gate
+#+BEGIN_defvar
+When true, the deductive step or forward chaining from a rule to its hypothesis is taken only if the rule is found ~*T*~ (gating on). When false, the deductive step is always taken whatever the value of the rule (gating off). The default is gating on.
+#+END_defvar
+
 *** Heuristics design space
+#+CINDEX: heuristics
+Backward- and forward-chaining by no means exhaust the possibilities and nuances of control in problem-solving. It is even debatable that computing is all there is to thinking [fn:5], both from the standpoint of the philosophy of mind and from the standpoint of computer science.
 
-Promises and delay/force. A mention of thread and parallelism (QLISP, Kugel non-halting computations v. thinking).
+Rules may be put to many uses in representing the process of problem-solving, [[Rules are put to many uses in inference]], and together with the various chaining and options already mentioned help explore a large portion of the heuristics design space. In pioneering early AIM systems, other representation schemes were also tested, most notably, /association/ and /weighted association/ (also known as /certainty factors/) relations between data and/or goals, @@texinfo:@xref{Szolovits1982,,33}.@@
 
-Data-driven vs. call: Hewitt mentioned in Sacerdoti as pattern-directed function invocation.
+#+CINDEX: hypothesis (generation)
+#+CINDEX: NCLOSE
+The /hypothesis generation/ phase is a well-identified and delimited step in the problem-solving task at large. While rules can be used for hypothesis generation, particularly in forward-chaining mode, AI research studied many alternative mechanisms very early on. (Dr Paycha's address to the 1956 First International Congress of Cybernetics already explained medical hypothesis generation in medical consultation by associational links from signs, to syndromes, to diseases, for instance, @@texinfo:@xref{Paycha1963,,11}.@@) The early NCLOSE system had a separate initial step of hypothesis generation before switching to a "deductive" mode to logically prove or disprove candidate hypotheses, @@texinfo:@xref{Rappaport-1984-15190,,12}.@@
 
-NXP-style rules. Rule: Hypo LHS &optional RHS &optional :context.
+#+CINDEX: context
+In order to extend the reach of the NXP Architecture in the heuristics design space, the rule model explicitly supports a form of associational linking, called /context/, or context links or evocation links. Each rule sexp may be decorated by an optional ~:context~ property which is a list of symbols, as in this example:
 
-Glossary of terms: hypo(thesis), cond(itions), LHS/RHS, actions, sign, goal/subgoal, backward/forward chaining, knowcess, gating...
+#+BEGIN_SRC emacs-lisp :results silent :exports code
+(rule OBSTRUCTIVE-AIRWAY-DISEASE
+    ((leq SLOPE-F50-FVC 32)
+     (leq 22 SLOPE-F50-FVC))
+    :context '(EMPHYSEMA ASTHMA BRONCHITIS))
+#+END_SRC
+
+where the main hypothesis ~OBSTRUCTIVE-AIRWAY-DISEASE~ may be evocative of one of the following ~EMPHYSEMA, ASTHMA,~ or ~BRONCHITIS~ without necessarily, at this stage of the problem-solving process, a logical or deductive step being involved.
+
+#+CINDEX: hypothesis (evocation)
+#+CINDEX: transitive closure
+The context links are collected for each hypothesis in the knowledge base by merging, without duplicates, the lists of context symbols found in each rule. A simple graph is then constituted by considering two hypotheses /adjacent/ if they share one or more symbols in their respective contexts. Given hypothesis ~H~ we called /evoked hypotheses/ all the hypotheses in this graph that can be reached by following edges, starting from ~H~.
+
+When the evaluation of a hypothesis terminates, all the evoked hypotheses are posted to the end of the agenda for later evaluation, once the backward-/forward-chaining processes reach quiescence. Using context links, the focus of attention of the problem-solving task can switch from one area of the problem-space to another, even when there appears to be no formal logical step represented by rules between both. This control of the focus of attention may find several task-dependent uses: differential diagnosis exploration, inductive links, taxonomic links, frame-slot constructs in frame-based knowledge representations, and so forth.
+
+#+CINDEX: evocation
+Evocation is controlled by a heuristics option:
+
+@@html:-- Variable <b>secd--kb-option-context</b>@@
+#+ATTR_TEXINFO: :options secd--kb-option-context
+#+BEGIN_defvar
+When switched to true, triggers evocation from each hypothesis just evaluated. Set to ~nil~ by default.
+#+END_defvar
+
+Association can be customized by defining custom context elements. The default heuristics is a context defined as a list of symbols, with equality of symbols used to determined the adjacency relation between hypotheses. This can be changed by defining the heuristics option: 
+
+@@html:-- Variable <b>secd--kb-option-context-compare</b>@@
+#+ATTR_TEXINFO: :options secd--kb-option-context-compare
+#+BEGIN_defvar
+When non ~nil~, defines a comparison function to be used when building the adjacency graph of hypotheses from context links. Default value is nil: assumes context lists are lists of symbols and use ~EQUAL~ for comparison.
+#+END_defvar
 
 * Compiling funxp
 #+BEGIN_QUOTE

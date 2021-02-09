@@ -2,6 +2,13 @@
 #+SUBTITLE: FUNXP (See also info file)
 #+AUTHOR: jmc
 
+* TODO Progress on the info file
+The info file turns out to be much more than a user manual, after all.
+
+#+CAPTION: Info file, and more...
+#+NAME:   fig:info
+[[./NXP-infofile.png]]
+
 * DONE Context links, definition and implementation <2021-01-19 mar.>
 Context links in the NXP architecture(s) are the long line descendants of the /signs/ in the original NClose system (1983-4). In the current system, each rule may associate a list of signs to its hypothesis, with the ~:context~ property in the ~rule~ sexp. Signs can be any symbol, and are not necessarily variables appearing in conditions or in actions.
 
