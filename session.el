@@ -119,6 +119,8 @@
 
 (setq session (nxp-session SATFAULT))
 
+
+
 (insert (format "%s\n" (equal '(STOP) (cadddr (assoc 'QUESTION session)))))
 t
 

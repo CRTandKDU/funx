@@ -308,9 +308,11 @@
       (setq clist (cons 'LDP (cons goal (cons 'AP0 clist))))
       )
     ;; Optional hooks
+    (remove-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)
     (add-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)
-    (if secd--kb-option-context
-	(add-hook 'secd-env-update-hook 'secd-comp--kb-context-hook))
+    (when secd--kb-option-context
+      (remove-hook 'secd-env-update-hook 'secd-comp--kb-context-hook)
+      (add-hook 'secd-env-update-hook 'secd-comp--kb-context-hook))
     ;; Setup control list and run
     (let ((state (list s e clist
 		       (cons (cons secd--kb-toplevel-control-list clist) nil))))

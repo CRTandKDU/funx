@@ -2,7 +2,14 @@
 #+SUBTITLE: FUNXP (See also info file)
 #+AUTHOR: jmc
 
-* TODO Progress on the info file
+* DONE Completed v.1.0 with info file <2021-02-12 ven.>
+Completed the first draft info file and fixed the what-if/volunteer command in Encyclopedia.
+
+#+CAPTION: A text-based Emacs client
+#+NAME:   fig:cli
+[[./NXP-cli.png]]
+
+* DONE Progress on the info file
 The info file turns out to be much more than a user manual, after all.
 
 #+CAPTION: Info file, and more...

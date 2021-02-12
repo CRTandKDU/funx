@@ -18,6 +18,17 @@
 
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 
+* Init code                                                        :noexport:
+#+NAME: startup 
+#+BEGIN_SRC emacs-lisp
+(require 'ox-texinfo)
+(visual-line-mode)
+#+END_SRC
+
+#+RESULTS: startup
+: t
+
+
 This manual is for FUNXP, a functional perspective on the NXP Architecture (version {{{version}}}).
 
 * Introduction
@@ -302,8 +313,8 @@ The seminal ideas, presented in context in the [[* Introduction]] slowly matured
 #+CINDEX: AIM
 #+ATTR_TEXINFO: :table-type vtable :sep , :indic asis
 - PHILIPS :: Associative memory; exploration of clustering in Machine Learning (1979-80).
-- NClose :: An AIM inference engine with a focus on differential diagnosis in medical consultation (1982-3). Also Rappaport, A., /Closed Search: an hypothesis evaluator/, Unpublished manuscript, Robotics Institute, Carnegie-Mellon University, (1982).
-- KAA :: Derived from PHILIPS, ML by clustering on the inference paths of the NClose performances (1982-3).
+- NCLOSE :: An AIM inference engine with a focus on differential diagnosis in medical consultation (1982-3). Also Rappaport, A., /Closed Search: an hypothesis evaluator/, Unpublished manuscript, Robotics Institute, Carnegie-Mellon University, (1982).
+- KAA :: Derived from PHILIPS, ML by clustering on the inference paths of the NCLOSE performances (1982-3).
 - SCS :: A knowledge management tool for the KAS/PROSPECTOR rule model, written in OPS 5 (1982-3). Also Mulsant, B., Servan-Schreiber, D. /A Gentle Introduction to Artificial Intelligence in Medicine/. Unpublished manuscript, Robotics Institute, Carnegie-Mellon University, (1982).
 - PROSYL :: Nclose-inspired algorithm for many-objects many-patterns matching à la RETE (1983).
 - AMBER :: Generalizing previous programs: discovery and clustering of sequential observations for prediction (1984).
@@ -1224,7 +1235,17 @@ Rules may be put to many uses in representing the process of problem-solving, [[
 
 #+CINDEX: hypothesis (generation)
 #+CINDEX: NCLOSE
-The /hypothesis generation/ phase is a well-identified and delimited step in the problem-solving task at large. While rules can be used for hypothesis generation, particularly in forward-chaining mode, AI research studied many alternative mechanisms very early on. (Dr Paycha's address to the 1956 First International Congress of Cybernetics already explained medical hypothesis generation in medical consultation by associational links from signs, to syndromes, to diseases, for instance, @@texinfo:@xref{Paycha1963,,11}.@@) The early NCLOSE system had a separate initial step of hypothesis generation before switching to a "deductive" mode to logically prove or disprove candidate hypotheses, @@texinfo:@xref{Rappaport-1984-15190,,12}.@@
+The /hypothesis generation/ phase is a well-identified and delimited step in the problem-solving task at large[fn:30]. While rules can be used for hypothesis generation, particularly in forward-chaining mode, AI research studied many alternative mechanisms very early on. (Dr Paycha's address to the 1956 First International Congress of Cybernetics already explained medical hypothesis generation in medical consultation by associational links from signs, to syndromes, to diseases, for instance, @@texinfo:@xref{Paycha1963,,11}.@@) The early NCLOSE system had a separate initial step of hypothesis generation before switching to a "deductive" mode to logically prove or disprove candidate hypotheses, @@texinfo:@xref{Rappaport-1984-15190,,12}.@@
+
+
+#+CAPTION: Schematic diagram of a system for ill-structured problems. It shows the alternation between a problem solver working on a well-structured problem, and a recognition system continually modifying the problem space. (From Simon, 1973)
+#+attr_texinfo: :width 300px :center t
+[[./EVOCATION.jpg]]
+
+
+#+CINDEX: context
+#+CINDEX: ill-structured problems
+Association links, when used as evoking or noticing, help guide the problem-solving process when confronting /ill-structured/ problems, an analysis brought forward by Herbert Simon. The NXP Architecture provides a generic implementation with the notion of context which can be customized to serve specific heuristics.
 
 #+CINDEX: context
 In order to extend the reach of the NXP Architecture in the heuristics design space, the rule model explicitly supports a form of associational linking, called /context/, or context links or evocation links. Each rule sexp may be decorated by an optional ~:context~ property which is a list of symbols, as in this example:
@@ -1268,6 +1289,313 @@ What seemed to be missing was the desire to compile.
 --- Don De Lillo, /The Players/
 #+END_QUOTE
 
+#+CINDEX: NXP Executive
+#+CINDEX: knowledge base compiler
+We chose to implement the knowledge base compiler to directly output control lists for a SECD Machine embedded within a NXP Executive which runs the machine according to user commands. An alternative would be to extend the simple variant of LISP with knowledge base related well-formed sexps and use the lazy compiler. Instead, we add a set of well-defined NXP-specific controls to the SECD Machine, and their transitions, to directly capture the rule sexps into controls lists, and rely on an external program, the NXP Executive, to implement the heuristics mentioned in the previous section.
+
+Implementing the NXP Architecture from the functional perspective provided by ~funxp~ then requires:
+  - extending the SECD repertoire of control operators to accommodate hypotheses, rules, conditions, actions, and variables; as well as I/O to the user and computing environment (here Emacs);
+  - embedding the SECD automaton into a larger executive that orchestrates the basic processes of backward-chaining, forward-chaining and evocation;
+  - embedding the ~funx~ (eager) compiler into a knowledge-base compiler that produces a complete state for the augmented SECD Abstract Machine to process.
+
+In the current implementation, the embedding of the SECD executive and the augmented executive itself are both written in Emacs-Lisp, like the implementation of the SECD Abstract Machine. For now, it remains an interesting avenue of research to port the machine and the NXP executive to other programming languages and environments, including ~funx~ itself.
+
+The same remark applies to the knowledge base compiler, implemented in Emacs-Lisp in the current implementation. The section on compiling the compiler shows that it might be interesting to port the NXP knowledge base compiler to ~funx~ with some extra work. This "native" compiler could then leverage any of the above SECD + NXP Executive program.
+
+To introduce a formal note, we plan to implement the following:
+
+#+CINDEX: knowcess
+@@html:-- Function <b>secd-comp--kb-knowcess</b> env goals [s var val]@@
+#+ATTR_TEXINFO: :options secd-comp--kb-knowcess env goals &optional s var val
+#+BEGIN_defun
+This runs the NXP SECD Machine on the state (implicitly) provided as arguments.
+
+/env/ is the NXP environment produced by the knowledge base compiler.
+
+/goals/ is a list of initial hypotheses to evaluate. This will be JIT compiled and added to the initially empty control list. These hypotheses were suggested before running the session.
+
+Optional /s/ is an initial stack (usually left at ~nil~).
+
+Optional /var/ and /val/ are lists of variables and values, known initially before running the session. They may have been volunteered before running the session, for instance.
+#+END_defun
+
+@@html:-- Function <b>secd-comp--kb2env</b> kb@@
+#+ATTR_TEXINFO: :options secd-comp--kb2env kb
+#+BEGIN_defun
+Compiles a knowlege base, i.e. a list of ~rule~ sexps into an environment for the augmented SECD Abstract Machine. This environment is passed as a first argument to the /knowcess/ command.
+#+END_defun
+
+In a diagram:
+#+BEGIN_EXAMPLE
+                                                                               
+                                                   S                        S  
+                                                                               
+                                                                               
+                                                                               
+                          +------------+                                       
+                          |            |                                       
+ Knowledge Base ----------|  COMPILER  | --------> E                        E  
+                          |            |                                       
+                          +------------+                 +--------------+      
+                                                         |  NXP + SECD  |      
+                                                         |    MACHINE   |      
+                                                         +--------------+      
+ Initial                                                                       
+  Suggest       ---------------------------------> C                        C  
+  Volunteer                                                                    
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                   D                        D  
+                                                                               
+                                                                               
+                                                Initial                   Final
+                                                 State                    State
+#+END_EXAMPLE
+
+** Mapping NXP to SECD
+#+CINDEX: hypothesis (as a promise)
+#+CINDEX: rule (as a promise)
+#+CINDEX: condition (as a promise)
+#+CINDEX: action (as a promise)
+#+CINDEX: variable (as a promise)
+In the current implementation, the first design choice is to map all the NXP-level entities defined above (hypothesis, rule, condition and action, variable) to promises in the functional programming language ~funxp~. The rationale is that each individual component of rules and knowledge bases can be understood as a functional sexp which evaluation is delayed until needed by the problem-solving process.
+
+#+CINDEX: call-by-need
+#+CINDEX: suggest (command)
+#+CINDEX: volunteer (command)
+#+CINDEX: NXP SECD Machine
+This design choice has several consequences:
+  - The NXP knowledge base compiler produces control lists for every individual entity found in the rule sexps.
+  - Since the promises are evaluated on a call-by-need basis, and the initial focus of attention is provided by the user (through one or several suggest/volunteer commands before running an interactive session), the promises are to be stored in the environment until called by the evaluation process. The output of the knowledge base compiler is therefore an environment ready to be consumed by the NXP SECD Machine.
+  - The starting control list of the NXP SECD Machine will consist of the calls required to evaluate the suggested hypotheses in the environment produced by the compiler, and augmented by the optional volunteer initial commands.
+  - The stack and dump registers of the NXP SECD Machine would usually be empty in the initial state. 
+
+Once the NXP SECD Machine stops (hitting the ~STOP~ control), the stack will show the values of the suggested hypotheses at start, and the environment will be updated with all the evaluations of hypotheses, rules, conditions and variables processed during the interactive session.
+
+#+CINDEX: production memory (in SECD Abstract Machine)
+#+CINDEX: working memory (in SECD Abstract Machine)
+#+CINDEX: agenda (in SECD Abstract Machine)
+This design feature also folds both the /production memory/, containing rules, and the /working memory/, containing data, values and conclusions, into the same implementation structure, the environment. It conflates short-term and long-term memory into the same register of the SECD Machine. The /agenda/, which is the high-level control structure of the NXP Architecture, is then mapped to the control list, the ~c~ register of the NXP SECD Machine.
+
+Another consequence is that events in the environment now need to be monitored by the NXP Executive, outside of the SECD Machine itself. The NXP Executive needs notification of the changes of value in the environment, i.e. on delayed evaluations being forced, to trigger the appropriate side-effects. The implementation of the environment in the basic ~funx~ SECD Machine requires additional instrumentation in the ~funxp~ SECD variant. This is the core of the NXP Executive addition to the ~funxp~ SECD Machine.
+
+The second design choice is to simplify the mapping of the agenda to the ~c~ register by lifting the control list to first-class citizenship in the SECD automaton transitions and introducing several new controls that alter the ~c~ register in-place. These new controls borrow heavily from the /continuation-passing style/ (CPS) in functional programming languages studies, @@texinfo:@xref{Appel1991,,19}.@@[fn:29]
+
+#+BEGIN_EXAMPLE
++--------------------++-----------------+        
+|                    ||                 |        
+| FUNXP SECD MACHINE ||  NXP EXECUTIVE  |        
+|                    ||                 |    USER
+|------------+       ||  E register API |        
+| FUNX SECD  |       ||  C register API |        
+|  MACHINE   |       ||                 |        
++--------------------++-----------------+        
+#+END_EXAMPLE
+
+#+CINDEX: backward chaining (CPS)
+#+CINDEX: forward chaining (CPS)
+#+CINDEX: evocation (CPS)
+Using these new controls, the focus of attention of the problem-solving process is explicitly controlled in the NXP Executive. The new controls are used for implementing backward-chaining, where they act on the top of the control list as on a stack, as well as for forward-chaining and evocation where they act on the end of the control list. 
+
+Finally the I/O with the user is managed by a new control which pauses the NXP SECD Machine when asking the user for a value. The NXP Executive implements the input of the user's answer, usually through a client user-interface (text-based in Emacs).
+
+** I/O extensions
+In order to handle the basic interaction of asking the user for the value of a variable, we introduce a new control ~ASK v~, where ~v~ is a variable which may appear in a condition or an action sexp.
+
+#+CINDEX: ASK (transition)
+| s                   | e | c           | d |
+|---------------------+---+-------------+---|
+|                     |   |             |   |
+| s                   | e | (ASK v . c) | d |
+| (v . s)             | e | c           | d |
+|                     |   | and stop    |   |
+|---------------------+---+-------------+---|
+
+The transition of the ~ASK~ control pushes the variable on the stack and stops the execution process.
+
+#+CINDEX: ASK (answer command)
+Execution of the SECD Machine is resumed by issuing the command /answer/ with the optional argument set to ~t~.
+
+@@html:-- Function <b>secd-answer</b> state val [resume]@@
+#+ATTR_TEXINFO: :options secd-answer state val &optional resume
+#+BEGIN_defun
+Assigns the value /val/ to the variable on top of the stack in /state/, optionally resuming execution of the SECD Machine according to the value of /resume/.
+#+END_defun
+
+With this minimal infrastructure in place, a variable mention in a rule, when not itself an hypothesis in another rule, is compiled to the promise:
+
+~(pressure_out_P3 PROMISE ASK pressure_out_P3 UPD)~
+
+for instance, here the variable is ~pressure_out_P3~ and the associated control list in the promise (ready to be pushed as a closure on the stack with the environment when needed, ~LDP~ control) simply asks the question and stops, waiting for an /answer/ command to resume. 
+
+This is the default output of the knowledge base compiler for variables in the current implementation. Should other data sources come into play, this implementation would require customization.
+
+** Backward Chaining
+#+CINDEX: backward chaining (implementation)
+#+CINDEX: CPS
+#+CINDEX: agenda
+In order to implement backward chaining we introduce NXP-specific controls which alter in-place the control list. These CPS operators represent the higher level agenda operations that drive the focus of attention in the NXP Architecture. These are ~ALL n~, ~ANY n~ which work together with the ~CPS~ control, where ~n~ is a positive integer (the number of rules or the number of conditions in a LHS).
+
+#+CINDEX: ALL (transition)
+#+CINDEX: ANY (transition)
+#+CINDEX: CPS (transition)
+| s             | e | c                       | d                    |
+|---------------+---+-------------------------+----------------------|
+|               |   |                         |                      |
+| (p1 ... pn s) | e | (ALL n . c)             | d                    |
+| (*F* s)       | e | c                       | d                    |
+|               |   | if one of /pi/ is *F*   |                      |
+| (p1 ... pn s) | e | (AP0 CPS . c)           | ((ALL n) d)          |
+|               |   | if not                  |                      |
+|---------------+---+-------------------------+----------------------|
+|               |   |                         |                      |
+| (p1 ... pn s) | e | (ANY n . c)             | d                    |
+| (*T* s)       | e | c                       | d                    |
+|               |   | if one of /pi/ is *T*   |                      |
+| (p1 ... pn s) | e | (AP0 CPS . c)           | ((ANY n) d)          |
+|               |   | if not                  |                      |
+|---------------+---+-------------------------+----------------------|
+|               |   |                         |                      |
+| (p1 ... pn s) | e | (CPS . c)               | (([ALL, ANY, SEQ] d) |
+|               |   |                         | ;; Case: ALL         |
+| (*F* s)       | e | c                       | d                    |
+|               |   | if /p1/ is *F*          |                      |
+| (p2 ... pn s) | e | (AP0 CPS . c)           | ((ALL n-1) d)        |
+|               |   | if /p1/ is *T*, and n>0 |                      |
+| (*T* s)       | e | c                       | d                    |
+|               |   | if all /pi/ are *T*     |                      |
+|---------------+---+-------------------------+----------------------|
+|               |   |                         | ;; Case: ANY         |
+| (*T* s)       | e | c                       | d                    |
+|               |   | if /p1/ is *T*          |                      |
+| (p2 ... pn s) | e | (AP0 CPS . c)           | ((ANY n-1) d)        |
+|               |   | if /p1/ is *F*, and n>0 |                      |
+| (*F* s)       | e | c                       | d                    |
+|               |   | if all /pi/ are *F*     |                      |
+|---------------+---+-------------------------+----------------------|
+|               |   |                         | ;; Case:             |
+| (p2 ... pn s) | e | (AP0 CPS . c)           | ((SEQ n-1) d)        |
+|               |   | if n>0                  |                      |
+| s             | e | c                       | d                    |
+|               |   | if n = 0                |                      |
+|---------------+---+-------------------------+----------------------|
+
+The bulk of the evaluation work is done in the ~CPS~ transition. ~ALL~, ~ANY~ and ~SEQ~ used for RHS actions (and forward chaining) all open the immediate evaluation of ~n~ promises loaded on the stack. So that the knowledge base compiler produces the following promises:
+
+#+CINDEX: hypothesis (compiled)
+#+CINDEX: LHS (compiled)
+#+CINDEX: RHS (compiled)
+- Compiled hypothesis :: ~(H PROMISE LDP rN ... LDP r1 ANY N UPD)~, where the ~rI~ are unique ids for the rules with given hypothesis.
+- Compiled LHS :: ~(LDP cN ... LDP c1 ALL N)~, where the ~cI~ are unique ids for the conditions in the LHS of the rule.
+- Compiled RHS :: ~(LDP aN ... LDP a1 SEQ N)~, where the ~aI~ are unique ids for the RHS actions
+- Compiled rule :: ~(rule PROMISE LDP cN ... LDP c1 ALL N SEL (LDP aM ... LDP a1 SEQ M LDC *T* JOIN) (LDC *F* JOIN) UPD)~ when there are ~N~ conditions and ~M~ actions.
+
+#+CINDEX: ALL (transition)
+#+CINDEX: ANY (transition)
+#+CINDEX: CPS (transition)
+The knowledge base compiler produces an if-LHS-then-RHS construct for each rule, and a control list that performs a logical ~OR~ on these constructs in order to evaluate their hypotheses. The implementation of the ~ANY~, ~ALL~, and ~SEQ~ operators executes 2 steps: 
+  * (i) a pre-execution scan is performed (except for ~SEQ~) looking for promises already forced to ~*T*~ or ~*F*~ according to the logical operator (~OR~, ~AND~) involved in the evaluation. When found, this value is directly propagated upwards to the rule, or to the hypothesis without further computation.
+  * (ii) if none is found in the scan, the ~ANY~/~CPS~, ~ALL~/~CPS~, and ~SEQ~/~CPS~ implement a loop through the ~N~ promises on the stack, evaluating each of them in sequence until resulting in ~*T*~ or ~*F*~ according to the logical operator (~OR~, ~AND~) involved in the evaluation; and all of them unconditionally  for ~SEQ~. 
+
+#+CINDEX: CPS
+This evaluation is performed by altering in-place the top level control list. The ~AP0 CPS~ sequence is repeatedly pushed on the head of the control list, as if on a stack, to switch the focus of attention immediately to the condition or action to be evaluated next.
+
+** Forward Chaining
+#+CINDEX: forward chaining (implementation)
+#+CINDEX: agenda
+#+CINDEX: gating
+#+FINDEX: secd--kb-option-forward-chaining-gate
+In forward chaining, a known data triggers evaluation of the conditions where it is mentioned. Should all the conditions in a LHS so triggered end up true, the rule is then deemed true (or false, respectively, if one of the said conditions is found false). Then again an evaluated rule triggers evaluation of its hypothesis, according to the heuristics option ~secd--kb-option-forward-chaining-gate~.
+
+#+CINDEX: hooks
+In line with the original design choice of mapping the knowledge base to the environment register of the SECD Machine, the starting event is the assignment of a value to a variable, a condition, or a rule in the environment. We implement forward chaining as a callback to the NXP Executive from the SECD Machine on an update event of the ~e~ register. In the current implementation, the callback mechanism relies on Emacs-Lisp /hooks/, @@texinfo:@xref{Hooks, Hooks, Hooks,elisp, The Emacs Lisp Reference Manual}.@@
+
+The environment register of the ~funxp~ machine supports two hooks:
+
+#+FINDEX: secd-comp--kb-forward-hook
+#+FINDEX: secd-comp--kb-knowcess
+@@html:-- Variable <b>secd-env-update-hook</b>@@
+#+ATTR_TEXINFO: :options secd-env-update-hook
+#+BEGIN_defvar
+Default is ~nil~. The NXP Executive provides a forward chaining callback, the function ~secd-comp--kb-forward-hook~ which needs to be installed before running an interactive session if forward chaining is required. This is done:
+
+~(add-hook 'secd-env-update-hook 'secd-comp--kb-forward-hook)~
+
+by default when calling ~secd-comp--kb-knowcess~, [[Compiling funxp]].
+
+Each hook in the list is passed three arguments: 
+- promise :: the variable name (each entity in the knowledge base is represented as a promise in the environment register)
+- val :: the value assigned to that promise by the evaluation process
+- state :: the current state of the SECD Machine ~(s e c d)~
+#+END_defvar
+
+@@html:-- Variable <b>secd-env-locate-hook</b>@@
+#+ATTR_TEXINFO: :options secd-env-locate-hook
+#+BEGIN_defvar
+Default is ~nil~. This hook lists functions to be called on a query to environment for the value of a ~funxp~ variable. It calls each hook function,
+stopping if one of them succeeds by returning a non-‘nil’ value.
+
+Each hook function is passed the arguments:
+- promise :: the variable name (each entity in the knowledge base is represented as a promise in the environment register)
+- state :: the current state of the SECD Machine ~(s e c d)~
+
+If this function stops because one of the hook functions returns a
+non-‘nil’ value, it returns that value; otherwise it returns the default value found in the environment register.
+#+END_defvar
+
+The latter hook can be used to implement external data sources for instance, or to notify an external program, such as a client user interface, that the variable evaluation is needed in the problem-solving process.
+
+#+CINDEX: CPS
+#+CINDEX: heuristics (customization)
+#+CINDEX: agenda (control of)
+The default forward chaining hook operates by altering in-place the top level control list. In contrast to backward chaining though, it adds to the /tail/ of the control list, just before the terminating ~STOP~ control, posting conditions, rules or hypotheses to be evaluated once the current focus of attention is completed. Should this alternation of backward and forward chaining require additional customization or a change of priority, this hook should be removed from the environment hook list and simply replaced by an appropriate one. This extra flexibility encourages experimenting with different agenda control structures to capture problem-specific heuristics.
+
+** Evocation
+#+CINDEX: evocation (implementation)
+#+CINDEX: agenda
+#+FINDEX: secd-env-update-hook
+The evocation also makes use of the ~secd-env-update-hook~. The NXP Executive installs a second default hook for evocation according to the value of the heuristics option: ~secd--kb-option-context~, [[Heuristics design space]].
+
+@@html:-- Function <b>secd-comp--kb-context-hook</b> var val state@@
+#+ATTR_TEXINFO: :options secd-comp--kb-context-hook var val state
+#+BEGIN_defun
+Traverse context links from hypothesis (transitive closure), post evaluation. Note that since it is triggered post evaluation the hook is modulated by the heuristics option controlling forward chaining of rules, the gating ~secd--kb-option-forward-chaining-gate~.
+#+END_defun
+
+The default hook implements evocation by posting hypotheses, found by traversing context links, at the tail of the top level control list, just before the ~STOP~ control. They compete therefore with forward chaining hypotheses postings, priority-wise. The hook mechanism allows for easy customization should the default switch of the focus of attention be adapted to the task domain.
+
+** Compiling it all together
+#+CINDEX: knowledge base (compiling)
+Bringing it all together, the knowledge base compiler produces an environment for the ~funxp~ SECD Machine from the well-formed sexp representing the list of rules. The environment serves as the initial content of the ~e~ register of the machine. It contains uniquely identified promises for each variable, condition, action, rule, and hypothesis in the knowledge base.
+
+This information is insufficient as is, however. The NXP Executive, and particularly the default hooks it installs for forward chaining and context associations, require additional information.
+
+The last major design choice in this implementation is to represent this meta-information on the structure of the knowledge base as simple association lists and store them also in the environment ~e~ register. (The dump ~d~ register is an alternative that could also be considered, if we would rather dedicate the ~e~ register to the knowledge based computation; any database external to the SECD Machine would also be satisfactory.)
+
+#+CINDEX: decoration
+#+CINDEX: decorator
+Hence the knowledge compiler adds several passes to the generation of the promises, adding new meta-information as association lists to the environment. We call each of these alist, a /decoration/ and it is associated to a /decorator/ in the environment:
+
+#+FINDEX: *FWRD-SIGNS*
+- ~*FWRD-SIGNS*~ :: Keeps track for each variable of all the conditions and rules in which it is mentioned. Used by the forward chaining hook.
+#+FINDEX: *FWRD-RULES*
+- ~*FWRD-RULES*~ :: Keeps track of each rule-hypothesis association. Used by the forward chaining hook.
+#+FINDEX: *BWRD-SIGNS*
+- ~*BWRD-SIGNS*~ :: Keeps track of which rules' RHS may set a variable's value. Used in backward chaining when the heuristics option. ~secd--kb-option-backward-chaining-rhs~ is ~t~.
+#+FINDEX: *SECD-TOPLEVEL-CLIST*
+- ~*SECD-TOPLEVEL-CLIST*~ :: The head of the top level control list. Used by all CPS operators, also in both forward chaining and context default hooks.
+#+FINDEX: *KB-PROMPTS*
+- ~*KB-PROMPTS*~ :: Keeps track for each variable of the possible values found in LHS and RHS of rules. Used in answering a question to present a few expected values.
+#+FINDEX: *CONTEXT-SIGNS*
+- ~*CONTEXT-SIGNS*~ :: Keeps track of all context symbols (or sexps) attached to each hypothesis.
+#+FINDEX: *CONTEXT-HYPOS*
+- ~*CONTEXT-HYPOS*~ :: Keeps track, for each hypothesis, of all hypotheses that can be reached by traversing the context links (transitive closure).
+#+FINDEX: *COND-SOURCE*
+- ~*COND-SOURCE*~ :: Keeps a copy of the well-formed ~funxp~ LISP variant sexp for each condition. Used in the what-if mechanism to /un-force/ a promise back to its delayed evaluation status.
+
+** WIP :noexport:
 cps-group, io-group
 
 Knowledge base, or rule sets, are compiled to funxp environments.
@@ -1279,21 +1607,83 @@ Richard Fikes, Deductive Retrieval Mechanisms for State Description Models, 1975
 Decorations and globales.
 
 * An Emacs-based client
+This last section describes a minimal text-based user interface to the ~funxp~ NXP Architecture implementation describes above. The choice of Emacs-Lisp as the implementation language for the NXP SECD Abstract Machine naturally leads to an Emacs text-based client, also written in Emacs-Lisp.
+
+Even without porting the SECD Machine to a different language and environment it is possible to use this Emacs-Lisp implementation as a server to client GUIs developed for a different execution environment. (Or from Emacs issue commands to an ad hoc GUI server, for example using Python + GTK).
+
+#+CINDEX: Encyclopedia
+#+CINDEX: interactive session
+In this section we focus on the discussion of the /Encyclopedia/, a basic client interface for interactive sessions in Emacs.
 
 ** Session. Interactivity. Trace and protocol.
+#+CINDEX: interactive session
+A client user interface introduces the notion of interactive session. The session keeps track of all information required for interacting with the user of the ~funxp~ system before, during and after a problem-solving performance in the chosen task domain.
+
+The session acts as a global variable acted upon by the following commands:
+
+| Status of session | Type of commands              |
+|-------------------+-------------------------------|
+| INITIALIZED       | Load knowledge bases          |
+|                   | Suggest hypothesis            |
+|                   | Volunteer value               |
+|                   | Explore rules, data           |
+|-------------------+-------------------------------|
+| RUNNING           | Answer question               |
+|                   | Suggest hypothesis            |
+|                   | Volunteer value               |
+|                   | Explore rules, data           |
+|                   | Visualize focus of attention  |
+|-------------------+-------------------------------|
+| CLOSED            | What-if queries               |
+|                   | Explore rules, data           |
+|                   | Visualize conclusions, values |
+|                   | Reset                         |
+|-------------------+-------------------------------|
+
+Other client applications would rather use a programmatic API to issue commands and queries to the SECD Machine in its different states.
+
+#+CINDEX: Encyclopedia
+The Encyclopedia is a special buffer in Emacs to visualize and interact with the variables and hypotheses in a knowledge base. It is setup by the function that initialize a new session on a given knowledge base.
+
+#+FINDEX: *SECD-COMP* (buffer)
+#+FINDEX: *SECD-PROTOCOL* (buffer)
+#+FINDEX: *NXP-ENCY* (buffer)
+#+FINDEX: *NXP-SESSION* (buffer)
+#+CINDEX: buffer (trace)
+#+CINDEX: interactive session
+@@html:-- Function <b>nxp_session</b> kb@@
+#+ATTR_TEXINFO: :options nxp-session kb
+#+BEGIN_defun
+The function initializes a new session by compiling the knowledge base argument /kb/. It opens a new Encyclopedia buffer, ~*NXP-ENCY*~ and returns a session (global) variable, called /session/.
+
+In addition it opens a few tracing buffers:
+- *SECD-COMP* :: Traces the compilation of the knowledge base and report errors.
+- *SECD-PROTOCOL* :: Step by step trace of the SECD Machine execution of the top level control list/
+- *NXP-SESSION* :: A buffer keeping track of the high-level interactions of Q&A while the session runs.
+#+END_defun
 
 ** Encyclopedia and tree representation. Commands.
 #+CINDEX: Encylopedia
+#+FINDEX: *NXP-ENCY* (buffer)
+The Encyclopedia buffer, ~*NXP-ENCY*~, acts as the main control dashboard of the ~funxp~ interactive session. It is initialized with a global Emacs-Lisp variable, /session/.
 
+It displays two tables, one for hypotheses, the other for variables in the knowledge base, with names and values at any given time in the interactive session. It is implemented with the so-called /Ewoc/ library, meaning “Emacs’s Widget for Object Collections”, @@texinfo::@xref{Abstract Display, Ewoc, Ewoc, elisp, The Emacs Lisp Reference Manual}.@@
+
+The Encyclopedia supports a very limited set of commands:
+#+CINDEX: Encylopedia (commands)
 #+ATTR_TEXINFO: :table-type vtable 
 #+BEGIN_QUOTE
   - `q' :: Kill Encyclopedia buffer.
-  - `k' :: Suggest hypo at point and knowcess.
-  - `w' :: Volunteer, or What-if, data at point and knowcess.
+  - `k' :: Suggest hypo at point and knowcess immediately.
+  - `w' :: Volunteer, or What-if, data at point and knowcess immediately.
   - `a' :: Answer pending question and resume session.
   - `r' :: Restart session.
-  - `t' :: Open backward-chaining tree of hypo at point.
+  - `t' :: Open backward-chaining tree visualization of hypo at point.
 #+END_QUOTE
+
+#+CINDEX: buffer (visualization)
+#+FINDEX: *NXP-TREE* (buffer)
+At any point during a session, pressing ~t~ when the cursor is over an hypothesis opens up a simple data visualization of the or-and tree of rules and conditions (recursively) attached to the selected hypothesis. The tree visualization is in its own separate buffer, ~*NXP-TREE*~. Its implementation uses the ~tree-widget~ Emacs-Lisp library.
 
 * Bibliography
 Source: ~funx.bib~.
@@ -1399,6 +1789,10 @@ From funx.bib
 
 * Footnotes
 
+[fn:30] For illuminating discussions, see Heuristic Methods for Imposing Structure on Ill-Structured Problems: The Structuring of Medical Diagnostics, /Harry E. Pople, Jr./ in Artificial Intelligence in Medicine, /Edited by Peter Szolovits/, AAAS Selected Symposium 51, (1982); The Structure of Ill Structured Problems, /Herbert A. Simon/, Artificial Intelligence 4, p. 181-201, (1973); Clinical Problem Solving: A Behavioral Analysis, /J.P. Kassirer and G.A. Gorry/, Ann. Int. Med. 89, 245, (1978); Medical Problem Solving: An Analysis of Clinical Reasoning, /A.S. Elstein, L.A. Shulman, and S.A. Sprafka/, Harvard University Press, (1978).
+
+[fn:29] See also: Monadic Style Control Constructs for Inference Systems, /Jean-Marie Chauvet/, Computer Science, ArXiv, (2002). 
+
 [fn:28] See e.g. A Comparative Study Of Control Strategies For Expert Systems:
 AGE Implementation Of Three Variations Of PUFF, /Nelleke Aiello/,  AAAI-83 Proceedings, (1983). And @@texinfo:@xref{Newell1972,,3}.@@ 
 
@@ -1481,3 +1875,7 @@ Match Problem, /Charles L. Forgy/, Artificial Intelligence 19, pp. 17-37, 1982.
 [fn:2] The philosophical perspective so stated does not focus on /how/ the physical symbol system itself is actually realized. It obviously suggests that the human mind is such as system but also that, implicitly, physical symbol systems may be realised in Turing/Von Neumann computer architectures, and computer programs more specifically. And thus in the 1960s and 1970s it became an established practice to research theories about memory, reasoning or beliefs on computer programs as an experimental substrate, drawing conclusions deemed legitimate for cognition in the human mind. Contrast this to current Computational Neurosciences and to Connectionism's neural networks architectures, old and new.
 
 [fn:1] Development of an expert system, /Daniel Sagalowicz/, Expert System, Vol. 1, Issue 2, Oct. 1984. 
+
+# Local Variables:
+# eval: (progn (org-babel-goto-named-src-block "startup") (org-babel-execute-src-block) (outline-hide-sublevels 1))
+# End:

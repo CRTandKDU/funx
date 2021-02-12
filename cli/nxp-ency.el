@@ -155,8 +155,17 @@
 	  (set-buffer (get-buffer-create "*NXP-SESSION*"))
 	  (insert (format "Off session, val: %s\n" val))
 	  )
-	(secd-comp--kb-knowcess (cdr (assoc 'ENVIRONMENT session)) hypos
-				nil var val)
+	(secd-env--update (cdr (assoc 'ENVIRONMENT session)) var val)
+	(let ((question
+	       (secd-comp--kb-knowcess
+		(cdr (assoc 'ENVIRONMENT session))
+		hypos)))
+	  (if (assoc 'QUESTION session)
+	      (setcdr (assoc 'QUESTION session) question)
+	    (push (cons 'QUESTION question) session))
+	  (dolist (w (cdr (assoc 'ENCY session)))
+	    (nxp-ency-update-widget w (caar question)))
+	  )
 	)
        )
       )

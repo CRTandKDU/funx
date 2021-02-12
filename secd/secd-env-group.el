@@ -2,10 +2,12 @@
 ;; Installs forward-chaining using hooks in Emacs-Lisp
 
 (defvar secd-env-update-hook nil)
+(defvar secd-env-locate-hook nil)
 
 (defun secd-env--locate (env var &optional state)
   "Implementation of LD mnemonic as a simple alist lookup."
-  (cdr (assoc var env))
+  (let ((val (run-hook-with-args-until-success  'secd-env-locate-hook var state)))
+    (if val val (cdr (assoc var env))))
   )
 
 (defun secd-env--update (env promise val &optional state)
