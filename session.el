@@ -167,23 +167,47 @@ t
 	 )
        ))
 
+(setq kb '((rule H (((lambda (x z) (leq x (add Y z))) '6 '3)
+		    (foo '5)
+		    )
+		 )
+	   )
+      )
+(setq env (secd-comp--kb2env kb))
+(setq session (nxp-session kb))
 
-(setq alist (cdr (assoc '*CONTEXT-SIGNS* (cdr (assoc 'ENVIRONMENT session)))))
-(mat-nclose (mat-adjacency alist))
-[[1 2 0] [2 1 0] [0 0 0]]
-(secd-comp-kb-context alist)
-((G2 . [1 2 0]) (G1 . [2 1 0]) (H1 . [0 0 0]))
-alist
-((G2 S4 S5) (G1 S4) (H1 S3 S1 S2))
-
+(setq secd-exec-verbose t)
 (secd-cycle
  nil
- '((a . 2) (b . 10)
+ '(
+   (foo . (PROMISE LDF ((n) . (LDC 1 LD n ADD RTN)) UPD))
    )
- '(DUM LDC 4 LDF ((x) LD x LD 2 MUL LD y ADD RTN) LDF ((foo y) LDC 3 LD foo AP RTN) RAP STOP)
+ '(LDC 13 LDP foo AP0 AP STOP)
  nil
  )
 
-(insert (format "%s" SATFAULT))
-((rule TANKS_OUT_PRESSURE_LOW ((leq pressure_out_P3 '20))) (rule TANKS_OUT_PRESSURE_LOW ((leq pressure_out_P4 '20))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P1 '370)))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P2 '370)))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P3 '370)))) (rule ALARM_TANK_WAS_HIGH ((not (leq pressure_P4 '370)))) (rule TANKS_EQUAL ((eq pressure_P2 pressure_P4))) (rule TANKS_EQUAL ((eq pressure_P1 pressure_P3))) (rule ALERT ((leq pressure_P1 '20))) (rule ALERT ((leq pressure_P2 '20))) (rule ALERT ((not (leq pressure_P1 '370)))) (rule ALERT ((not (leq pressure_P2 '370)))) (rule ALERT ((leq pressure_out_P3 '20))) (rule ALERT ((leq pressure_out_P4 '20))) (rule ALERT ((not (leq pressure_out_P3 '370)))) (rule ALERT ((not (leq pressure_out_P4 '370)))) (rule ALARM_TANK_WAS_P1_OR_P2 ((leq pressure_P1 '20))) (rule ALARM_TANK_WAS_P1_OR_P2 ((leq pressure_P2 '20))) (rule ALARM_TANK_WAS_P1_OR_P2 ((not (leq pressure_P1 '370)))) (rule ALARM_TANK_WAS_P1_OR_P2 ((not (leq pressure_P2 '370)))) (rule TANK_P1_OR_P2_WAS_HIGH ((not (leq pressure_P1 '370)))) (rule TANK_P1_OR_P2_WAS_HIGH ((not (leq pressure_P1 '370)))) (rule ACTION_12 ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) ALARM_TANK_WAS_P1_OR_P2 TANK_P1_OR_P2_WAS_HIGH) ((set pressure_P1 '200) (set pressure_P2 '205) (set pressure_P3 '300) (set pressure_P4 '200) (set pressure_out_P3 '200) (set pressure_out_P4 '205) (set pressure_P5 '200))) (rule ACTION_14 ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) ALARM_TANK_WAS_P1_OR_P2 (not TANK_P1_OR_P2_WAS_HIGH)) ((set pressure_P1 '200) (set pressure_P2 '205) (set pressure_P3 '300) (set pressure_P4 '200) (set pressure_out_P3 '200) (set pressure_out_P4 '205))) (rule ACTION_19 ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) ALARM_TANK_WAS_P1_OR_P2 (not (eq pressure_out_P3 pressure_out_P4))) ((set pressure_out_P3 '200) (set pressure_out_P4 '200))) (rule ACTION_4 ((eq CRT_and_KDU 'AGREE) (eq task 'FLUID-TRANSFER) ALERT) ((set pressure_P1 '200) (set pressure_P2 '205) (set pressure_P3 '300) (set pressure_P4 '200) (set pressure_out_P3 '200) (set pressure_out_P4 '205))) (rule DECREASE_DUE_TO_THERMAL_CONDITIONS ((eq CRT_and_KDU 'AGREE) (not (eq task 'FLUID-TRANSFER)) (not ALARM_TANK_WAS_P1_OR_P2) (eq pressure_out_P3 pressure_out_P4))) (rule EXC_P_RISE_V10 (ACTION_12 (eq pressure_P2 pressure_P5))) (rule EXC_P_RISE_V3 (ACTION_12 (eq pressure_P1 pressure_P5))) (rule EXC_P_RISE_V16 (ACTION_4 TANKS_EQUAL ALARM_TANK_WAS_HIGH)) (rule THERMAL_TRANSIENT_CONDITION (ACTION_19 (not TANKS_OUT_PRESSURE_LOW) (eq pressure_out_P3 pressure_out_P4))) (rule POSSIBLE_LEAK (ACTION_19 TANKS_OUT_PRESSURE_LOW (eq pressure_out_P3 pressure_out_P4))) (rule POSSIBLE_LEAK (ACTION_14 TANKS_EQUAL)) (rule POSSIBLE_LEAK (ACTION_4 TANKS_EQUAL (not ALARM_TANK_WAS_HIGH))) (rule MDM_ANALOG_INPUT_PARAMETER_LOSS ((eq CRT_and_KDU 'DISAGREE) ALERT)) (rule XDRC_FAILURE_OR_BIAS (ACTION_14 (not TANKS_EQUAL))) (rule XDRC_FAILURE_OR_BIAS (ACTION_4 (not TANKS_EQUAL))) (rule XDRC_FAILURE_OR_BIAS (ACTION_19 (not (eq pressure_out_P3 pressure_out_P4)))) (rule XDRC_FAILURE_OR_BIAS (ACTION_12 (not (eq pressure_P2 pressure_P5)) (not (eq pressure_P1 pressure_P5)))))
+(secd-comp--comp '(lambda (n) (add n (quote 1))) NAMES nil)
+
+
+(setq session
+      (nxp-session-env 
+       (secd-comp-kb--initfill
+	'(((rule H (((lambda (x z) (leq x (add Y z))) '6 '3)
+		    (foo '5)
+		    )
+		 )
+	   )
+	  :with ((foo . (lambda (n) (leq n (quote 7)))))))))
+
+(cons 'PROMISE (append (secd-comp--comp '(lambda (n) (leq n (quote 7))) NAMES nil) '(UPD)))
+
+
+
+
+
+
+
+   
+
+      
 

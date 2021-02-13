@@ -102,11 +102,11 @@ Returns environment and list of terminals found in conditions."
     )
   )
 
-(defun secd-comp--kb2env (kb)
+(defun secd-comp--kb2env (kb &optional env-init)
   "Compiles a complete environment for knowledge base `kb'."
   ;; Adds typed graph edges in several passes
   (let (
-	(env nil)     ;; Environment incrementally built from rule sexps
+	(env env-init)     ;; Environment incrementally built from rule sexps
 	(hypos nil)   ;; Collect hypotheses
 	(signs nil)   ;; Collect signs, i.e. non-hypo terminals in conds
 	(flist nil)   ;; Forward-chaining signs -> rule alist
@@ -206,10 +206,12 @@ Returns environment and list of terminals found in conditions."
 		  ;; jmc 2021-01-20 Patch to put 'PROMISE kw in environment
 		  (push (cons sign (cons 'PROMISE ctrls)) env)
 		  )
-	      (push (cons sign (cons 'PROMISE (cons 'ASK (cons sign (cons 'UPD nil))))) env))
+	      (if (null (assoc sign env))
+		  (push (cons sign (cons 'PROMISE (cons 'ASK (cons sign (cons 'UPD nil))))) env)))
 	    )
 	;; No: standard ASK <SIGN> UPD control list
-	(push (cons sign (cons 'PROMISE (cons 'ASK (cons sign (cons 'UPD nil))))) env)
+	(if (null (assoc sign env))
+	    (push (cons sign (cons 'PROMISE (cons 'ASK (cons sign (cons 'UPD nil))))) env))
 	)
       )
 

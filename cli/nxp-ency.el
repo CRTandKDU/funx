@@ -341,6 +341,27 @@
     session
     )
   )
+
+(defun nxp-session-env (env)
+  "The NXP session alist contains all runtime information."
+  (let ((session nil))
+    (setq widgets (nxp-ency-init env))
+    (remove-hook	'secd-env-update-hook 'nxp-ency--hook)
+    (add-hook		'secd-env-update-hook 'nxp-ency--hook)
+    (remove-hook	'secd-exec-stop-hook  'nxp-ency--stop-hook)
+    (add-hook		'secd-exec-stop-hook  'nxp-ency--stop-hook)
+    (secd-trace-init)
+    (remove-hook	'secd-exec-control-hook 'secd-trace-hook)
+    (add-hook		'secd-exec-control-hook 'secd-trace-hook)
+    ;; Builds alist
+    (push (cons 'KB kb) session) ;; KB source code 
+    (push (cons 'FASKB (copy-tree env)) session) ;; KB compiled code, immutable
+    (push (cons 'ENVIRONMENT env) session) ;; Initial environment 
+    (push (cons 'ENCY widgets) session) ;; Encyclopedia ewoc-based GUI
+    session
+    )
+  )
+
     
 
 ;; `widgets' is the global return by the call to widget

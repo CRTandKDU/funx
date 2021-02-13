@@ -323,4 +323,22 @@
     )
   )
 
+;;; Explore the notion of mixing functional expressions in knowledge bases.
+;;; 1. Init-fill environment with strictly compiled promises without references
+;;;    knowledge base variables. This defines new LHS operators.
+(defun secd-comp-kb--initfill (kb)
+  "Compiles a knowlege base `kb' in an init-filled environment with the promises found in the `:with' property."
+  (let ((block-defs (plist-get (cdr kb) :with)))
+    (if block-defs
+	(let ((env-init nil) (names nil))
+	  (dolist (def block-defs env-init)
+	    (push
+	     (cons
+	      (car def)
+	      (cons 'PROMISE (append (secd-comp--comp (cdr def) names nil) '(UPD))))
+	     env-init))
+	    (secd-comp--kb2env (car kb) env-init))
+	  (secd-comp--kb2env (car kb)))))
+  
+
 (provide 'secd-comp-kb)

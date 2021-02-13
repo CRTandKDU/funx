@@ -1,3 +1,12 @@
+(defun secd-comp--args-lazy (elist n c)
+  "Compiles a list of expressions in order stated (in application forms)."
+  ;; (insert (format "\t--- comp--args\n\te: %s\n\tn: %s\n\tc: %s\n" elist n c))
+  
+  (if (eq elist nil) c
+    (secd-comp--args-lazy (cdr elist) n (secd-comp--comp-lazy (car elist) n c))
+    )
+  )
+
 
 (defun secd-compile-sexp--lazy (e c)
   "Compiles sexp `e' with continuation `c' and all variables bound to promises.
@@ -23,6 +32,9 @@ Adds variables to alist of names in `n', altering it.
   ;; (insert (format "--\ne: %s\nn: %s\nc: %s\n" e n c))
   ;; 0 arg
   (if (atom e) (add-to-list n (cons secd--kb-LHS-variable e)))
+  (secd-comp--comp-lazy-aux e n c))
+
+(defun secd-comp--comp-lazy-aux (e n c)  
   (if (atom e) (cons 'LDP (cons e (cons 'AP0 c)))
     ;; 1 arg
     (if (eq (car e) 'car)
@@ -88,7 +100,7 @@ Adds variables to alist of names in `n', altering it.
 						 n
 						 (cons 'LDF (cons (cons (secd-comp--vars (car (cdr e))) (secd-comp--comp-lazy (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
 					;; Rest has to be an application
-					(secd-comp--args
+					(secd-comp--args-lazy
 					 (cdr e)
 					 n
 					 (secd-comp--comp-lazy (car e) n (cons 'AP c)))
