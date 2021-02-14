@@ -4,6 +4,9 @@
 (require 'secd-comp-kb)
 (require 'nxp-tree)
 
+(defun ency-substring (s beg end)
+  (if (< (length s) (- end beg)) s (concat (substring s beg end) "...")))
+
 (defun nxp-ency--promise-pp (p)
   (let ((col1 (car p))
 	(col2 (if (and (listp (cdr p)) (equal 'PROMISE (cadr p)))
@@ -30,7 +33,8 @@
       (let ((cstr (format "#%02X%02X%02X" 0 255 255)))
 	(insert
 	 (propertize
-	  (format "%-16s:\t%s" col1 col2)
+	  (format "%-16s:\t%s" col1
+		  (ency-substring (format "%s" col2) 0 32))
 	  'face `(foreground-color . ,cstr)))))
      ;; Current
      ((eq col1 (car (car (cdr (assoc 'QUESTION session)))))
@@ -40,7 +44,8 @@
 	  (format "%-16s:\t%s" col1 col2)
 	  'face `(foreground-color . ,cstr)))))
      ;; Unknown
-     (t (insert (format "%-16s:\t%s" col1 col2)))
+     (t
+      (insert (format "%-16s:\t%s" col1 col2)))
      )
     )
   )
@@ -354,7 +359,7 @@
     (remove-hook	'secd-exec-control-hook 'secd-trace-hook)
     (add-hook		'secd-exec-control-hook 'secd-trace-hook)
     ;; Builds alist
-    (push (cons 'KB kb) session) ;; KB source code 
+    ;; (push (cons 'KB kb) session) ;; KB source code 
     (push (cons 'FASKB (copy-tree env)) session) ;; KB compiled code, immutable
     (push (cons 'ENVIRONMENT env) session) ;; Initial environment 
     (push (cons 'ENCY widgets) session) ;; Encyclopedia ewoc-based GUI

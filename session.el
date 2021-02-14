@@ -189,17 +189,23 @@ t
 (secd-comp--comp '(lambda (n) (add n (quote 1))) NAMES nil)
 
 
-(setq session
-      (nxp-session-env 
-       (secd-comp-kb--initfill
-	'(((rule H (((lambda (x z) (leq x (add Y z))) '6 '3)
-		    (foo '5)
-		    )
-		 )
+
+(setq session (nxp-session-env 
+ (secd-comp-kb--initfill
+  '(((rule H (((lambda (x z) (leq x (add Y z))) '6 '3)
+	      (foo '5)
+	      (foo '16)
+	      )
 	   )
-	  :with ((foo . (lambda (n) (leq n (quote 7)))))))))
+     )
+    :with ((foo . (lambda (n) (leq n (quote 7))))))))
+)
 
 (cons 'PROMISE (append (secd-comp--comp '(lambda (n) (leq n (quote 7))) NAMES nil) '(UPD)))
+
+(insert (format "%s" (substring (format "%s" "HELLO WORLD") 0 3)))
+HEL
+
 
 
 
