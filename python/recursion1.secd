@@ -1,0 +1,16 @@
+    #     '(DUM '
+    #     'LDF ((n) LD n LDC 1 EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD ping AP LD n MUL JOIN) RTN) '
+    #     'LDF ((n) LD n LDC 1 EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD pong AP LD n MUL JOIN) RTN) '
+    #     'LDF ((n) LD n LDC 1 EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD pang AP LD n MUL JOIN) RTN) '
+    #     'LDF ((ping pang pong) LDC 5 LD ping AP RTN) '
+    #     'RAP STOP)' )
+
+(
+DUM
+LDF ((n) LD n LDC 1 EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD ping AP LD n MUL JOIN) RTN)
+LDF ((n) LD n LDC 1 EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD pong AP LD n MUL JOIN) RTN)
+LDF ((n) LD n LDC 1 EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD pang AP LD n MUL JOIN) RTN)
+LDF ((ping pang pong) LDC 5 LD ping AP RTN)
+RAP
+STOP
+)

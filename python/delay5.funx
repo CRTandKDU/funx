@@ -1,0 +1,2 @@
+(let ((fib (lambda (x y) (cons x (cons y (delay (fib (add x y) (add y (add x y)))))))))
+    (car (force (cdr (cdr (fib (quote 1) (quote 1)))))))

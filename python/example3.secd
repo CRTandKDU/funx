@@ -1,0 +1,1 @@
+(DUM LDF ((n) LDC 1 LD n EQ SEL (LDC 1 JOIN) (LD n LDC 1 SUB LD fac AP LD n MUL JOIN) RTN) LDF ((fac) LDC 3 LD fac AP RTN) RAP STOP)

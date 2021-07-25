@@ -1,0 +1,2 @@
+(let ((fac (lambda (n) (if (eq n (quote 1)) (quote 1) (mul n (fac (sub (quote 1) n)))))))
+  (fac (quote 3)))

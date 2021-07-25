@@ -1,0 +1,1 @@
+(let ((inc (lambda (x) (add x (quote 1)))) (exp (lambda (x) (mul (quote 2) x)))) (inc (exp (quote 3))))

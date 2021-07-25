@@ -1,0 +1,55 @@
+(let
+    ((secdcomp (lambda (e n c)
+	    (if (atom e) (cons (quote LD) (cons e c))
+    	  (if (eq (car e) (quote car)) (secdcomp (car (cdr e)) n (cons (quote CAR) c))
+	        (if (eq (car e) (quote cdr)) (secdcomp (car (cdr e)) n (cons (quote CDR) c))
+	            (if (eq (car e) (quote atom)) (secdcomp (car (cdr e)) n (cons (quote ATOM) c))
+		            (if (eq (car e) (quote quote)) (cons (quote LDC) (cons (car (cdr e)) c))
+            		  (if (eq (car e) (quote cons)) (secdcomp (car (cdr e)) n
+            		                                    (secdcomp (car (cdr (cdr e))) n (cons (quote CONS) c)))
+		                (if (eq (car e) (quote eq)) (secdcomp (car (cdr (cdr e))) n
+		                                                (secdcomp (car (cdr e)) n (cons (quote EQ) c)))
+		                    (if (eq (car e) (quote leq)) (secdcomp (car (cdr (cdr e))) n
+		                                                    (secdcomp (car (cdr e)) n (cons (quote LEQ) c)))
+			                    (if (eq (car e) (quote add))
+			                        (secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons (quote ADD) c)))
+			                        (if (eq (car e) (quote sub))
+			                            (secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons (quote SUB) c)))
+			                            (if (eq (car e) (quote mul))
+				                            (secdcomp (car (cdr (cdr e))) n
+				                                (secdcomp (car (cdr e)) n (cons (quote MUL) c)))
+			                                (if (eq (car e) (quote div))
+				                                (secdcomp (car (cdr (cdr e))) n
+				                                    (secdcomp (car (cdr e)) n (cons (quote DIV) c)))
+				                                (if (eq (car e) (quote rem))
+				                                    (secdcomp (car (cdr (cdr e))) n
+				                                        (secdcomp (car (cdr e)) n (cons (quote REM) c)))
+                                        			(if (eq (car e) (quote if))
+	((lambda (contt contf) (secdcomp (car (cdr e)) n (cons (quote SEL) (cons contt (cons contf c)))))
+	    (secdcomp (car (cdr (cdr e))) n (quote (JOIN)))
+		(secdcomp (car (cdr (cdr (cdr e)))) n (quote (JOIN))))
+                                    				    (if (eq (car e) (quote lambda))
+	(cons (quote LDF) (cons (cons (car (cdr e)) (secdcomp (car (cdr (cdr e))) n (quote (RTN)))) c))
+				                                            (if (eq (car e) (quote let))
+	(cons (quote DUM) (secdcomplist (car (cdr e)) n
+	    (cons (quote LDF) (cons (cons (secdcompvars (car (cdr e))) (secdcomp (car (cdr (cdr e))) n (quote (RTN))))
+	                        (cons (quote RAP) c)))))
+    (cons (quote SKP) (secdcompargs (cdr e) n (secdcomp (car e) n (cons (quote AP) c))))
+				))))))))))))))))))
+
+    (secdcomplist (lambda (elist n c)
+	    (if (eq nil elist) c
+	        (secdcomplist (cdr elist) n (secdcomp (car (cdr (car elist))) n c)))))
+
+    (secdcompvars (lambda (elist)
+	    (if (eq nil elist) nil (cons (car (car elist)) (secdcompvars (cdr elist))))))
+
+    (secdcompargs (lambda  (elist n c)
+	    (if (eq nil elist) c (secdcompargs (cdr elist) n (secdcomp (car elist) n c)))))
+    )
+
+    (secdcomp (quote S) nil nil)
+)
+
+
+

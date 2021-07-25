@@ -1,0 +1,5 @@
+(let ((or (lambda (arg)
+        (if (eq nil arg) (quote False)
+            (if (eq (quote True) (car arg)) (quote True)
+                (or (cdr arg)))))))
+    (or (cons (eq (quote 1) (quote 2)) (cons (eq (quote 2) (quote 3)) nil))))

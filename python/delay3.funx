@@ -1,0 +1,1 @@
+(let ((terms (delay (cons (quote 1) terms)))) (car (force terms)))

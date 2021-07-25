@@ -1,0 +1,2 @@
+(let ((myinc (lambda (n) (lambda (x) (add n x)))))
+        ((myinc (quote 2)) (quote 3)))

@@ -1,0 +1,11 @@
+(
+DUM
+LDF ((x)
+ LD x
+ LDE (LDC 1 LD x ADD LDF ((n) LD n LD terms AP RTN) AP UPD)
+ CONS
+ RTN)
+LDF ((terms) LDC 1 LD terms AP CDR AP0 CDR AP0 CDR AP0 CAR RTN)
+RAP
+STOP
+)

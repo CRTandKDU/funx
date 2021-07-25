@@ -1,0 +1,7 @@
+(
+DUM
+LDE (LDC 1 LD terms CONS UPD)
+LDF ((terms) LD terms AP0 CDR AP0 CDR AP0 CAR RTN)
+RAP
+STOP
+)

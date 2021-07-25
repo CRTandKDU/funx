@@ -1,0 +1,75 @@
+(let
+    ((secdcomp
+      (lambda (e n c)
+	(if (atom e) (cons 'LD (cons e c))
+	  ;; 1 arg
+	  (if (eq (car e) 'car)
+	      (secdcomp (car (cdr e)) n (cons 'CAR c))
+	    (if (eq (car e) 'cdr)
+		(secdcomp (car (cdr e)) n (cons 'CDR c))
+	      (if (eq (car e) 'atom)
+		  (secdcomp (car (cdr e)) n (cons 'ATOM c))
+		(if (eq (car e) 'quote)
+		    (cons 'LDC (cons (car (cdr e)) c))
+		  ;; 2 args
+		  (if (eq (car e) 'cons)
+		      (secdcomp (car (cdr e)) n (secdcomp (car (cdr (cdr e))) n (cons 'CONS c)))
+		    (if (eq (car e) 'eq)
+			(secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons 'EQ c)))
+		      (if (eq (car e) 'leq)
+			  (secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons 'LEQ c)))
+			(if (eq (car e) 'add)
+			    (secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons 'ADD c)))
+			  (if (eq (car e) 'sub)
+			      (secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons 'SUB c)))
+			    (if (eq (car e) 'mul)
+				(secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons 'MUL c)))
+			      (if (eq (car e) 'div)
+				  (secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons 'DIV c)))
+				(if (eq (car e) 'rem)
+				    (secdcomp (car (cdr (cdr e))) n (secdcomp (car (cdr e)) n (cons 'REM c)))
+				  ;; 3 args
+				  (if (eq (car e) 'if)
+				      ((lambda (cont-t cont-f)
+					 (secdcomp (car (cdr e)) n
+							  (cons 'SEL (cons cont-t (cons cont-f c)))))
+				       (secdcomp (car (cdr (cdr e))) n '(JOIN))
+				       (secdcomp (car (cdr (cdr (cdr e)))) n '(JOIN)))
+				    ;; many args
+				    (if (eq (car e) 'lambda)
+					(cons 'LDF
+					      (cons
+					       (cons (car (cdr e))
+						     (secdcomp (car (cdr (cdr e))) n '(RTN)))
+					       c)
+					      )
+				      (if (eq (car e) 'let)
+					  (cons 'DUM
+						(secdcomplist
+						 (car (cdr e))
+						 n
+						 (cons 'LDF (cons (cons (secdcompvars (car (cdr e))) (secdcomp (car (cdr (cdr e))) n '(RTN))) (cons 'RAP c)))))
+					;; Rest has to be an application
+					(secd-comp--args
+					 (cdr e)
+					 n
+					 (secdcomp (car e) n (cons 'AP c)))
+					;; Done
+					)
+				      )
+				    )
+				  )))))))))))))
+	))
+     (secdcomplist
+      (lambda (elist n c)
+	(if (eq elist nil) c
+	  (secdcomplist (cdr elist) n
+			   (secdcomp (car (cdr (car elist))) n c)
+			   ))))
+     (secdcompvars
+      (lambda (elist)
+	(if (eq elist nil) nil
+	  (cons (car (car elist)) (secdcompvars (cdr elist))))))
+     )
+  (secdcomp '(mul (quote 2) (quote 3)) nil nil))
+

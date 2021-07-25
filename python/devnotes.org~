@@ -1,0 +1,78 @@
+#+TITLE: PyFUNX
+#+AUTHOR: jmc
+#+DATE: <2021-03-11 jeu.>
+
+* Introduction
+A Python implementation of the ~funx~ SECD Abstract Machine. (See also: [[https://github.com/CRTandKDU/funx][GitHub repository]].) It is based on PyCharm 2020.1.3 Community Edition (Python 2.7.13).
+
+* Compiling
+The compiler is invoked with ~python secd_comp.py~.
+
+#+BEGIN_EXAMPLE
+(venv) C:\Users\jmchauvet\PycharmProjects\SECD>python secd_comp.py -h
+usage: secd_comp.py [-h] [--log LOG] [--verbose] [--alternate ALTERNATE]
+                    infile [outfile]
+
+funx Metacircular Strict Compiler. (jmc) 2021.
+
+positional arguments:
+  infile                funx source file
+  outfile               secd compiled file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --log LOG             logfile (optional)
+  --verbose
+  --alternate ALTERNATE
+                        alternate compiler secd-file
+#+END_EXAMPLE
+
+The compiler loads a SECD-compiled file, with the conventional ~.secd~ extension, which contains the compiler and then runs the SECD Abstract Machine on the concatenation of the compiler code and ~funx~ source code in order to produce the ~funx~ compiled code.
+
+** There are several compilers available
+The initial compiler compiled SECD was bootstrapped by the Emacs-Lisp compiler (see GitHub repository above for details).
+
+List of available compilers:
+
+  - ~compiler.secd~ Initial compiler compiled externally from Emacs-Lisp
+  - ~comp4.secd~ Features ~&rest~ in lambda-args-lists (source in ~comp4.funx~)
+
+** Metacircular compiler
+The ~comp4~ compiler may be compiled with the bootstrapped compiler rather than with the Emacs-Lisp implementation.
+
+#+BEGIN_EXAMPLE
+python secd_comp.py --log comp4.log comp4-1.txt comp4-1.secd
+#+END_EXAMPLE
+
+This compiles the new featured compiler with the original ~compiler.secd~ code to produce the ~comp4-1.secd~ executable file, which may now be used as the new compiler:
+
+#+BEGIN_EXAMPLE
+python secd_comp.py --alternate comp4-1.secd example10.funx
+#+END_EXAMPLE
+
+for a ~funx~ example source using the ~&rest~ feature.
+
+* Running
+The SECD Abstract Machine (or VM) is invoked by ~python secd_run.py~.
+
+#+BEGIN_EXAMPLE
+(venv) C:\Users\jmchauvet\PycharmProjects\SECD>python secd_run.py -h
+usage: secd_run.py [-h] [--log LOG] [--env ENV] [--verbose]
+                   [--outfile OUTFILE]
+                   [infile]
+
+funx VM. (jmc) 2021.
+
+positional arguments:
+  infile             SECD source file
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --log LOG          logfile (optional)
+  --env ENV          global environment (optional)
+  --verbose
+  --outfile OUTFILE  result of execution (optional)
+
+#+END_EXAMPLE
+
+

@@ -1,0 +1,65 @@
+Scratch file:
+
+    # ifoo = secd_sym_get_create('foo')
+    # i4 = secd_sym_get_create('4')
+    # i1 = secd_sym_get_create('1')
+    # print g_symtable
+    # try:
+    #
+    #     tail = secd_mem_cons(
+    #         secd_mem_cons( ifoo,
+    #             secd_mem_cons( i4, NIL, True ), True ), NIL, False)
+    #     tail = secd_mem_cons(
+    #             secd_mem_cons( i1, secd_mem_cons( i1, NIL, True ), True), tail, False )
+    #     tail = secd_mem_cons( ifoo, tail, True )
+    #
+    #     print secd_mem_pp( tail )
+    #     print secd_mem2sexp( tail )
+    # except SECDMemFullError as err:
+    #     print "SECDMemFullError", err.message
+    try:
+        # s1 = parse.secd_sexp2mem( '(LDC 1)' )
+        # s2 = -mem.secd_sym_get_create('STOP')
+        # s3 = parse.secd_sexp2mem( '(foo 1 2)' )
+        # mem.secd_mem_append(s3, s1)
+        # print parse.secd_mem2sexp(s1)
+        # mem.secd_mem_append(s2, s1)
+        # print parse.secd_mem2sexp(s1)
+
+        env = alist.secd_alist_push( -mem.secd_sym_get_create( 'CRTandKDU'),
+                                     -mem.secd_sym_get_create( 'AGREE'),
+                                     mem.NIL)
+        env = alist.secd_alist_push(-mem.secd_sym_get_create('task'),
+                                    -mem.secd_sym_get_create('FLUID_TRANSFER'),
+                                    env)
+        env = alist.secd_alist_push(-mem.secd_sym_get_create('task'),
+                                    parse.secd_sexp2mem( '(T1 T2 T5)' ),
+                                    env)
+        print parse.secd_mem2sexp( env )
+
+        val = alist.secd_alist_assq( mem.secd_sym_get_create( 'CRTandKDU'), env )
+        print parse.secd_mem2sexp(val) if val > 0 else mem.g_symtable[ -val ]
+        val = alist.secd_alist_assq(mem.secd_sym_get_create('stuff'), env)
+        print parse.secd_mem2sexp(val) if val > 0 else mem.g_symtable[-val]
+        key = alist.secd_alist_rassq(mem.secd_sym_get_create('AGREE'), env)
+        print parse.secd_mem2sexp(key) if key > 0 else mem.g_symtable[-key]
+        pair = alist.secd_alist_setq( mem.secd_sym_get_create( 'CRTandKDU'), -mem.secd_sym_get_create( 'DISAGREE'), env)
+        print parse.secd_mem2sexp(pair)
+        env = alist.secd_alist_delq(mem.secd_sym_get_create( 'CRTandKDU'), env)
+        print 'CRTandKDU', parse.secd_mem2sexp(env)
+        env = alist.secd_alist_delq(mem.secd_sym_get_create('truc'), env)
+        print 'truc', parse.secd_mem2sexp(env)
+        env = alist.secd_alist_delq(mem.secd_sym_get_create('task'), env)
+        print 'task', parse.secd_mem2sexp(env)
+        env = alist.secd_alist_delq(mem.secd_sym_get_create('task'), env)
+        print 'task', parse.secd_mem2sexp(env)
+
+        print env, parse.secd_mem2sexp(env)
+        # ast= parse.secd_sexp2mem( '((A . 1) (B . 2) (C 3) STOP))' )
+        # print parse.secd_mem2dot( ast )
+        # print parse.secd_mem_pp( ast )
+        # print parse.secd_mem2sexp(ast)
+    except mem.SECDMemFullError as err:
+        print "SECDMemFullError", err.message
+    # print mem.g_mem
+    # print mem.g_symtable
