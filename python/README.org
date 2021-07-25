@@ -173,4 +173,4 @@ Therefore the piped invocation:
 (720)
 #+END_EXAMPLE
 
-directly produces the expected result 720, as the top of the SECD Absract Machine stack.
+directly produces the expected result 720, as the top of the SECD Abstract Machine stack.
