@@ -56,7 +56,7 @@ is the result of the compilation of the ~funx~ source code for the famous factor
 
 * Design Notes
 ** Memory management: cells and lists
-The new issue brought forward by the Python implementation is of course an old problem of any Lisp implementation: memory management for cells and lists. (See abundant bibliography dating back to the sixties.) In this experimental endeavor we opted for simplicity, possibly at the cost of performance.
+The new issue introduces in the Python implementation is of course an old problem in any Lisp implementation: memory management for cells and lists. (See abundant bibliography dating back to the sixties.) In this experimental endeavor we opted for simplicity, possibly at the cost of performance.
 
 Each cell is a two-pointer block, aptly named the ~car~ and ~cdr~ pointers. Each pointer is a 16-bit integer index in a global Python array (~g_mem~) when positive, and if negative a 16-bit integer index (with sign reversed) in another global Python array, the symbol table (~g_symtable~), which stores all values and symbol regardless of type with possible redundancy. The symbol ~NIL~ is the unique cell with both pointers set to ~0~.
 
@@ -83,6 +83,8 @@ KW_SKP	= -secd_sym_get_create('&skp')
 The garbage collector in this simple implementation is from Henderson's book. Starting from the cells representing the ~S~, ~E~, ~C~ and ~D~ registers of the abstract machine it marks, all cells by following both pointers.
 
 In a second steps all marked cells are released, i.e. both of their pointers are set back to ~0~.
+
+For further development ideas, see also: Baker, Henry G. (4 April 1978), "List processing in real time on a serial computer.", /Communications of the ACM, 21 (4)/: 280–294. 
 
 ** Parser
 The parser provides function to translate lists from memory to printable expressions and back.
